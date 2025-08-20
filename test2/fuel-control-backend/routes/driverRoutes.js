@@ -1,0 +1,25 @@
+import express from "express";
+import {
+  requestFuel,
+  getDriverTransactions,
+  getDriverDetails,
+} from "../controllers/driverController.js";
+import Driver from "../models/Driver.js";
+
+const router = express.Router();
+router.post("/request-fuel", requestFuel);
+router.get("/transactions", getDriverTransactions);
+router.get("/:id/details", getDriverDetails);
+router.get("/:id", async (req, res) => {
+  try {
+    const driver = await Driver.findById(req.params.id).select("-password");
+    if (!driver) {
+      return res.status(404).json({ msg: "Driver not found" });
+    }
+    res.status(200).json(driver);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+export default router;
