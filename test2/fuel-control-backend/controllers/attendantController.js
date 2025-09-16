@@ -173,7 +173,9 @@ export const dispenseFuel = async (req, res) => {
 
     const today = new Date().toDateString();
 
-    // Handle DRIVER
+    // -----------------------------------
+    // DRIVER LOGIC
+    // -----------------------------------
     if (userType === "driver") {
       const driver = await Driver.findById(userId);
       if (!driver || !driver.isApproved) {
@@ -185,6 +187,7 @@ export const dispenseFuel = async (req, res) => {
       const lastFuelDate = driver.lastFuelDate
         ? new Date(driver.lastFuelDate).toDateString()
         : null;
+
       if (lastFuelDate !== today) {
         driver.dailyLimitUsed = 0;
         driver.lastFuelDate = new Date();
@@ -224,13 +227,12 @@ export const dispenseFuel = async (req, res) => {
       stock.litersDispensed += liters;
       await stock.save();
 
-      
       await FuelTransaction.create({
         driver: driver._id,
         gasType,
         liters,
         stationName: fuelAttendant.stationName,
-        attendantName: fuelAttendant.name ,
+        attendantName: fuelAttendant.name,
       });
 
       return res
@@ -238,16 +240,38 @@ export const dispenseFuel = async (req, res) => {
         .json({ message: "Fuel dispensed successfully to driver" });
     }
 
-    // Handle FARMER
+   
     else if (userType === "farmer") {
       const farmer = await Farmer.findById(userId);
-      if (!farmer) {
+      if (!farmer || !farmer.isApproved) {
         return res
           .status(404)
           .json({ message: "Farmer not found or not approved" });
       }
 
-      // Check stock
+    
+      if (!farmer.limitStartDate) farmer.limitStartDate = null;
+      if (farmer.litersUsed15Days == null) farmer.litersUsed15Days = 0;
+
+      const now = new Date();
+      const limitStartDate = farmer.limitStartDate
+        ? new Date(farmer.limitStartDate)
+        : null;
+
+     
+      if (!limitStartDate || (now - limitStartDate) / (1000 * 60 * 60 * 24) > 15) {
+       
+        farmer.litersUsed15Days = 0;
+        farmer.limitStartDate = now;
+      }
+
+      if (farmer.litersUsed15Days + liters > 50) {
+        const daysLeft = 15 - Math.floor((now - new Date(farmer.limitStartDate)) / (1000 * 60 * 60 * 24));
+        return res.status(400).json({
+          message: `You have reached your 50-liter limit. Please wait ${daysLeft > 0 ? daysLeft : 0} day(s) for the next 15-day period.`,
+        });
+      }
+
       const stock = await FuelStock.findOne({
         stationName: fuelAttendant.stationName,
         city: fuelAttendant.city,
@@ -258,11 +282,13 @@ export const dispenseFuel = async (req, res) => {
         return res.status(400).json({ message: "Not enough fuel in stock" });
       }
 
-      // No daily limit logic for farmer here (add if needed)
+      
+      farmer.litersUsed15Days += liters;
+      if (!farmer.limitStartDate) farmer.limitStartDate = now;
+      await farmer.save();
 
       stock.litersDispensed += liters;
       await stock.save();
-    
 
       await FuelTransaction.create({
         farmer: farmer._id,
@@ -277,7 +303,7 @@ export const dispenseFuel = async (req, res) => {
         .json({ message: "Fuel dispensed successfully to farmer" });
     }
 
-    // Invalid user type
+   
     else {
       return res.status(400).json({ message: "Invalid user type" });
     }
@@ -288,6 +314,8 @@ export const dispenseFuel = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
+
+
 
 export async function getAttendantTransactions(req, res) {
   try {

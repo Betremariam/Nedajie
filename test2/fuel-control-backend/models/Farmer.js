@@ -5,6 +5,8 @@ const farmerSchema = new Schema({
   kebele: { type: String, required: true },
   woreda: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  litersUsed15Days: { type: Number, default: 0 },
+  limitStartDate: { type: Date, default: null },
   documentPath: { type: String },
   approvedBy: {
   type: Schema.Types.ObjectId,
