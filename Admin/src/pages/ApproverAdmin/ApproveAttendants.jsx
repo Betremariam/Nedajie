@@ -38,47 +38,86 @@ const ApproveAttendants = () => {
     fetchAttendants();
   }, []);
 
-  if (loading) return <div className="text-center p-4">Loading attendants...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center p-8">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading attendants...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Unapproved Attendants</h1>
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Approve Attendants</h1>
+        <p className="text-gray-600">Review and approve pending attendant registrations</p>
+      </div>
+
       {attendants.length === 0 ? (
-        <p>No pending attendants.</p>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="text-6xl mb-4">👥</div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Pending Approvals</h3>
+          <p className="text-gray-500">All attendants have been reviewed and processed.</p>
+        </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="grid gap-6">
           {attendants.map((attendant) => (
             <div
               key={attendant._id}
-              className="bg-white rounded-lg shadow px-4 py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
-                <p><strong>Name:</strong> {attendant.name}</p>
-                <p><strong>Phone:</strong> {attendant.phone}</p>
-                {attendant.documentUrl && (
-                  <a
-                    href={attendant.documentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold text-lg">
+                        {attendant.name?.charAt(0) || 'A'}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{attendant.name}</h3>
+                      <p className="text-gray-600">{attendant.phone}</p>
+                    </div>
+                  </div>
+                  
+                  {attendant.documentUrl && (
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <a
+                        href={attendant.documentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                      >
+                        View Verification Document
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleApprove(attendant._id)}
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
-                    View Document
-                  </a>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleApprove(attendant._id)}
-                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => handleReject(attendant._id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                >
-                  Reject
-                </button>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleReject(attendant._id)}
+                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Reject
+                  </button>
+                </div>
               </div>
             </div>
           ))}

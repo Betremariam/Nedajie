@@ -15,6 +15,7 @@ import {
   refillFuelStock,
   getFarmerDetails,
   getDriverDetails,
+  createStationOwner,
   getAllOthers,
   getAllDrivers,
   getAllFarmers,
@@ -75,7 +76,8 @@ router.get("/drivers",protectSuper, getAllDrivers);
 router.get("/farmers",protectSuper,getAllFarmers);
 // User details
 router.get("/farmer/:id", protectSuper, getFarmerDetails);    // Farmer eligibility & details
-router.get("/driver/:id", protectSuper, getDriverDetails);    // Driver daily info
+router.get("/driver/:id", protectSuper, getDriverDetails); 
+router.post("/owners", protectSuper, createStationOwner);
 router.get("/others", protectSuper, getAllOthers);
 router.post('/upload-deliveries', upload.single('xlsx'),protectSuper, uploadFuelDeliveries);
 router.get('/deliveries',protectSuper, getFuelDeliveries);

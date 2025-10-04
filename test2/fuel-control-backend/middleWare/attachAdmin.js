@@ -2,7 +2,7 @@ import Admin from "../models/Admin.js";
 
 const attachAdmin = async (req, res, next) => {
   try {
-    const admin = await Admin.findById(req.user.id).select("name email role");
+    const admin = await Admin.findById(req.user.id);
     if (!admin) {
       return res.status(401).json({ msg: "Admin not found" });
     }

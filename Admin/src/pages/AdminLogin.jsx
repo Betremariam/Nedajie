@@ -9,30 +9,38 @@ const AdminLogin = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (!email || !password) {
-      return setError("All fields are required.");
-    }
+  if (!email || !password) {
+    return setError("All fields are required.");
+  }
 
-    try {
-      const res = await loginAdmin({ email, password });
-      const { token, admin } = res.data;
+  try {
+    const res = await loginAdmin({ email, password });
+    const { token, admin, stationIds } = res.data; // <-- include stationId
 
-     localStorage.setItem("adminToken", token); // Use consistent key
-     localStorage.setItem("admin", JSON.stringify(admin)); // Save admin info
+    localStorage.setItem("adminToken", token);
+    localStorage.setItem("admin", JSON.stringify(admin));
 
-      // Navigate based on role
-      if (admin.role === "super") navigate("/super-admin");
-      else if (admin.role === "approver") navigate("/approver");
-      else if (admin.role === "register") navigate("/register");
+    // ✅ Save stationId only if this is a station owner
+   if (admin.role === "stationOwner" && admin.stationIds) {
+  localStorage.setItem("stationIds", JSON.stringify(admin.stationIds));
+        }
 
-    } catch (err) {
-      const msg = err.response?.data?.msg || "Login failed.";
-      setError(msg);
-    }
-  };
+
+    // Navigate based on role
+    if (admin.role === "super") navigate("/super-admin");
+    else if (admin.role === "approver") navigate("/approver");
+    else if (admin.role === "register") navigate("/register");
+    else if (admin.role === "stationOwner") navigate("/owner");
+
+  } catch (err) {
+    const msg = err.response?.data?.msg || "Login failed.";
+    setError(msg);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">

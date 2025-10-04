@@ -4,11 +4,12 @@ import Farmer from "../../models/Farmer.js";
 import Driver from "../../models/Driver.js";
 import Admin from "../../models/Admin.js";
 import OtherUser from "../../models/Others.js";
-import FuelDelivery from '../../models/FuelDelivery.js';
+import FuelDelivery from "../../models/FuelDelivery.js";
+import FuelReceived from "../../models/FuelReceived.js";
 import bcrypt from "bcryptjs";
 import moment from "moment";
-import ExcelJS from 'exceljs';
-import path from 'path';
+import ExcelJS from "exceljs";
+import path from "path";
 
 export async function getAllFuelTransactions(req, res) {
   try {
@@ -33,8 +34,13 @@ export async function getAllFuelStocks(req, res) {
 
 export async function addFuelStock(req, res) {
   try {
-    const { stationName,city, gasType, litersReceived} = req.body;
-    const newStock = new FuelStock({ stationName,city, gasType, litersReceived });
+    const { stationName, city, gasType, litersReceived } = req.body;
+    const newStock = new FuelStock({
+      stationName,
+      city,
+      gasType,
+      litersReceived,
+    });
     await newStock.save();
     res.status(201).json({ msg: "Fuel stock added", stock: newStock });
   } catch (err) {
@@ -59,6 +65,9 @@ export async function updateFuelDispensed(req, res) {
   }
 }
 
+
+
+
 export async function refillFuelStock(req, res) {
   try {
     const { stockId } = req.params;
@@ -67,14 +76,32 @@ export async function refillFuelStock(req, res) {
     const stock = await FuelStock.findById(stockId);
     if (!stock) return res.status(404).json({ msg: "Fuel stock not found" });
 
+    // Update the total liters in FuelStock
     stock.litersReceived += additionalLiters;
     await stock.save();
 
-    res.status(200).json({ msg: "Fuel stock refilled", stock });
+    // Create a FuelReceived record with stationName and city
+    const newRecord = new FuelReceived({
+      station: stock._id,
+      stationName: stock.stationName, // added
+      city: stock.city,               // added
+      gasType: stock.gasType,
+      liters: additionalLiters,
+      date: new Date(),
+    });
+
+    await newRecord.save();
+
+    res.status(200).json({
+      msg: "Fuel stock refilled",
+      stock,
+      record: newRecord,
+    });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
+
 
 export async function getFarmerDetails(req, res) {
   const { id } = req.params;
@@ -85,11 +112,11 @@ export async function getFarmerDetails(req, res) {
       return res.status(404).json({ message: "Farmer not found" });
     }
 
-    const last15Days = moment().subtract(15, 'days').startOf('day').toDate();
+    const last15Days = moment().subtract(15, "days").startOf("day").toDate();
 
     const recentTx = await FuelTransaction.findOne({
       farmer: id,
-      date: { $gte: last15Days }
+      date: { $gte: last15Days },
     });
 
     const isEligible = !recentTx;
@@ -100,9 +127,9 @@ export async function getFarmerDetails(req, res) {
         name: farmer.fullName,
         phoneNumber: farmer.phoneNumber,
         kebele: farmer.kebele,
-        woreda: farmer.woreda
+        woreda: farmer.woreda,
       },
-      isEligible
+      isEligible,
     });
   } catch (error) {
     console.error("Error getting farmer details:", error);
@@ -112,8 +139,7 @@ export async function getFarmerDetails(req, res) {
 
 export async function getAllFarmers(req, res) {
   try {
-    const farmers = await Farmer.find()
-      .populate("approvedBy", "name email");
+    const farmers = await Farmer.find().populate("approvedBy", "name email");
 
     res.status(200).json(farmers);
   } catch (error) {
@@ -121,7 +147,6 @@ export async function getAllFarmers(req, res) {
     res.status(500).json({ message: "Server error" });
   }
 }
-
 
 export async function getDriverDetails(req, res) {
   const { id } = req.params;
@@ -134,7 +159,7 @@ export async function getDriverDetails(req, res) {
 
     const today = moment().startOf("day").toDate();
     const transaction = await FuelTransaction.findOne({
-      driver: id, 
+      driver: id,
       date: { $gte: today },
     });
 
@@ -157,8 +182,7 @@ export async function getDriverDetails(req, res) {
 
 export async function getAllDrivers(req, res) {
   try {
-    const drivers = await Driver.find()
-      .populate("approvedBy", "name email");
+    const drivers = await Driver.find().populate("approvedBy", "name email");
 
     res.status(200).json(drivers);
   } catch (error) {
@@ -166,8 +190,6 @@ export async function getAllDrivers(req, res) {
     res.status(500).json({ message: "Server error" });
   }
 }
-
-
 
 /**
  * Super Admin - Create new admin (approver or registerer)
@@ -181,12 +203,16 @@ export async function createAdmin(req, res) {
     }
 
     if (!["approver", "register"].includes(role)) {
-      return res.status(400).json({ msg: "Invalid role. Must be approver or registerer." });
+      return res
+        .status(400)
+        .json({ msg: "Invalid role. Must be approver or registerer." });
     }
 
     const existing = await Admin.findOne({ email });
     if (existing) {
-      return res.status(400).json({ msg: "Admin with this email already exists." });
+      return res
+        .status(400)
+        .json({ msg: "Admin with this email already exists." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -234,12 +260,48 @@ export async function deleteAdmin(req, res) {
   }
 }
 
+export async function createStationOwner(req, res) {
+  try {
+    const { name, email, password, stationIds } = req.body;
 
+    if (!stationIds || !Array.isArray(stationIds) || stationIds.length === 0) {
+      return res
+        .status(400)
+        .json({ msg: "At least one stationId is required" });
+    }
+
+    const stations = await FuelStock.find({ _id: { $in: stationIds } });
+    if (stations.length !== stationIds.length) {
+      return res.status(404).json({ msg: "One or more stations not found" });
+    }
+
+    const exists = await Admin.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ msg: "Email already used" });
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+
+    const owner = new Admin({
+      name,
+      email,
+      password: hashed,
+      role: "stationOwner",
+      stationIds,
+    });
+
+    await owner.save();
+
+    res.status(201).json({ msg: "Station owner created", ownerId: owner._id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
 
 export async function getAllOthers(req, res) {
   try {
-    const others = await OtherUser.find()
-      .populate("approvedBy", "name email");
+    const others = await OtherUser.find().populate("approvedBy", "name email");
 
     res.status(200).json(others);
   } catch (error) {
@@ -248,18 +310,15 @@ export async function getAllOthers(req, res) {
   }
 }
 
-
-
-
 export async function uploadFuelDeliveries(req, res) {
   const fuelType = req.body.fuelType;
 
   if (!req.file) {
-    return res.status(400).json({ message: 'No XLSX file uploaded' });
+    return res.status(400).json({ message: "No XLSX file uploaded" });
   }
 
-  if (!['diesel', 'benzene'].includes(fuelType)) {
-    return res.status(400).json({ message: 'Invalid fuel type' });
+  if (!["diesel", "benzene"].includes(fuelType)) {
+    return res.status(400).json({ message: "Invalid fuel type" });
   }
 
   try {
@@ -274,17 +333,9 @@ export async function uploadFuelDeliveries(req, res) {
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return; // Skip header
 
-      const [
-        date,
-        customer,
-        destination,
-        citter,
-        fdcNo,
-        volume,
-        region
-      ] = row.values.slice(1); // Skip first empty value
+      const [date, customer, destination, citter, fdcNo, volume, region] =
+        row.values.slice(1); // Skip first empty value
 
-     
       deliveries.push({
         date: date?.toString().trim(),
         customer: customer?.toString().trim(),
@@ -294,36 +345,44 @@ export async function uploadFuelDeliveries(req, res) {
         volume: parseFloat(volume),
         region: region?.toString().trim(),
         fuelType,
-        isConfirmed: false
+        isConfirmed: false,
       });
     });
 
     await FuelDelivery.insertMany(deliveries);
 
-    res.status(200).json({ message: 'Fuel deliveries imported successfully', data: deliveries });
+    res.status(200).json({
+      message: "Fuel deliveries imported successfully",
+      data: deliveries,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Failed to process fuel deliveries', error: error.message });
+    res.status(500).json({
+      message: "Failed to process fuel deliveries",
+      error: error.message,
+    });
   }
 }
-
-   
-
 
 export async function getFuelDeliveries(req, res) {
   const fuelType = req.query.fuelType;
 
-  if (!['benzene', 'diesel'].includes(fuelType)) {
-    return res.status(400).json({ message: 'Invalid fuel type' });
+  if (!["benzene", "diesel"].includes(fuelType)) {
+    return res.status(400).json({ message: "Invalid fuel type" });
   }
 
   try {
-    const deliveries = await FuelDelivery.find({ fuelType }).sort({ createdAt: -1 });
+    const deliveries = await FuelDelivery.find({ fuelType }).sort({
+      createdAt: -1,
+    });
     res.status(200).json(deliveries);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch fuel deliveries', error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch fuel deliveries",
+      error: error.message,
+    });
   }
-};
+}
 
 // controllers/fuelDeliveryController.js
 export async function approveFuelDelivery(req, res) {
@@ -337,11 +396,14 @@ export async function approveFuelDelivery(req, res) {
     );
 
     if (!delivery) {
-      return res.status(404).json({ message: 'Fuel delivery not found' });
+      return res.status(404).json({ message: "Fuel delivery not found" });
     }
 
-    res.status(200).json({ message: 'Fuel delivery approved', data: delivery });
+    res.status(200).json({ message: "Fuel delivery approved", data: delivery });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to approve fuel delivery', error: error.message });
+    res.status(500).json({
+      message: "Failed to approve fuel delivery",
+      error: error.message,
+    });
   }
 }

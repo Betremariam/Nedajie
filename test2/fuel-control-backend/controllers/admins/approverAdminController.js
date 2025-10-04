@@ -8,7 +8,7 @@ export async function approveDriver(req, res) {
   
   try {
     const { driverId } = req.params;
-    const approverId = req.admin._id; // assuming middleware adds logged-in admin info
+    const approverId = req.admin._id;
 
     const driver = await Driver.findByIdAndUpdate(
       driverId,

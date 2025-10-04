@@ -25,6 +25,13 @@ import ApproveAttendants from "./pages/ApproverAdmin/ApproveAttendants";
 import ApproveOthers from "./pages/ApproverAdmin/ApproveOthers";
 import ApproveDashboard from "./pages/ApproverAdmin/ApproverDashboard";
 
+import OwnerLayout from "./layouts/OwnerLayout";
+import OwnerDashboard from "./pages/Owner/Dashboard";
+import RegisterAttendants from "./pages/Owner/Attendant";
+import OwnerTransactions from "./pages/Owner/OwnerTransactions";
+import OwnerReports from "./pages/Owner/Reports";
+import FuelReceived from "./pages/Owner/FuelReceived";
+
 function App() {
   return (
     <Router>
@@ -61,6 +68,14 @@ function App() {
           <Route path="/approver/attendants" element={<ApproveAttendants/>} />
           <Route path="/approver/others" element={<ApproveOthers/>} />
          </Route>
+
+         <Route path="/owner" element={<OwnerLayout />}>
+          <Route path="dashboard" element={<OwnerDashboard />} />
+          <Route path="attendant" element={<RegisterAttendants />} />
+          <Route path="transactions" element={<OwnerTransactions />} />
+          <Route path="reports" element={<OwnerReports />} />
+          <Route path="fuel-received" element={<FuelReceived />} />
+        </Route>
       </Routes>
     </Router>
   );

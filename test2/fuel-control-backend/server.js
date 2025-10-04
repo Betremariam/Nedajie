@@ -10,6 +10,7 @@ import attendantRoutes from "./routes/attendantRoutes.js";
 import farmerRoutes from "./routes/farmerRoutes.js";
 import adminsRoutes from "./routes/adminsRoutes.js";
 import adminsAuthRoutes from "./routes/adminsAuthRoutes.js";
+import stationOwnerRoutes from './routes/stationOwnerRoutes.js';
 
 import Admin from "./models/Admin.js"; // Ensure this path matches your Admin model
 
@@ -29,6 +30,7 @@ app.use("/api/drivers", driverRoutes);
 app.use("/api/attendants", attendantRoutes);
 app.use("/api/admins", adminsRoutes);
 app.use("/api/admin-auth", adminsAuthRoutes);
+app.use("/api/owners", stationOwnerRoutes);
 
 app.use('/uploads', express.static('uploads'));
 

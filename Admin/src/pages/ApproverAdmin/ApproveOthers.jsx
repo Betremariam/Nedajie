@@ -58,65 +58,119 @@ const ApproveOthers = () => {
     fetchOthers();
   }, []);
 
-  if (loading) return <div className="text-center p-4">Loading users...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center p-8">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading users...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen text-black">
-      <h1 className="text-2xl font-bold mb-4">Unapproved Other Users</h1>
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Approve Other Users</h1>
+        <p className="text-gray-600">Review and approve pending user registrations</p>
+      </div>
 
       {approvedUser && (
-        <div
-          ref={qrRef}
-          className="mt-6 bg-white shadow-lg p-4 rounded text-center max-w-md mx-auto"
-        >
-          <h3 className="text-lg font-semibold mb-2">
-            QR Code for {approvedUser.fullName}
-          </h3>
-          <QRCodeCanvas
-            value={approvedUser._id}
-            size={180}
-            bgColor="#ffffff"
-            fgColor="#000000"
-            level="H"
-            includeMargin={true}
-          />
-          <p className="mt-2 text-sm text-gray-600">ID: {approvedUser._id}</p>
-          <button
-            onClick={handleDownload}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Download QR Code
-          </button>
+        <div className="mb-8 bg-white rounded-xl shadow-lg border border-purple-200 p-8 max-w-md mx-auto">
+          <div ref={qrRef} className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">User Approved Successfully</h3>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <QRCodeCanvas
+                value={approvedUser._id}
+                size={200}
+                bgColor="#ffffff"
+                fgColor="#1f2937"
+                level="H"
+                includeMargin={true}
+              />
+            </div>
+            
+            <div className="bg-purple-50 rounded-lg p-4 mb-6">
+              <p className="font-semibold text-gray-900">{approvedUser.fullName}</p>
+              <p className="text-sm text-gray-600 mt-1">User ID: {approvedUser._id}</p>
+              <p className="text-sm text-gray-600">Fuel Type: {approvedUser.fuelType}</p>
+            </div>
+            
+            <button
+              onClick={handleDownload}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2 mx-auto"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download QR Code
+            </button>
+          </div>
         </div>
       )}
 
       {others.length === 0 ? (
-        <p className="mt-4 text-gray-600">No pending users.</p>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="text-6xl mb-4">👥</div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Pending Users</h3>
+          <p className="text-gray-500">All user applications have been reviewed and processed.</p>
+        </div>
       ) : (
-        <div className="flex flex-col gap-4 mt-6">
+        <div className="grid gap-6">
           {others.map((user) => (
             <div
               key={user._id}
-              className="bg-white rounded-lg shadow px-4 py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
-                <p><strong>Name:</strong> {user.fullName}</p>
-                <p><strong>Phone:</strong> {user.phoneNumber}</p>
-                <p><strong>Fuel Type:</strong> {user.fuelType}</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleApprove(user._id)}
-                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => handleReject(user._id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                >
-                  Reject
-                </button>
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span className="text-purple-600 font-semibold text-lg">
+                        {user.fullName?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{user.fullName}</h3>
+                      <p className="text-gray-600">{user.phoneNumber}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span className="text-gray-700"><strong>Fuel Type:</strong> {user.fuelType}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleApprove(user._id)}
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleReject(user._id)}
+                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Reject
+                  </button>
+                </div>
               </div>
             </div>
           ))}

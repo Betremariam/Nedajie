@@ -57,67 +57,138 @@ const RegisterDriver = () => {
   };
 
   return (
-    <div className="p-6 text-white">
-      <h2 className="text-xl font-bold mb-4">Register Driver</h2>
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Register Driver</h1>
+        <p className="text-gray-600">Register new drivers for the fuel management system</p>
+      </div>
 
       {success && (
-        <div className="mb-4 p-2 bg-green-700 text-white rounded">
+        <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center gap-3">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
           {success}
         </div>
       )}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <input
-          className="w-full p-2 rounded bg-gray-700"
-          placeholder="Name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-        />
-        <input
-          className="w-full p-2 rounded bg-gray-700"
-          placeholder="Phone Number"
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-        />
-        <input
-          className="w-full p-2 rounded bg-gray-700"
-          placeholder="Password"
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-        />
-        <select
-          className="w-full p-2 rounded bg-gray-700"
-          name="carType"
-          value={form.carType}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Car Type</option>
-          <option value="bajaj">bajaj</option>
-          <option value="taxi">taxi</option>
-          <option value="heavy">heavy</option>
-        </select>
-        <input
-          className="w-full p-2 rounded bg-gray-700"
-          placeholder="Car Plate"
-          name="carPlate"
-          value={form.carPlate}
-          onChange={handleChange}
-        />
-        <input
-          className="w-full p-2 rounded bg-gray-700"
-          type="file"
-          name="document"
-          onChange={handleChange}
-        />
-        <button className="bg-green-600 px-4 py-2 rounded" type="submit">
-          Register
-        </button>
-      </form>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full Name *
+              </label>
+              <input
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Enter driver's full name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number *
+              </label>
+              <input
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Enter phone number"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password *
+              </label>
+              <input
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Create password"
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Car Type *
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                name="carType"
+                value={form.carType}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Car Type</option>
+                <option value="bajaj">Bajaj</option>
+                <option value="taxi">Taxi</option>
+                <option value="heavy">Heavy Vehicle</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Car Plate Number *
+              </label>
+              <input
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Enter car plate number"
+                name="carPlate"
+                value={form.carPlate}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Driver Document
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                <input
+                  className="hidden"
+                  type="file"
+                  name="document"
+                  id="document"
+                  onChange={handleChange}
+                />
+                <label htmlFor="document" className="cursor-pointer">
+                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <p className="text-gray-600 mb-1">Upload driver document</p>
+                  <p className="text-sm text-gray-500">Click to browse files</p>
+                  {form.document && (
+                    <p className="text-sm text-green-600 mt-2">Selected: {form.document.name}</p>
+                  )}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-6">
+            <button 
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+              type="submit"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Register Driver
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

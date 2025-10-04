@@ -233,6 +233,7 @@ export const dispenseFuel = async (req, res) => {
         liters,
         stationName: fuelAttendant.stationName,
         attendantName: fuelAttendant.name,
+        city:fuelAttendant.city
       });
 
       return res
@@ -296,6 +297,7 @@ export const dispenseFuel = async (req, res) => {
         liters,
         stationName: fuelAttendant.stationName,
         attendantName: fuelAttendant.name,
+        city:fuelAttendant.city
       });
 
       return res
