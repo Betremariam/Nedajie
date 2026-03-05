@@ -9,7 +9,7 @@ const Navbar = () => {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Fuel Management System</h1>
+            <h1 className="text-xl font-bold tracking-tight">Fuel Control </h1>
           </div>
         </div>
         

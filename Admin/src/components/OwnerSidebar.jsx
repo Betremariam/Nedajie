@@ -18,6 +18,9 @@ const OwnerSidebar = () => {
         <NavLink to="/owner/dashboard" className={linkClass}>
           📊 Dashboard
         </NavLink>
+        <NavLink to="/owner/fuelstock" className={linkClass}>
+          OwnerFuel Stock
+        </NavLink>
         <NavLink to="/owner/attendant" className={linkClass}>
           👥 Attendant Registration
         </NavLink>

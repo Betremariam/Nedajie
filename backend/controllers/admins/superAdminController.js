@@ -1,0 +1,478 @@
+import prisma from "../../lib/prisma.js";
+import bcrypt from "bcryptjs";
+import moment from "moment";
+import ExcelJS from "exceljs";
+import path from "path";
+
+export async function getAllFuelTransactions(req, res) {
+  try {
+    const transactions = await prisma.fuelTransaction.findMany({
+      include: {
+        driver: {
+          select: {
+            name: true,
+            phone: true,
+            carPlate: true,
+            carType: true,
+          },
+        },
+        farmer: {
+          select: {
+            fullName: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json(transactions);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getAllFuelStocks(req, res) {
+  try {
+    const stocks = await prisma.fuelStock.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json(stocks);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function addFuelStock(req, res) {
+  try {
+    const { stationName, city, gasType, litersReceived } = req.body;
+    const newStock = await prisma.fuelStock.create({
+      data: {
+        stationName,
+        city,
+        gasType,
+        litersReceived,
+      },
+    });
+    res.status(201).json({ msg: "Fuel stock added", stock: newStock });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function updateFuelDispensed(req, res) {
+  try {
+    const { stockId } = req.params;
+    const { litersDispensed } = req.body;
+
+    const stock = await prisma.fuelStock.findUnique({
+      where: { id: stockId },
+    });
+    if (!stock) return res.status(404).json({ msg: "Fuel stock not found" });
+
+    const updatedStock = await prisma.fuelStock.update({
+      where: { id: stockId },
+      data: {
+        litersDispensed: stock.litersDispensed + litersDispensed,
+      },
+    });
+
+    res.status(200).json({ msg: "Fuel dispensed updated", stock: updatedStock });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function refillFuelStock(req, res) {
+  try {
+    const { stockId } = req.params;
+    const { additionalLiters } = req.body;
+
+    const stock = await prisma.fuelStock.findUnique({
+      where: { id: stockId },
+    });
+    if (!stock) return res.status(404).json({ msg: "Fuel stock not found" });
+
+    // Use a transaction to ensure both updates happen or none
+    const [updatedStock, newRecord] = await prisma.$transaction([
+      prisma.fuelStock.update({
+        where: { id: stockId },
+        data: {
+          litersReceived: stock.litersReceived + additionalLiters,
+        },
+      }),
+      prisma.fuelReceived.create({
+        data: {
+          stationId: stock.id,
+          stationName: stock.stationName,
+          city: stock.city,
+          gasType: stock.gasType,
+          liters: additionalLiters,
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      msg: "Fuel stock refilled",
+      stock: updatedStock,
+      record: newRecord,
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getFarmerDetails(req, res) {
+  const { id } = req.params;
+
+  try {
+    const farmer = await prisma.farmer.findUnique({
+      where: { id },
+    });
+    if (!farmer) {
+      return res.status(404).json({ message: "Farmer not found" });
+    }
+
+    const last15Days = moment().subtract(15, "days").startOf("day").toDate();
+
+    const recentTx = await prisma.fuelTransaction.findFirst({
+      where: {
+        farmerId: id,
+        date: { gte: last15Days },
+      },
+    });
+
+    const isEligible = !recentTx;
+
+    res.status(200).json({
+      farmer: {
+        id: farmer.id,
+        name: farmer.fullName,
+        phoneNumber: farmer.phoneNumber,
+        kebele: farmer.kebele,
+        woreda: farmer.woreda,
+      },
+      isEligible,
+    });
+  } catch (error) {
+    console.error("Error getting farmer details:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function getAllFarmers(req, res) {
+  try {
+    const farmers = await prisma.farmer.findMany({
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(farmers);
+  } catch (error) {
+    console.error("Error fetching farmers:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function getDriverDetails(req, res) {
+  const { id } = req.params;
+
+  try {
+    const driver = await prisma.driver.findUnique({
+      where: { id },
+    });
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    const today = moment().startOf("day").toDate();
+    const transaction = await prisma.fuelTransaction.findFirst({
+      where: {
+        driverId: id,
+        date: { gte: today },
+      },
+    });
+
+    const alreadyReceivedFuelToday = !!transaction;
+
+    res.status(200).json({
+      driver: {
+        id: driver.id,
+        name: driver.name,
+        vehicleType: driver.carType,
+        // fuelLimit: driver.fuelLimit, // Note: fuelLimit wasn't in original schema but referenced in controller.
+      },
+      alreadyReceivedFuelToday,
+    });
+  } catch (error) {
+    console.error("Error getting driver details:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function getAllDrivers(req, res) {
+  try {
+    const drivers = await prisma.driver.findMany({
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(drivers);
+  } catch (error) {
+    console.error("Error fetching drivers:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+/**
+ * Super Admin - Create new admin (approver or registerer)
+ */
+export async function createAdmin(req, res) {
+  try {
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ msg: "All fields are required." });
+    }
+
+    if (!["approver", "register"].includes(role)) {
+      return res
+        .status(400)
+        .json({ msg: "Invalid role. Must be approver or registerer." });
+    }
+
+    const existing = await prisma.admin.findUnique({
+      where: { email },
+    });
+    if (existing) {
+      return res
+        .status(400)
+        .json({ msg: "Admin with this email already exists." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newAdmin = await prisma.admin.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: role,
+      },
+    });
+
+    res.status(201).json({ msg: `New ${role} admin created successfully.` });
+  } catch (err) {
+    console.error("Create Admin Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+/**
+ * Super Admin - View all admins
+ */
+export async function getAllAdmins(req, res) {
+  try {
+    const admins = await prisma.admin.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        stationIds: true,
+        createdAt: true,
+      },
+    });
+    res.status(200).json(admins);
+  } catch (err) {
+    res.status(500).json({ msg: "Failed to fetch admins", error: err.message });
+  }
+}
+
+/**
+ * Super Admin - Delete an admin by ID
+ */
+export async function deleteAdmin(req, res) {
+  try {
+    const { adminId } = req.params;
+    await prisma.admin.delete({
+      where: { id: adminId },
+    });
+    res.status(200).json({ msg: "Admin deleted successfully." });
+  } catch (err) {
+    res.status(500).json({ msg: "Error deleting admin", error: err.message });
+  }
+}
+
+export async function createStationOwner(req, res) {
+  try {
+    const { name, email, password, stationIds } = req.body;
+
+    if (!stationIds || !Array.isArray(stationIds) || stationIds.length === 0) {
+      return res
+        .status(400)
+        .json({ msg: "At least one stationId is required" });
+    }
+
+    const stations = await prisma.fuelStock.findMany({
+      where: { id: { in: stationIds } },
+    });
+    if (stations.length !== stationIds.length) {
+      return res.status(404).json({ msg: "One or more stations not found" });
+    }
+
+    const exists = await prisma.admin.findUnique({
+      where: { email },
+    });
+    if (exists) {
+      return res.status(400).json({ msg: "Email already used" });
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+
+    const owner = await prisma.admin.create({
+      data: {
+        name,
+        email,
+        password: hashed,
+        role: "stationOwner",
+        stationIds,
+      },
+    });
+
+    res.status(201).json({ msg: "Station owner created", ownerId: owner.id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getAllOthers(req, res) {
+  try {
+    const others = await prisma.otherUser.findMany({
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(others);
+  } catch (error) {
+    console.error("Error fetching others:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function uploadFuelDeliveries(req, res) {
+  const fuelType = req.body.fuelType;
+
+  if (!req.file) {
+    return res.status(400).json({ message: "No XLSX file uploaded" });
+  }
+
+  if (!["diesel", "benzene"].includes(fuelType)) {
+    return res.status(400).json({ message: "Invalid fuel type" });
+  }
+
+  try {
+    const filePath = path.join(process.cwd(), req.file.path);
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
+    const worksheet = workbook.worksheets[0];
+
+    const deliveries = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip header
+
+      const [date, customer, destination, citter, fdcNo, volume, region] =
+        row.values.slice(1); // Skip first empty value
+
+      deliveries.push({
+        date: date?.toString().trim(),
+        customer: customer?.toString().trim(),
+        destination: destination?.toString().trim(),
+        citter: citter?.toString().trim(),
+        fdcNo: fdcNo?.toString().trim(),
+        volume: parseFloat(volume),
+        region: region?.toString().trim(),
+        fuelType,
+      });
+    });
+
+    await prisma.fuelDelivery.createMany({
+      data: deliveries,
+    });
+
+    res.status(200).json({
+      message: "Fuel deliveries imported successfully",
+      data: deliveries,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to process fuel deliveries",
+      error: error.message,
+    });
+  }
+}
+
+export async function getFuelDeliveries(req, res) {
+  const fuelType = req.query.fuelType;
+
+  if (!["benzene", "diesel"].includes(fuelType)) {
+    return res.status(400).json({ message: "Invalid fuel type" });
+  }
+
+  try {
+    const deliveries = await prisma.fuelDelivery.findMany({
+      where: { fuelType },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json(deliveries);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch fuel deliveries",
+      error: error.message,
+    });
+  }
+}
+
+export async function approveFuelDelivery(req, res) {
+  try {
+    const { id } = req.params;
+
+    const delivery = await prisma.fuelDelivery.update({
+      where: { id },
+      data: { isConfirmed: true },
+    });
+
+    res.status(200).json({ message: "Fuel delivery approved", data: delivery });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to approve fuel delivery",
+      error: error.message,
+    });
+  }
+}

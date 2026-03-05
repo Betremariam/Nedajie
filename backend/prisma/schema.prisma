@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider   = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      AdminRole
+  isApproved Boolean  @default(true)
+  stationIds String[] // Since PostgreSQL doesn't have a direct equivalent to MongoDB's array of ObjectIds in a single field without relations, we'll use a String array or better yet, a relation if possible. For now, matching the existing logic.
+  createdAt DateTime @default(now())
+
+  drivers         Driver[]
+  farmers         Farmer[]
+  otherUsers      OtherUser[]
+}
+
+enum AdminRole {
+  super
+  approver
+  register
+  stationOwner
+}
+
+model Driver {
+  id              String   @id @default(cuid())
+  name            String
+  phone           String   @unique
+  carType         CarType
+  carPlate        String
+  qrCode          String?
+  password        String
+  dailyLimitUsed  Float    @default(0)
+  lastFuelDate    DateTime?
+  isApproved      Boolean  @default(false)
+  documentPath    String?
+  approvedBy      Admin?   @relation(fields: [approvedById], references: [id])
+  approvedById    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transactions    FuelTransaction[]
+}
+
+enum CarType {
+  bajaj
+  taxi
+  heavy
+}
+
+model Farmer {
+  id              String   @id @default(cuid())
+  fullName        String
+  kebele          String
+  woreda          String
+  phoneNumber     String   @unique
+  litersUsed15Days Float    @default(0)
+  limitStartDate  DateTime? @default(now())
+  documentPath    String?
+  approvedBy      Admin?   @relation(fields: [approvedById], references: [id])
+  approvedById    String?
+  isApproved      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  transactions    FuelTransaction[]
+}
+
+model FuelAttendant {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String   @unique
+  password     String
+  stationName  String
+  city         String
+  isApproved   Boolean  @default(false)
+  documentPath String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model FuelDelivery {
+  id          String   @id @default(cuid())
+  date        String
+  customer    String
+  destination String
+  citter      String
+  fdcNo       String
+  volume      Float
+  region      String
+  fuelType    FuelType
+  isConfirmed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+enum FuelType {
+  diesel
+  benzene
+}
+
+model FuelReceived {
+  id          String    @id @default(cuid())
+  station     FuelStock @relation(fields: [stationId], references: [id])
+  stationId   String
+  stationName String
+  city        String
+  gasType     FuelType
+  liters      Float
+  date        DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model FuelStock {
+  id              String   @id @default(cuid())
+  stationName     String
+  city            String
+  gasType         FuelType
+  litersReceived  Float
+  litersDispensed Float    @default(0)
+  date            DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  fuelReceived    FuelReceived[]
+}
+
+model FuelTransaction {
+  id            String    @id @default(cuid())
+  driver        Driver?   @relation(fields: [driverId], references: [id])
+  driverId      String?
+  farmer        Farmer?   @relation(fields: [farmerId], references: [id])
+  farmerId      String?
+  otherUser     OtherUser? @relation(fields: [otherUserId], references: [id])
+  otherUserId   String?
+  gasType       FuelType
+  liters        Float
+  stationName   String
+  attendantName String
+  city          String
+  date          DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model OtherUser {
+  id             String   @id @default(cuid())
+  fullName       String
+  phoneNumber    String   @unique
+  fuelType       FuelType
+  dailyLimitUsed Float    @default(0)
+  documentPath   String?
+  isApproved     Boolean  @default(false)
+  approvedBy     Admin?   @relation(fields: [approvedById], references: [id])
+  approvedById   String?
+  createdAt      DateTime @default(now())
+
+  transactions   FuelTransaction[]
+}

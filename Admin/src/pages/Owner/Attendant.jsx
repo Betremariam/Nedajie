@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import API from "../../services/api.js"; 
 
+
 const RegisterAttendant = () => {
   const [form, setForm] = useState({
     name: "",
@@ -32,7 +33,7 @@ const RegisterAttendant = () => {
     formData.append("document", form.document);
 
     try {
-      const res = await API.post("/admins/register-attendant", formData, {
+      const res = await API.post("/owners/attendant", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

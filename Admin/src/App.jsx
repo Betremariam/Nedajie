@@ -31,6 +31,7 @@ import RegisterAttendants from "./pages/Owner/Attendant";
 import OwnerTransactions from "./pages/Owner/OwnerTransactions";
 import OwnerReports from "./pages/Owner/Reports";
 import FuelReceived from "./pages/Owner/FuelReceived";
+import OwnerFuelStock from "./pages/Owner/OwnerFuelStock";
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
 
          <Route path="/owner" element={<OwnerLayout />}>
           <Route path="dashboard" element={<OwnerDashboard />} />
+          <Route path="fuelstock" element={<OwnerFuelStock />} />
           <Route path="attendant" element={<RegisterAttendants />} />
           <Route path="transactions" element={<OwnerTransactions />} />
           <Route path="reports" element={<OwnerReports />} />

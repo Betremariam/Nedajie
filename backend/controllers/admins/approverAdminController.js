@@ -1,0 +1,215 @@
+import prisma from "../../lib/prisma.js";
+
+export async function approveDriver(req, res) {
+  try {
+    const { driverId } = req.params;
+    const approverId = req.admin.id;
+
+    const driver = await prisma.driver.update({
+      where: { id: driverId },
+      data: {
+        isApproved: true,
+        approvedById: approverId,
+      },
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!driver) return res.status(404).json({ msg: "Driver not found" });
+
+    res.status(200).json({ msg: "Driver approved", driver });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getUnapprovedDrivers(req, res) {
+  try {
+    const drivers = await prisma.driver.findMany({
+      where: { isApproved: false },
+    });
+
+    const baseUrl = 'http://192.168.43.237:5000';
+
+    const updatedDrivers = drivers.map(driver => ({
+      ...driver,
+      documentUrl: driver.documentPath ? `${baseUrl}/${driver.documentPath.replace(/\\/g, '/')}` : null
+    }));
+
+    res.status(200).json(updatedDrivers);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function rejectDriver(req, res) {
+  try {
+    const { driverId } = req.params;
+    await prisma.driver.delete({
+      where: { id: driverId },
+    });
+    res.status(200).json({ msg: "Driver rejected and deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function approveAttendant(req, res) {
+  try {
+    const { attendantId } = req.params;
+    const attendant = await prisma.fuelAttendant.update({
+      where: { id: attendantId },
+      data: { isApproved: true },
+    });
+    if (!attendant) return res.status(404).json({ msg: "Attendant not found" });
+    res.json({ msg: "Attendant approved", attendant });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getUnapprovedAttendants(req, res) {
+  try {
+    const attendants = await prisma.fuelAttendant.findMany({
+      where: { isApproved: false },
+    });
+
+    const baseUrl = 'http://192.168.43.237:5000';
+
+    const updatedAttendants = attendants.map(attendant => ({
+      ...attendant,
+      documentUrl: attendant.documentPath ? `${baseUrl}/${attendant.documentPath.replace(/\\/g, '/')}` : null
+    }));
+
+    res.status(200).json(updatedAttendants);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function rejectAttendant(req, res) {
+  try {
+    const { attendantId } = req.params;
+    await prisma.fuelAttendant.delete({
+      where: { id: attendantId },
+    });
+    res.json({ msg: "Attendant rejected and deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function approveFarmer(req, res) {
+  try {
+    const { farmerId } = req.params;
+    const approverId = req.admin.id;
+    const farmer = await prisma.farmer.update({
+      where: { id: farmerId },
+      data: {
+        isApproved: true,
+        approvedById: approverId,
+      },
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    if (!farmer) return res.status(404).json({ msg: "Farmer not found" });
+    res.status(200).json({ msg: "Farmer approved", farmer });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getUnapprovedFarmers(req, res) {
+  try {
+    const farmers = await prisma.farmer.findMany({
+      where: { isApproved: false },
+    });
+
+    const baseUrl = 'http://192.168.43.237:5000';
+
+    const updatedFarmers = farmers.map(farmer => ({
+      ...farmer,
+      documentUrl: farmer.documentPath
+        ? `${baseUrl}/${farmer.documentPath.replace(/\\/g, '/')}`
+        : null
+    }));
+
+    res.status(200).json(updatedFarmers);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function rejectFarmer(req, res) {
+  try {
+    const { farmerId } = req.params;
+    await prisma.farmer.delete({
+      where: { id: farmerId },
+    });
+    res.status(200).json({ msg: "Farmer rejected and deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function approveOthers(req, res) {
+  try {
+    const { otherId } = req.params;
+    const approverId = req.admin.id;
+    const other = await prisma.otherUser.update({
+      where: { id: otherId },
+      data: {
+        isApproved: true,
+        approvedById: approverId,
+      },
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    if (!other) return res.status(404).json({ msg: "other not found" });
+    res.status(200).json({ msg: "Farmer approved", other });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export const rejectOther = async (req, res) => {
+  try {
+    const { otherId } = req.params;
+    await prisma.otherUser.delete({
+      where: { id: otherId },
+    });
+    res.status(200).json({ msg: "Other user rejected and deleted" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+export const getUnapprovedOthers = async (req, res) => {
+  try {
+    const unapproved = await prisma.otherUser.findMany({
+      where: { isApproved: false },
+      orderBy: { createdAt: "desc" },
+    });
+    res.status(200).json(unapproved);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
