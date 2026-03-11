@@ -13,10 +13,7 @@ function FuelDelivery() {
 
   const loadDeliveries = async () => {
     try {
-      if (!fuelType) {
-        console.warn("Fuel type not selected yet.");
-        return;
-      }
+      if (!fuelType) return;
       setLoading(true);
       const res = await API.get(`/admins/deliveries?fuelType=${fuelType}`);
       setDeliveries(res.data);

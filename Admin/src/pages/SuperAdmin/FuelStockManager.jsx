@@ -115,7 +115,7 @@ const FuelStockManager = () => {
       (s) => s.stationName === stationName && s.city === city
     );
 
-    const stationIds = matchedStations.map((s) => s._id);
+    const stationIds = matchedStations.map((s) => s.id);
 
     try {
       await API.post("/admins/owners", {

@@ -106,7 +106,7 @@ const FarmerLists = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredFarmers.map((farmer) => (
-                  <tr key={farmer._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={farmer.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
