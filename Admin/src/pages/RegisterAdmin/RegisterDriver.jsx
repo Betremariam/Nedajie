@@ -59,8 +59,8 @@ const RegisterDriver = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Register Driver</h1>
-        <p className="text-gray-600">Register new drivers for the fuel management system</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Register Driver</h1>
+        <p className="text-muted-foreground">Register new drivers for the fuel management system</p>
       </div>
 
       {success && (
@@ -72,15 +72,15 @@ const RegisterDriver = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-8">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Full Name *
               </label>
               <input
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Enter driver's full name"
                 name="name"
                 value={form.name}
@@ -90,11 +90,11 @@ const RegisterDriver = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Phone Number *
               </label>
               <input
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Enter phone number"
                 name="phone"
                 value={form.phone}
@@ -104,11 +104,11 @@ const RegisterDriver = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Password *
               </label>
               <input
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Create password"
                 type="password"
                 name="password"
@@ -119,11 +119,11 @@ const RegisterDriver = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Car Type *
               </label>
               <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 name="carType"
                 value={form.carType}
                 onChange={handleChange}
@@ -137,11 +137,11 @@ const RegisterDriver = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Car Plate Number *
               </label>
               <input
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Enter car plate number"
                 name="carPlate"
                 value={form.carPlate}
@@ -151,10 +151,10 @@ const RegisterDriver = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Driver Document
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                 <input
                   className="hidden"
                   type="file"
@@ -166,8 +166,8 @@ const RegisterDriver = () => {
                   <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <p className="text-gray-600 mb-1">Upload driver document</p>
-                  <p className="text-sm text-gray-500">Click to browse files</p>
+                  <p className="text-muted-foreground mb-1">Upload driver document</p>
+                  <p className="text-sm text-muted-foreground">Click to browse files</p>
                   {form.document && (
                     <p className="text-sm text-green-600 mt-2">Selected: {form.document.name}</p>
                   )}
