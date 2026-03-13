@@ -86,7 +86,7 @@ const FuelReceived = () => {
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading fuel received data...</p>
+        <p className="mt-4 text-muted-foreground">Loading fuel received data...</p>
       </div>
     </div>
   );
@@ -105,19 +105,19 @@ const FuelReceived = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Fuel Received Records</h1>
-        <p className="text-gray-600">Track and monitor fuel deliveries to your stations</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Fuel Received Records</h1>
+        <p className="text-muted-foreground">Track and monitor fuel deliveries to your stations</p>
       </div>
 
       {stations.length > 0 && (
-        <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6 bg-card rounded-lg shadow-sm border border-border p-4">
+          <label className="block text-sm font-medium text-muted-foreground mb-2">
             Filter by Station
           </label>
           <select
             value={selectedStation}
             onChange={handleStationChange}
-            className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full md:w-64 px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="">All Fuels</option>
             {stations.map((s) => (
@@ -130,42 +130,42 @@ const FuelReceived = () => {
       )}
 
       {records.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
           <div className="text-6xl mb-4">⛽</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Fuel Records Found</h3>
-          <p className="text-gray-500">No fuel received records available for the selected station(s).</p>
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Fuel Records Found</h3>
+          <p className="text-muted-foreground">No fuel received records available for the selected station(s).</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Station
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     City
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Fuel Type
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Liters Received
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Date & Time
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {records.map((rec) => (
-                  <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={rec.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{rec.stationName}</div>
+                      <div className="text-sm font-medium text-foreground">{rec.stationName}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{rec.city}</div>
+                      <div className="text-sm text-muted-foreground">{rec.city}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
@@ -173,10 +173,10 @@ const FuelReceived = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{rec.liters} L</div>
+                      <div className="text-sm font-semibold text-foreground">{rec.liters} L</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-muted-foreground">
                         {new Date(rec.date).toLocaleString()}
                       </div>
                     </td>

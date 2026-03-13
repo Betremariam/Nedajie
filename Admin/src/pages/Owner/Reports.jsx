@@ -64,7 +64,7 @@ const Reports = () => {
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading report data...</p>
+        <p className="mt-4 text-muted-foreground">Loading report data...</p>
       </div>
     </div>
   );
@@ -72,20 +72,20 @@ const Reports = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Fuel Reports</h1>
-        <p className="text-gray-600">Analyze fuel dispensing data across different time periods</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Fuel Reports</h1>
+        <p className="text-muted-foreground">Analyze fuel dispensing data across different time periods</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-muted-foreground">
               Report Period:
             </label>
             <select
               value={reportType}
               onChange={(e) => setReportType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             >
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
@@ -118,7 +118,7 @@ const Reports = () => {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Total Liters Dispensed</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-1">Total Liters Dispensed</h3>
               <p className="text-3xl font-bold text-blue-600">{totalLiters} L</p>
             </div>
             <div className="text-4xl">⛽</div>
@@ -127,50 +127,50 @@ const Reports = () => {
       </div>
 
       {transactions.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
           <div className="text-6xl mb-4">📊</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Report Data</h3>
-          <p className="text-gray-500">No transactions found for the selected period and stations.</p>
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Report Data</h3>
+          <p className="text-muted-foreground">No transactions found for the selected period and stations.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Date & Time
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Fuel Type
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Liters
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Attendant
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Station
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     City
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={tx.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-muted-foreground">
                         {new Date(tx.date).toLocaleString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-foreground">
                         {tx.driver?.name || tx.farmer?.fullName || "N/A"}
                       </div>
                     </td>
@@ -180,16 +180,16 @@ const Reports = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{tx.liters} L</div>
+                      <div className="text-sm font-semibold text-foreground">{tx.liters} L</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{tx.attendantName || ""}</div>
+                      <div className="text-sm text-muted-foreground">{tx.attendantName || ""}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{tx.stationName || ""}</div>
+                      <div className="text-sm text-foreground">{tx.stationName || ""}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{tx.city || ""}</div>
+                      <div className="text-sm text-muted-foreground">{tx.city || ""}</div>
                     </td>
                   </tr>
                 ))}

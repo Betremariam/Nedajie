@@ -1,124 +1,175 @@
+import React from "react";
+import { 
+  Users, 
+  Fuel, 
+  History, 
+  ArrowUpRight, 
+  Droplets,
+  Zap,
+  Clock,
+  LayoutDashboard,
+  Wallet,
+  Package,
+  ArrowDownRight
+} from "lucide-react";
+import { cn } from "../../lib/utils";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/Card";
+import { Badge } from "../../components/ui/Badge";
+import { Button } from "../../components/ui/Button";
+
 const OwnerDashboard = () => {
+  const stats = [
+    { label: "Active Attendants", value: "8", icon: Users, trend: "Online", color: "gold" },
+    { label: "Daily Transactions", value: "342", icon: History, trend: "+12%", color: "amber" },
+    { label: "Revenue Today", value: "$12,450", icon: Wallet, trend: "+8.2%", color: "gold" },
+    { label: "Alerts", value: "2", icon: Zap, trend: "Requires Action", color: "red" },
+  ];
+
+  const recentDeliveries = [
+    { id: 1, type: "Diesel", volume: "5,000L", time: "Today, 10:30 AM", status: "completed" },
+    { id: 2, type: "Petrol", volume: "3,500L", time: "Yesterday, 04:15 PM", status: "completed" },
+    { id: 3, type: "Diesel", volume: "4,000L", time: "2 days ago", status: "completed" },
+  ];
+
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Station Owner Dashboard</h1>
-        <p className="text-gray-600">Welcome to your Fuel Station Management Portal</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">👥</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Attendants</h3>
-              <p className="text-gray-600 text-sm">Manage station attendants</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">⛽</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Fuel Received</h3>
-              <p className="text-gray-600 text-sm">Track fuel deliveries</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">💳</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Transactions</h3>
-              <p className="text-gray-600 text-sm">View all station transactions</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">📊</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Reports</h3>
-              <p className="text-gray-600 text-sm">Generate detailed reports</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Active Attendants</span>
-              <span className="font-semibold text-gray-900">--</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Today's Transactions</span>
-              <span className="font-semibold text-gray-900">--</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Fuel Stock</span>
-              <span className="font-semibold text-gray-900">--</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-          </div>
-          <div className="space-y-3">
-            <div className="text-sm text-gray-600">
-              Monitor your station operations and track performance metrics from your dashboard.
-            </div>
-            <div className="text-sm text-gray-500">
-              Use the navigation menu to access detailed sections for each management area.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Station Management</h2>
-          <p className="text-gray-600 mb-4">
-            Efficiently manage your fuel station operations, track fuel deliveries, 
-            monitor transactions, and generate comprehensive reports for better business insights.
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-3xl font-bold tracking-tight">Station Control</h2>
+          <p className="text-muted-foreground">
+            Strategic Operations & Asset Oversight
           </p>
-          <div className="text-sm text-gray-500">
-            Access all management features through the sidebar navigation
-          </div>
+        </div>
+        <div className="flex items-center gap-2 bg-muted/30 p-1.5 rounded-xl border border-border/50">
+          <Button variant="ghost" size="sm" className="h-8 rounded-lg bg-background shadow-sm">Real-time</Button>
+          <Button variant="ghost" size="sm" className="h-8 rounded-lg">Historical</Button>
         </div>
       </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, i) => (
+          <Card key={i} className="hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {stat.label}
+              </CardTitle>
+              <stat.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="flex items-center justify-between mt-1">
+                 {stat.trend.startsWith('+') ? (
+                   <Badge variant="outline" className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 border-emerald-200 py-0 px-2 h-auto">
+                     <ArrowUpRight className="h-2 w-2 mr-1" /> {stat.trend}
+                   </Badge>
+                 ) : (
+                   <span className={cn("text-[10px] font-bold uppercase tracking-widest", stat.color === 'red' ? "text-red-500 animate-pulse" : "text-muted-foreground")}>
+                      {stat.trend}
+                   </span>
+                 )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+             <CardTitle className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-primary" />
+                Inventory Overview
+             </CardTitle>
+             <CardDescription>
+                Aggregate volume across all active tanks.
+             </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8">
+             <div>
+                <h2 className="text-5xl font-bold tracking-tighter">142.8k <span className="text-xl font-medium text-muted-foreground ml-1">Liters</span></h2>
+                <p className="text-sm text-muted-foreground mt-1">Estimated total capacity utilization: 76%</p>
+             </div>
+             
+             <div className="space-y-6">
+                <div className="space-y-2">
+                   <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                      <span className="flex items-center gap-2"><Droplets className="h-3 w-3 text-primary" /> Unleaded Premium</span>
+                      <span>65% Full</span>
+                   </div>
+                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-primary w-[65%]" />
+                   </div>
+                </div>
+                <div className="space-y-2">
+                   <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                      <span className="flex items-center gap-2"><Droplets className="h-3 w-3 text-primary" /> Diesel Max</span>
+                      <span>88% Full</span>
+                   </div>
+                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-primary w-[88%]" />
+                   </div>
+                </div>
+             </div>
+          </CardContent>
+          <CardFooter className="border-t bg-muted/30 py-3">
+             <p className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
+                <Clock className="h-3 w-3" /> Next replenishment scheduled: Tomorrow at 09:00 AM
+             </p>
+          </CardFooter>
+        </Card>
+
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+               <History className="h-5 w-5 text-primary" />
+               Stock Inflow
+            </CardTitle>
+            <CardDescription>
+               Latest bulk deliveries and refills.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+             <div className="space-y-4">
+                {recentDeliveries.map((delivery) => (
+                  <div key={delivery.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 group hover:bg-muted/50 transition-colors border border-transparent">
+                     <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center font-bold text-primary shrink-0">
+                           <Fuel className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0">
+                           <p className="font-bold text-sm truncate">{delivery.type} - {delivery.volume}</p>
+                           <p className="text-[10px] font-semibold text-muted-foreground uppercase">{delivery.time}</p>
+                        </div>
+                     </div>
+                     <ArrowDownRight className="h-4 w-4 text-emerald-500" />
+                  </div>
+                ))}
+             </div>
+          </CardContent>
+          <CardFooter>
+             <Button variant="ghost" className="w-full text-xs h-8 underline decoration-muted-foreground/30 hover:decoration-primary" size="sm">
+                View Full Audit Log
+             </Button>
+          </CardFooter>
+        </Card>
+      </div>
+
+      <Card className="bg-primary hover:bg-primary/95 transition-colors text-primary-foreground border-none shadow-xl shadow-primary/20">
+         <CardContent className="py-10 flex flex-col items-center justify-center text-center space-y-6">
+            <div className="h-14 w-14 bg-card/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-2">
+               <Zap className="h-7 w-7 fill-white text-white" />
+            </div>
+            <div className="space-y-2">
+               <h3 className="text-2xl font-bold tracking-tight">Efficiency Optimization</h3>
+               <p className="text-primary-foreground/80 max-w-sm mx-auto font-medium">
+                  Peak demand detected on Tuesdays between 2pm-5pm. Our smart analytics suggest staff optimization for these windows.
+               </p>
+            </div>
+            <Button className="h-12 px-10 font-bold bg-card text-primary hover:bg-card/90 shadow-lg">
+               View Smart Analytics
+            </Button>
+         </CardContent>
+      </Card>
     </div>
   );
 };

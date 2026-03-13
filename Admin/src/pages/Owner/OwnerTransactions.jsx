@@ -47,7 +47,7 @@ const OwnerTransactions = () => {
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading transactions...</p>
+        <p className="mt-4 text-muted-foreground">Loading transactions...</p>
       </div>
     </div>
   );
@@ -66,50 +66,50 @@ const OwnerTransactions = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Station Transactions</h1>
-        <p className="text-gray-600">Monitor all fuel transactions across your stations</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Station Transactions</h1>
+        <p className="text-muted-foreground">Monitor all fuel transactions across your stations</p>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
           <div className="text-6xl mb-4">💳</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Transactions Found</h3>
-          <p className="text-gray-500">No transactions recorded for your stations yet.</p>
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Transactions Found</h3>
+          <p className="text-muted-foreground">No transactions recorded for your stations yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Fuel Type
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Liters
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Attendant
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Station
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     City
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Date & Time
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={tx.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-foreground">
                         {tx.driver?.name || tx.farmer?.fullName || "N/A"}
                       </div>
                     </td>
@@ -119,19 +119,19 @@ const OwnerTransactions = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{tx.liters} L</div>
+                      <div className="text-sm font-semibold text-foreground">{tx.liters} L</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{tx.attendantName || "N/A"}</div>
+                      <div className="text-sm text-muted-foreground">{tx.attendantName || "N/A"}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{tx.stationName}</div>
+                      <div className="text-sm text-foreground">{tx.stationName}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{tx.city}</div>
+                      <div className="text-sm text-muted-foreground">{tx.city}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-muted-foreground">
                         {new Date(tx.createdAt).toLocaleString()}
                       </div>
                     </td>
