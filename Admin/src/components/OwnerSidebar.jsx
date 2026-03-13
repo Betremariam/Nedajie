@@ -1,52 +1,71 @@
-import { NavLink } from "react-router-dom";
+import React from "react";
+import { 
+  LayoutDashboard, 
+  Fuel, 
+  Users, 
+  History, 
+  BarChart3
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "./ui/Sidebar";
+import { NavMain } from "./NavMain";
+import { NavUser } from "./NavUser";
 
 const OwnerSidebar = () => {
-  const linkClass = ({ isActive }) => 
-    `block py-3 px-4 text-white transition-all duration-200 rounded-lg border-l-4 ${
-      isActive 
-        ? 'bg-blue-700 border-blue-400 shadow-md font-semibold' 
-        : 'bg-gray-700 border-gray-700 hover:bg-gray-600 hover:border-blue-500 hover:translate-x-1'
-    }`;
+  const navItems = [
+    {
+      title: "Dashboard",
+      url: "/owner/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Attendants",
+      url: "/owner/attendant",
+      icon: Users,
+    },
+    {
+      title: "Fuel Inflow",
+      url: "/owner/fuel-received",
+      icon: Fuel,
+    },
+    {
+      title: "Transactions",
+      url: "/owner/transactions",
+      icon: History,
+    },
+    {
+      title: "Analytics",
+      url: "/owner/reports",
+      icon: BarChart3,
+    },
+  ];
 
   return (
-    <div className="w-64 bg-gray-600 text-white h-full p-6 shadow-xl">
-      <div className="mb-8 pb-4 border-b border-gray-700">
-        <h1 className="text-2xl font-bold text-white">Station Owner</h1>
-        <p className="text-white text-sm mt-1">Management Portal</p>
-      </div>
-      <nav className="flex flex-col gap-3">
-        <NavLink to="/owner/dashboard" className={linkClass}>
-          📊 Dashboard
-        </NavLink>
-        <NavLink to="/owner/fuelstock" className={linkClass}>
-          OwnerFuel Stock
-        </NavLink>
-        <NavLink to="/owner/attendant" className={linkClass}>
-          👥 Attendant Registration
-        </NavLink>
-        <NavLink to="/owner/fuel-received" className={linkClass}>
-          ⛽ Fuel Received
-        </NavLink>
-        <NavLink to="/owner/transactions" className={linkClass}>
-          💰 Transactions
-        </NavLink>
-        <NavLink to="/owner/reports" className={linkClass}>
-          📈 Reports
-        </NavLink>
-      </nav>
-      
-      <div className="mt-auto pt-6 border-t border-gray-700">
-        <div className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-sm font-bold">O</span>
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-2 py-4">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <LayoutDashboard className="size-4" />
           </div>
-          <div>
-            <p className="text-sm font-medium">Owner Account</p>
-            <p className="text-xs text-gray-400">Administrator</p>
+          <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
+            <span className="font-semibold">Nigd Bureau</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wider">Station Owner</span>
           </div>
         </div>
-      </div>
-    </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <NavMain label="Owner Portal" items={navItems} />
+      </SidebarContent>
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
   );
 };
 
