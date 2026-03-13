@@ -8,24 +8,32 @@ import DriverLists from "./pages/SuperAdmin/DriverLists";
 import FarmerLists from "./pages/SuperAdmin/FarmerLists";
 import OtherLists from "./pages/SuperAdmin/OtherLists";
 import FuelDilevery from "./pages/SuperAdmin/FuelDilevery";
-import AdminLayout from "./layouts/SuperAdminLayout ";
+
+// Layouts
+import DashboardLayout from "./layouts/DashboardLayout";
+import { ThemeProvider } from "./components/ThemeProvider";
+
+// Sidebars
+import SuperAdminSidebar from "./components/SuperAdminSidebar";
+import RegisterAdminSidebar from "./components/RegisterAdminSidebar";
+import ApproverSidebar from "./components/ApproverSidebar";
+import OwnerSidebar from "./components/OwnerSidebar";
 
 // Register Admin Pages
 import RegisterAdminDashboard from "./pages/RegisterAdmin/RegisterAdminDashboard";
-import RegisterAdminLayout from "./layouts/RegisterAdminlayout";
 import RegisterAttendant from "./pages/RegisterAdmin/RegisterAttendant";
 import RegisterDriver from "./pages/RegisterAdmin/RegisterDriver";
 import RegisterFarmer from "./pages/RegisterAdmin/RegisterFarmer";
 import OtherRegistration from "./pages/RegisterAdmin/OtherRegistration";
 
-import ApproverAdminLayout from "./layouts/ApproverAdminLayout";
+// Approver Admin Pages
 import ApproveDrivers from "./pages/ApproverAdmin/ApproveDrivers";
 import ApproveFarmers from "./pages/ApproverAdmin/ApproveFarmers";
 import ApproveAttendants from "./pages/ApproverAdmin/ApproveAttendants";
 import ApproveOthers from "./pages/ApproverAdmin/ApproveOthers";
 import ApproveDashboard from "./pages/ApproverAdmin/ApproverDashboard";
 
-import OwnerLayout from "./layouts/OwnerLayout";
+// Owner Pages
 import OwnerDashboard from "./pages/Owner/Dashboard";
 import RegisterAttendants from "./pages/Owner/Attendant";
 import OwnerTransactions from "./pages/Owner/OwnerTransactions";
@@ -35,55 +43,57 @@ import OwnerFuelStock from "./pages/Owner/OwnerFuelStock";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<AdminLogin />} />
+    <ThemeProvider defaultTheme="light" storageKey="fuel-control-theme">
+      <Router>
+        <Routes>
+          <Route path="/" element={<AdminLogin />} />
 
-        {/* Super Admin Routes */}
-        <Route path="/super-admin" element={<AdminLayout />}>
-        <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />}/>
-        <Route path="/super-admin/manage-admins" element={<ManageAdmins />} />
-        <Route path="/super-admin/fuel-stock" element={<FuelStockManager />} />
-        <Route path="/super-admin/transactions" element={<TransactionHistory />}/>
-        <Route path="/super-admin/drivers-list" element={<DriverLists />} />
-        <Route path="/super-admin/farmers-list" element={<FarmerLists />} />
-        <Route path="/super-admin/others-list" element={<OtherLists />} />
-        <Route path="/super-admin/fuel-delivery" element={<FuelDilevery />} />
-        
-        </Route>
+          {/* Super Admin Routes */}
+          <Route path="/super-admin" element={<DashboardLayout Sidebar={SuperAdminSidebar} />}>
+            <Route path="dashboard" element={<SuperAdminDashboard />}/>
+            <Route path="manage-admins" element={<ManageAdmins />} />
+            <Route path="fuel-stock" element={<FuelStockManager />} />
+            <Route path="transactions" element={<TransactionHistory />}/>
+            <Route path="drivers-list" element={<DriverLists />} />
+            <Route path="farmers-list" element={<FarmerLists />} />
+            <Route path="others-list" element={<OtherLists />} />
+            <Route path="fuel-delivery" element={<FuelDilevery />} />
+          </Route>
 
           {/* Register Admin Routes */}
-        <Route path="/register" element={<RegisterAdminLayout />}>
-          <Route path="/register/register-dashboard" element={<RegisterAdminDashboard />} />
-          <Route path="/register/attendant-registration" element={<RegisterAttendant />} />
-          <Route path="/register/driver-registration" element={<RegisterDriver />} />
-          <Route path="/register/farmer-registration" element={<RegisterFarmer />} />
-          <Route path="/register/other-registration" element={<OtherRegistration />} />
-        </Route>
-          
-          {/* Register Admin Routes */}
-          <Route path="/approver" element={<ApproverAdminLayout />}>
-          <Route path="/approver/dashboard" element={<ApproveDashboard/>} />
-          <Route path="/approver/drivers" element={<ApproveDrivers/>} />
-          <Route path="/approver/farmers" element={<ApproveFarmers/>} />
-          <Route path="/approver/attendants" element={<ApproveAttendants/>} />
-          <Route path="/approver/others" element={<ApproveOthers/>} />
-         </Route>
+          <Route path="/register" element={<DashboardLayout Sidebar={RegisterAdminSidebar} />}>
+            <Route path="register-dashboard" element={<RegisterAdminDashboard />} />
+            <Route path="attendant-registration" element={<RegisterAttendant />} />
+            <Route path="driver-registration" element={<RegisterDriver />} />
+            <Route path="farmer-registration" element={<RegisterFarmer />} />
+            <Route path="other-registration" element={<OtherRegistration />} />
+          </Route>
+            
+          {/* Approver Admin Routes */}
+          <Route path="/approver" element={<DashboardLayout Sidebar={ApproverSidebar} />}>
+            <Route path="dashboard" element={<ApproveDashboard/>} />
+            <Route path="drivers" element={<ApproveDrivers/>} />
+            <Route path="farmers" element={<ApproveFarmers/>} />
+            <Route path="attendants" element={<ApproveAttendants/>} />
+            <Route path="others" element={<ApproveOthers/>} />
+          </Route>
 
-         <Route path="/owner" element={<OwnerLayout />}>
-          <Route path="dashboard" element={<OwnerDashboard />} />
-          <Route path="fuelstock" element={<OwnerFuelStock />} />
-          <Route path="attendant" element={<RegisterAttendants />} />
-          <Route path="transactions" element={<OwnerTransactions />} />
-          <Route path="reports" element={<OwnerReports />} />
-          <Route path="fuel-received" element={<FuelReceived />} />
-        </Route>
-      </Routes>
-    </Router>
+          <Route path="/owner" element={<DashboardLayout Sidebar={OwnerSidebar} />}>
+            <Route path="dashboard" element={<OwnerDashboard />} />
+            <Route path="fuelstock" element={<OwnerFuelStock />} />
+            <Route path="attendant" element={<RegisterAttendants />} />
+            <Route path="transactions" element={<OwnerTransactions />} />
+            <Route path="reports" element={<OwnerReports />} />
+            <Route path="fuel-received" element={<FuelReceived />} />
+          </Route>
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
 export default App;
+
 
 
 

@@ -48,7 +48,7 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8 mx-4">
+        <div className="bg-card rounded-2xl shadow-xl p-8 mx-4">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -56,8 +56,8 @@ const AdminLogin = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Portal</h1>
-            <p className="text-gray-600">Sign in to access the control system</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Admin Portal</h1>
+            <p className="text-muted-foreground">Sign in to access the control system</p>
           </div>
 
           {/* Error Message */}
@@ -73,14 +73,14 @@ const AdminLogin = () => {
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Email Address
               </label>
               <div className="relative">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full px-4 py-3 pl-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 pl-11 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -92,14 +92,14 @@ const AdminLogin = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Password
               </label>
               <div className="relative">
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 pl-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 pl-11 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -132,8 +132,8 @@ const AdminLogin = () => {
           </form>
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-center text-sm text-gray-500">
+          <div className="mt-8 pt-6 border-t border-border">
+            <p className="text-center text-sm text-muted-foreground">
               Secure access to Fuel Control System
             </p>
           </div>
