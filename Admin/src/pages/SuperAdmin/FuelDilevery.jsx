@@ -68,23 +68,23 @@ function FuelDelivery() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Fuel Delivery Management</h1>
-        <p className="text-gray-600">Import and manage fuel delivery records from Excel files</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Fuel Delivery Management</h1>
+        <p className="text-muted-foreground">Import and manage fuel delivery records from Excel files</p>
       </div>
 
       {/* Upload Form */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Import Delivery Data</h2>
+      <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
+        <h2 className="text-xl font-semibold text-foreground mb-6">Import Delivery Data</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Fuel Type *
               </label>
               <select
                 value={fuelType}
                 onChange={(e) => setFuelType(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
               >
                 <option value="">Choose Fuel Type</option>
                 <option value="diesel">Diesel</option>
@@ -93,10 +93,10 @@ function FuelDelivery() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Excel File *
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-red-400 transition-colors">
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-red-400 transition-colors">
                 <input
                   type="file"
                   accept=".xlsx"
@@ -108,8 +108,8 @@ function FuelDelivery() {
                   <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <p className="text-gray-600 mb-1">Upload Excel File (.xlsx)</p>
-                  <p className="text-sm text-gray-500">Click to browse files</p>
+                  <p className="text-muted-foreground mb-1">Upload Excel File (.xlsx)</p>
+                  <p className="text-sm text-muted-foreground">Click to browse files</p>
                   {file && (
                     <p className="text-sm text-red-600 mt-2">Selected: {file.name}</p>
                   )}
@@ -134,9 +134,9 @@ function FuelDelivery() {
       </div>
 
       {/* Deliveries Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-xl font-semibold text-foreground">
             Imported Fuel Deliveries {fuelType && `- ${fuelType.charAt(0).toUpperCase() + fuelType.slice(1)}`}
           </h2>
         </div>
@@ -144,15 +144,15 @@ function FuelDelivery() {
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading deliveries...</p>
+            <p className="mt-2 text-muted-foreground">Loading deliveries...</p>
           </div>
         ) : deliveries.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-6xl mb-4">🚚</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            <h3 className="text-xl font-semibold text-muted-foreground mb-2">
               {fuelType ? "No Deliveries Found" : "Select Fuel Type"}
             </h3>
-            <p className="text-gray-500">
+            <p className="text-muted-foreground">
               {fuelType 
                 ? "No delivery records found for the selected fuel type." 
                 : "Please select a fuel type to view delivery records."
@@ -162,60 +162,60 @@ function FuelDelivery() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Destination
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Citter
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     FDC Number
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Volume
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Region
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Fuel Type
                   </th>
-                  <th className="px-4 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {deliveries.map((d, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  <tr key={index} className="hover:bg-muted/50 transition-colors">
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{d.date?.slice(0, 10)}</div>
+                      <div className="text-sm text-foreground">{d.date?.slice(0, 10)}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{d.customer}</div>
+                      <div className="text-sm font-medium text-foreground">{d.customer}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{d.destination}</div>
+                      <div className="text-sm text-muted-foreground">{d.destination}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{d.citter}</div>
+                      <div className="text-sm text-muted-foreground">{d.citter}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{d.fdcNo}</div>
+                      <div className="text-sm font-semibold text-foreground">{d.fdcNo}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{d.volume}</div>
+                      <div className="text-sm text-foreground">{d.volume}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{d.region}</div>
+                      <div className="text-sm text-muted-foreground">{d.region}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">

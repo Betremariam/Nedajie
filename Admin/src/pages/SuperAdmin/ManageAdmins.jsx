@@ -73,8 +73,8 @@ const ManageAdmins = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Manage Administrators</h1>
-        <p className="text-gray-600">Create and manage system administrators with different roles</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Manage Administrators</h1>
+        <p className="text-muted-foreground">Create and manage system administrators with different roles</p>
       </div>
 
       {/* Alert Messages */}
@@ -96,12 +96,12 @@ const ManageAdmins = () => {
       )}
 
       {/* Create Admin Form */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Create New Admin</h2>
+      <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
+        <h2 className="text-xl font-semibold text-foreground mb-6">Create New Admin</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Full Name *
               </label>
               <input
@@ -109,13 +109,13 @@ const ManageAdmins = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                 placeholder="Enter admin's full name"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Email Address *
               </label>
               <input
@@ -123,13 +123,13 @@ const ManageAdmins = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                 placeholder="Enter email address"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Password *
               </label>
               <input
@@ -137,21 +137,21 @@ const ManageAdmins = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                 placeholder="Set password"
                 required
               />
-              <p className="text-sm text-gray-500 mt-1">Set a secure password for this admin</p>
+              <p className="text-sm text-muted-foreground mt-1">Set a secure password for this admin</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Admin Role *
               </label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
               >
                 <option value="register">Registration Admin</option>
                 <option value="approver">Approval Admin</option>
@@ -174,47 +174,47 @@ const ManageAdmins = () => {
       </div>
 
       {/* Admins List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Registered Administrators</h2>
+      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-xl font-semibold text-foreground">Registered Administrators</h2>
         </div>
 
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading admins...</p>
+            <p className="mt-2 text-muted-foreground">Loading admins...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Administrator
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {admins.length === 0 ? (
                   <tr>
                     <td colSpan="4" className="px-6 py-12 text-center">
                       <div className="text-6xl mb-4">👨‍💼</div>
-                      <h3 className="text-lg font-semibold text-gray-700 mb-2">No Administrators</h3>
-                      <p className="text-gray-500">No administrators have been created yet.</p>
+                      <h3 className="text-lg font-semibold text-muted-foreground mb-2">No Administrators</h3>
+                      <p className="text-muted-foreground">No administrators have been created yet.</p>
                     </td>
                   </tr>
                 ) : (
                   admins.map((admin) => (
-                    <tr key={admin.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={admin.id} className="hover:bg-muted/50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
@@ -222,11 +222,11 @@ const ManageAdmins = () => {
                               {admin.name?.charAt(0) || 'A'}
                             </span>
                           </div>
-                          <div className="text-sm font-medium text-gray-900">{admin.name}</div>
+                          <div className="text-sm font-medium text-foreground">{admin.name}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{admin.email}</div>
+                        <div className="text-sm text-muted-foreground">{admin.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${

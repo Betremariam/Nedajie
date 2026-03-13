@@ -29,7 +29,7 @@ const DriverLists = () => {
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading drivers...</p>
+        <p className="mt-4 text-muted-foreground">Loading drivers...</p>
       </div>
     </div>
   );
@@ -37,21 +37,21 @@ const DriverLists = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Registered Drivers</h1>
-        <p className="text-gray-600">View and manage all registered drivers in the system</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Registered Drivers</h1>
+        <p className="text-muted-foreground">View and manage all registered drivers in the system</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
               Search Drivers
             </label>
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search by driver name..."
-                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                className="w-full px-4 py-3 pl-10 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -69,12 +69,12 @@ const DriverLists = () => {
       </div>
 
       {filteredDrivers.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
           <div className="text-6xl mb-4">🚗</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">
             {search ? "No Drivers Found" : "No Drivers Registered"}
           </h3>
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             {search 
               ? "No drivers match your search criteria" 
               : "There are no drivers registered in the system yet"
@@ -82,31 +82,31 @@ const DriverLists = () => {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Driver
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Vehicle Type
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Plate Number
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Approved by
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {filteredDrivers.map((driver) => (
-                  <tr key={driver.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={driver.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
@@ -114,11 +114,11 @@ const DriverLists = () => {
                             {driver.name?.charAt(0) || 'D'}
                           </span>
                         </div>
-                        <div className="text-sm font-medium text-gray-900">{driver.name}</div>
+                        <div className="text-sm font-medium text-foreground">{driver.name}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{driver.phone}</div>
+                      <div className="text-sm text-muted-foreground">{driver.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
@@ -126,7 +126,7 @@ const DriverLists = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{driver.carPlate}</div>
+                      <div className="text-sm font-semibold text-foreground">{driver.carPlate}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {driver.approvedBy ? (
@@ -134,7 +134,7 @@ const DriverLists = () => {
                           <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             {driver.approvedBy.name} ({driver.approvedBy.email})
                           </div>
                         </div>

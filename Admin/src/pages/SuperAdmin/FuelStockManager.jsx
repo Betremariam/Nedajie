@@ -158,8 +158,8 @@ const FuelStockManager = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Fuel Stock Management</h1>
-        <p className="text-gray-600">Manage fuel stocks and station owners across all stations</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Fuel Stock Management</h1>
+        <p className="text-muted-foreground">Manage fuel stocks and station owners across all stations</p>
       </div>
 
       {/* Alert Messages */}
@@ -187,8 +187,8 @@ const FuelStockManager = () => {
             onClick={() => setActiveTab("stock")}
             className={`px-6 py-3 rounded-md font-medium transition-colors ${
               activeTab === "stock" 
-                ? "bg-white text-gray-900 shadow-sm" 
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-card text-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Manage Fuel Stock
@@ -197,8 +197,8 @@ const FuelStockManager = () => {
             onClick={() => setActiveTab("owner")}
             className={`px-6 py-3 rounded-md font-medium transition-colors ${
               activeTab === "owner" 
-                ? "bg-white text-gray-900 shadow-sm" 
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-card text-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Create Station Owner
@@ -207,8 +207,8 @@ const FuelStockManager = () => {
             onClick={() => setActiveTab("view")}
             className={`px-6 py-3 rounded-md font-medium transition-colors ${
               activeTab === "view" 
-                ? "bg-white text-gray-900 shadow-sm" 
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-card text-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             View Stocks
@@ -218,12 +218,12 @@ const FuelStockManager = () => {
 
       {/* Fuel Stock Management Tab */}
       {activeTab === "stock" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Manage Fuel Stock</h2>
+        <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-6">Manage Fuel Stock</h2>
           <form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Station Name *
                 </label>
                 <input
@@ -231,12 +231,12 @@ const FuelStockManager = () => {
                   placeholder="Enter station name"
                   value={stockForm.stationName}
                   onChange={(e) => setStockForm({ ...stockForm, stationName: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   City *
                 </label>
                 <input
@@ -244,25 +244,25 @@ const FuelStockManager = () => {
                   placeholder="Enter city"
                   value={stockForm.city}
                   onChange={(e) => setStockForm({ ...stockForm, city: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Fuel Type *
                 </label>
                 <select
                   value={stockForm.gasType}
                   onChange={(e) => setStockForm({ ...stockForm, gasType: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 >
                   <option value="benzene">Benzene</option>
                   <option value="diesel">Diesel</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Liters *
                 </label>
                 <input
@@ -270,7 +270,7 @@ const FuelStockManager = () => {
                   placeholder="Enter liters"
                   value={stockForm.litersReceived}
                   onChange={(e) => setStockForm({ ...stockForm, litersReceived: Number(e.target.value) })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   required
                 />
               </div>
@@ -301,17 +301,17 @@ const FuelStockManager = () => {
 
       {/* Create Station Owner Tab */}
       {activeTab === "owner" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Create Station Owner</h2>
+        <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
+          <h2 className="text-xl font-semibold text-foreground mb-6">Create Station Owner</h2>
           <form className="space-y-6" onSubmit={handleAddOwner}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Select Station *
               </label>
               <select
                 value={ownerForm.stationKey}
                 onChange={(e) => setOwnerForm({ ...ownerForm, stationKey: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 required
               >
                 <option value="">Choose a station...</option>
@@ -324,7 +324,7 @@ const FuelStockManager = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Owner Full Name *
                 </label>
                 <input
@@ -332,12 +332,12 @@ const FuelStockManager = () => {
                   placeholder="Enter owner name"
                   value={ownerForm.name}
                   onChange={(e) => setOwnerForm({ ...ownerForm, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Email *
                 </label>
                 <input
@@ -345,12 +345,12 @@ const FuelStockManager = () => {
                   placeholder="Enter email address"
                   value={ownerForm.email}
                   onChange={(e) => setOwnerForm({ ...ownerForm, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   required
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Password *
                 </label>
                 <input
@@ -358,7 +358,7 @@ const FuelStockManager = () => {
                   placeholder="Create password"
                   value={ownerForm.password}
                   onChange={(e) => setOwnerForm({ ...ownerForm, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   required
                 />
               </div>
@@ -377,36 +377,36 @@ const FuelStockManager = () => {
 
       {/* View Stocks Tab */}
       {activeTab === "view" && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Current Fuel Stocks</h2>
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-border">
+            <h2 className="text-xl font-semibold text-foreground">Current Fuel Stocks</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Station Name
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     City
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Fuel Type
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Available Liters
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {stations.map((stock) => (
-                  <tr key={stock.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={stock.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{stock.stationName}</div>
+                      <div className="text-sm font-medium text-foreground">{stock.stationName}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{stock.city}</div>
+                      <div className="text-sm text-muted-foreground">{stock.city}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
@@ -414,7 +414,7 @@ const FuelStockManager = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">
+                      <div className="text-sm font-semibold text-foreground">
                         {stock.litersReceived - stock.litersDispensed} L
                       </div>
                     </td>
@@ -426,8 +426,8 @@ const FuelStockManager = () => {
           {stations.length === 0 && (
             <div className="p-12 text-center">
               <div className="text-6xl mb-4">⛽</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Fuel Stocks</h3>
-              <p className="text-gray-500">No fuel stocks have been added yet.</p>
+              <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Fuel Stocks</h3>
+              <p className="text-muted-foreground">No fuel stocks have been added yet.</p>
             </div>
           )}
         </div>
