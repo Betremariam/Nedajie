@@ -73,7 +73,7 @@ const Transactions = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {transactions.map((tx) => (
-                  <tr key={tx._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">

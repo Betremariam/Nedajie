@@ -22,7 +22,7 @@ const ApproveDrivers = () => {
   const handleApprove = async (id) => {
     try {
       const { data } = await API.put(`/admins/approve-driver/${id}`);
-      setDrivers((prev) => prev.filter((d) => d._id !== id));
+      setDrivers((prev) => prev.filter((d) => d.id !== id));
       setApprovedDriver(data.driver); // Save driver info for QR
     } catch (error) {
       console.error("Error approving driver:", error);
@@ -32,7 +32,7 @@ const ApproveDrivers = () => {
   const handleReject = async (id) => {
     try {
       await API.delete(`/admins/reject-driver/${id}`);
-      setDrivers((prev) => prev.filter((d) => d._id !== id));
+      setDrivers((prev) => prev.filter((d) => d.id !== id));
     } catch (error) {
       console.error("Error rejecting driver:", error);
     }
@@ -48,7 +48,7 @@ const ApproveDrivers = () => {
 
     const downloadLink = document.createElement("a");
     downloadLink.href = pngUrl;
-    downloadLink.download = `driver-qr-${approvedDriver._id}.png`;
+    downloadLink.download = `driver-qr-${approvedDriver.id}.png`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -88,7 +88,7 @@ const ApproveDrivers = () => {
             
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <QRCodeCanvas
-                value={approvedDriver._id}
+                value={approvedDriver.id}
                 size={200}
                 bgColor="#ffffff"
                 fgColor="#1f2937"
@@ -99,7 +99,7 @@ const ApproveDrivers = () => {
             
             <div className="bg-green-50 rounded-lg p-4 mb-6">
               <p className="font-semibold text-gray-900">{approvedDriver.name}</p>
-              <p className="text-sm text-gray-600 mt-1">Driver ID: {approvedDriver._id}</p>
+              <p className="text-sm text-gray-600 mt-1">Driver ID: {approvedDriver.id}</p>
               <p className="text-sm text-gray-600">{approvedDriver.carType} • {approvedDriver.carPlate}</p>
             </div>
             
@@ -126,7 +126,7 @@ const ApproveDrivers = () => {
         <div className="grid gap-6">
           {drivers.map((driver) => (
             <div
-              key={driver._id}
+              Key={driver.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -177,7 +177,7 @@ const ApproveDrivers = () => {
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleApprove(driver._id)}
+                    onClick={() => handleApprove(driver.id)}
                     className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +186,7 @@ const ApproveDrivers = () => {
                     Approve
                   </button>
                   <button
-                    onClick={() => handleReject(driver._id)}
+                    onClick={() => handleReject(driver.id)}
                     className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

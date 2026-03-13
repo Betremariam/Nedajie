@@ -22,7 +22,7 @@ const FuelReceived = () => {
       setStations(res.data);
 
       if (!selectedStation && res.data.length > 0) {
-        setSelectedStation(res.data[0]._id);
+        setSelectedStation(res.data[0].id);
       }
     } catch (err) {
       console.error("Error fetching stations:", err);
@@ -121,7 +121,7 @@ const FuelReceived = () => {
           >
             <option value="">All Fuels</option>
             {stations.map((s) => (
-              <option key={s._id} value={s._id}>
+              <option key={s.id} value={s.id}>
                 {s.stationName} - {s.city}
               </option>
             ))}
@@ -160,7 +160,7 @@ const FuelReceived = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {records.map((rec) => (
-                  <tr key={rec._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{rec.stationName}</div>
                     </td>

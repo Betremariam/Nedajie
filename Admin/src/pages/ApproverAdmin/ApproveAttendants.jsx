@@ -19,7 +19,7 @@ const ApproveAttendants = () => {
   const handleApprove = async (id) => {
     try {
       await API.put(`/admins/approve-attendant/${id}`);
-      setAttendants((prev) => prev.filter((a) => a._id !== id));
+      setAttendants((prev) => prev.filter((a) => a.id !== id));
     } catch (error) {
       console.error("Error approving attendant:", error);
     }
@@ -28,7 +28,7 @@ const ApproveAttendants = () => {
   const handleReject = async (id) => {
     try {
       await API.delete(`/admins/reject-attendant/${id}`);
-      setAttendants((prev) => prev.filter((a) => a._id !== id));
+      setAttendants((prev) => prev.filter((a) => a.id !== id));
     } catch (error) {
       console.error("Error rejecting attendant:", error);
     }
@@ -64,7 +64,7 @@ const ApproveAttendants = () => {
         <div className="grid gap-6">
           {attendants.map((attendant) => (
             <div
-              key={attendant._id}
+              key={attendant.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -100,7 +100,7 @@ const ApproveAttendants = () => {
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleApprove(attendant._id)}
+                    onClick={() => handleApprove(attendant.id)}
                     className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ const ApproveAttendants = () => {
                     Approve
                   </button>
                   <button
-                    onClick={() => handleReject(attendant._id)}
+                    onClick={() => handleReject(attendant.id)}
                     className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

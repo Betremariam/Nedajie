@@ -103,7 +103,7 @@ const OthersLists = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOthers.map((other) => (
-                  <tr key={other._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={other.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">

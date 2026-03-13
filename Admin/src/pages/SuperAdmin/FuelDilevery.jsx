@@ -232,7 +232,7 @@ function FuelDelivery() {
                         </span>
                       ) : (
                         <button
-                          onClick={() => handleApprove(d._id)}
+                          onClick={() => handleApprove(d.id)}
                           className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm shadow-sm hover:shadow-md flex items-center gap-1"
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

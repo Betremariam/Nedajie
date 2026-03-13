@@ -22,7 +22,7 @@ const ApproveFarmers = () => {
   const handleApprove = async (id) => {
     try {
       const { data } = await API.put(`/admins/approve-farmer/${id}`);
-      setFarmers((prev) => prev.filter((f) => f._id !== id));
+      setFarmers((prev) => prev.filter((f) => f.id !== id));
       setApprovedFarmer(data.farmer); // Save farmer info for QR
     } catch (error) {
       console.error("Error approving farmer:", error);
@@ -32,7 +32,7 @@ const ApproveFarmers = () => {
   const handleReject = async (id) => {
     try {
       await API.delete(`/admins/reject-farmer/${id}`);
-      setFarmers((prev) => prev.filter((f) => f._id !== id));
+      setFarmers((prev) => prev.filter((f) => f.id !== id));
     } catch (error) {
       console.error("Error rejecting farmer:", error);
     }
@@ -48,7 +48,7 @@ const ApproveFarmers = () => {
 
     const link = document.createElement("a");
     link.href = pngUrl;
-    link.download = `farmer-qr-${approvedFarmer._id}.png`;
+    link.download = `farmer-qr-${approvedFarmer.id}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -88,7 +88,7 @@ const ApproveFarmers = () => {
             
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <QRCodeCanvas
-                value={approvedFarmer._id}
+                value={approvedFarmer.id}
                 size={200}
                 bgColor="#ffffff"
                 fgColor="#1f2937"
@@ -99,7 +99,7 @@ const ApproveFarmers = () => {
             
             <div className="bg-green-50 rounded-lg p-4 mb-6">
               <p className="font-semibold text-gray-900">{approvedFarmer.fullName}</p>
-              <p className="text-sm text-gray-600 mt-1">Farmer ID: {approvedFarmer._id}</p>
+              <p className="text-sm text-gray-600 mt-1">Farmer ID: {approvedFarmer.id}</p>
               <p className="text-sm text-gray-600">{approvedFarmer.woreda} • {approvedFarmer.kebele}</p>
             </div>
             
@@ -126,7 +126,7 @@ const ApproveFarmers = () => {
         <div className="grid gap-6">
           {farmers.map((farmer) => (
             <div
-              key={farmer._id}
+              key={farmer.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -162,7 +162,7 @@ const ApproveFarmers = () => {
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleApprove(farmer._id)}
+                    onClick={() => handleApprove(farmer.id)}
                     className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ const ApproveFarmers = () => {
                     Approve
                   </button>
                   <button
-                    onClick={() => handleReject(farmer._id)}
+                    onClick={() => handleReject(farmer.id)}
                     className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

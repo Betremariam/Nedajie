@@ -22,7 +22,7 @@ const ApproveOthers = () => {
   const handleApprove = async (id) => {
     try {
       const { data } = await API.put(`/admins/approve-other-user/${id}`);
-      setOthers((prev) => prev.filter((user) => user._id !== id));
+      setOthers((prev) => prev.filter((user) => user.id !== id));
       setApprovedUser(data.other);
     } catch (error) {
       console.error("Error approving other user:", error);
@@ -32,7 +32,7 @@ const ApproveOthers = () => {
   const handleReject = async (id) => {
     try {
       await API.delete(`/admins/reject-other-user/${id}`);
-      setOthers((prev) => prev.filter((user) => user._id !== id));
+      setOthers((prev) => prev.filter((user) => user.id !== id));
     } catch (error) {
       console.error("Error rejecting other user:", error);
     }
@@ -48,7 +48,7 @@ const ApproveOthers = () => {
 
     const link = document.createElement("a");
     link.href = pngUrl;
-    link.download = `other-user-qr-${approvedUser._id}.png`;
+    link.download = `other-user-qr-${approvedUser.id}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -88,7 +88,7 @@ const ApproveOthers = () => {
             
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <QRCodeCanvas
-                value={approvedUser._id}
+                value={approvedUser.id}
                 size={200}
                 bgColor="#ffffff"
                 fgColor="#1f2937"
@@ -99,7 +99,7 @@ const ApproveOthers = () => {
             
             <div className="bg-purple-50 rounded-lg p-4 mb-6">
               <p className="font-semibold text-gray-900">{approvedUser.fullName}</p>
-              <p className="text-sm text-gray-600 mt-1">User ID: {approvedUser._id}</p>
+              <p className="text-sm text-gray-600 mt-1">User ID: {approvedUser.id}</p>
               <p className="text-sm text-gray-600">Fuel Type: {approvedUser.fuelType}</p>
             </div>
             
@@ -126,7 +126,7 @@ const ApproveOthers = () => {
         <div className="grid gap-6">
           {others.map((user) => (
             <div
-              key={user._id}
+              key={user.id}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -153,7 +153,7 @@ const ApproveOthers = () => {
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleApprove(user._id)}
+                    onClick={() => handleApprove(user.id)}
                     className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ const ApproveOthers = () => {
                     Approve
                   </button>
                   <button
-                    onClick={() => handleReject(user._id)}
+                    onClick={() => handleReject(user.id)}
                     className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

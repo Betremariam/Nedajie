@@ -80,7 +80,7 @@ const FuelStockManager = () => {
     }
 
     try {
-      await API.put(`/admins/fuel-stocks/${existing._id}/refill`, {
+      await API.put(`/admins/fuel-stocks/${existing.id}/refill`, {
         additionalLiters: stockForm.litersReceived,
       });
 
@@ -401,7 +401,7 @@ const FuelStockManager = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {stations.map((stock) => (
-                  <tr key={stock._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={stock.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{stock.stationName}</div>
                     </td>
