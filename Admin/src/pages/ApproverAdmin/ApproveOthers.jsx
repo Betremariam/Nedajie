@@ -62,7 +62,7 @@ const ApproveOthers = () => {
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading users...</p>
+        <p className="mt-4 text-muted-foreground">Loading users...</p>
       </div>
     </div>
   );
@@ -70,12 +70,12 @@ const ApproveOthers = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Approve Other Users</h1>
-        <p className="text-gray-600">Review and approve pending user registrations</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Approve Other Users</h1>
+        <p className="text-muted-foreground">Review and approve pending user registrations</p>
       </div>
 
       {approvedUser && (
-        <div className="mb-8 bg-white rounded-xl shadow-lg border border-purple-200 p-8 max-w-md mx-auto">
+        <div className="mb-8 bg-card rounded-xl shadow-lg border border-purple-200 p-8 max-w-md mx-auto">
           <div ref={qrRef} className="text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
@@ -83,10 +83,10 @@ const ApproveOthers = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">User Approved Successfully</h3>
+              <h3 className="text-xl font-semibold text-foreground">User Approved Successfully</h3>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <div className="bg-muted/50 rounded-lg p-4 mb-4">
               <QRCodeCanvas
                 value={approvedUser.id}
                 size={200}
@@ -98,9 +98,9 @@ const ApproveOthers = () => {
             </div>
             
             <div className="bg-purple-50 rounded-lg p-4 mb-6">
-              <p className="font-semibold text-gray-900">{approvedUser.fullName}</p>
-              <p className="text-sm text-gray-600 mt-1">User ID: {approvedUser.id}</p>
-              <p className="text-sm text-gray-600">Fuel Type: {approvedUser.fuelType}</p>
+              <p className="font-semibold text-foreground">{approvedUser.fullName}</p>
+              <p className="text-sm text-muted-foreground mt-1">User ID: {approvedUser.id}</p>
+              <p className="text-sm text-muted-foreground">Fuel Type: {approvedUser.fuelType}</p>
             </div>
             
             <button
@@ -117,17 +117,17 @@ const ApproveOthers = () => {
       )}
 
       {others.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
           <div className="text-6xl mb-4">👥</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Pending Users</h3>
-          <p className="text-gray-500">All user applications have been reviewed and processed.</p>
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Pending Users</h3>
+          <p className="text-muted-foreground">All user applications have been reviewed and processed.</p>
         </div>
       ) : (
         <div className="grid gap-6">
           {others.map((user) => (
             <div
               key={user.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+              className="bg-card rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="flex-1">
@@ -138,8 +138,8 @@ const ApproveOthers = () => {
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{user.fullName}</h3>
-                      <p className="text-gray-600">{user.phoneNumber}</p>
+                      <h3 className="text-lg font-semibold text-foreground">{user.fullName}</h3>
+                      <p className="text-muted-foreground">{user.phoneNumber}</p>
                     </div>
                   </div>
                   
@@ -147,7 +147,7 @@ const ApproveOthers = () => {
                     <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span className="text-gray-700"><strong>Fuel Type:</strong> {user.fuelType}</span>
+                    <span className="text-muted-foreground"><strong>Fuel Type:</strong> {user.fuelType}</span>
                   </div>
                 </div>
 

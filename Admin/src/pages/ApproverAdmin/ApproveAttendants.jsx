@@ -42,7 +42,7 @@ const ApproveAttendants = () => {
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading attendants...</p>
+        <p className="mt-4 text-muted-foreground">Loading attendants...</p>
       </div>
     </div>
   );
@@ -50,22 +50,22 @@ const ApproveAttendants = () => {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Approve Attendants</h1>
-        <p className="text-gray-600">Review and approve pending attendant registrations</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Approve Attendants</h1>
+        <p className="text-muted-foreground">Review and approve pending attendant registrations</p>
       </div>
 
       {attendants.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
           <div className="text-6xl mb-4">👥</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Pending Approvals</h3>
-          <p className="text-gray-500">All attendants have been reviewed and processed.</p>
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Pending Approvals</h3>
+          <p className="text-muted-foreground">All attendants have been reviewed and processed.</p>
         </div>
       ) : (
         <div className="grid gap-6">
           {attendants.map((attendant) => (
             <div
               key={attendant.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+              className="bg-card rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-shadow duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="flex-1">
@@ -76,8 +76,8 @@ const ApproveAttendants = () => {
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{attendant.name}</h3>
-                      <p className="text-gray-600">{attendant.phone}</p>
+                      <h3 className="text-lg font-semibold text-foreground">{attendant.name}</h3>
+                      <p className="text-muted-foreground">{attendant.phone}</p>
                     </div>
                   </div>
                   
