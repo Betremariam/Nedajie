@@ -241,41 +241,44 @@ export async function getAllDrivers(req, res) {
 /**
  * Super Admin - Create new admin (approver or registerer)
  */
+// Helper: generate a random alphanumeric temp password
+function generateTempPassword(length = 10) {
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export async function createAdmin(req, res) {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, role } = req.body;
 
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ msg: "All fields are required." });
+    if (!name || !email || !role) {
+      return res.status(400).json({ msg: "Name, email, and role are required." });
     }
 
     if (!["approver", "register"].includes(role)) {
-      return res
-        .status(400)
-        .json({ msg: "Invalid role. Must be approver or registerer." });
+      return res.status(400).json({ msg: "Invalid role. Must be approver or register." });
     }
 
-    const existing = await prisma.admin.findUnique({
-      where: { email },
-    });
+    const existing = await prisma.admin.findUnique({ where: { email } });
     if (existing) {
-      return res
-        .status(400)
-        .json({ msg: "Admin with this email already exists." });
+      return res.status(400).json({ msg: "Admin with this email already exists." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const tempPassword = generateTempPassword();
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    const newAdmin = await prisma.admin.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: role,
-      },
+    await prisma.admin.create({
+      data: { name, email, password: hashedPassword, role, mustChangePassword: true },
     });
 
-    res.status(201).json({ msg: `New ${role} admin created successfully.` });
+    res.status(201).json({
+      msg: `New ${role} admin created successfully.`,
+      tempPassword,
+    });
   } catch (err) {
     console.error("Create Admin Error:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
@@ -294,12 +297,34 @@ export async function getAllAdmins(req, res) {
         email: true,
         role: true,
         stationIds: true,
+        isBlocked: true,
+        mustChangePassword: true,
         createdAt: true,
       },
     });
     res.status(200).json(admins);
   } catch (err) {
     res.status(500).json({ msg: "Failed to fetch admins", error: err.message });
+  }
+}
+
+export async function blockAdmin(req, res) {
+  try {
+    const { adminId } = req.params;
+    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    if (!admin) return res.status(404).json({ msg: "Admin not found" });
+
+    const updated = await prisma.admin.update({
+      where: { id: adminId },
+      data: { isBlocked: !admin.isBlocked },
+    });
+
+    res.status(200).json({
+      msg: updated.isBlocked ? "Admin has been blocked." : "Admin has been unblocked.",
+      isBlocked: updated.isBlocked,
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Error toggling block status", error: err.message });
   }
 }
 
@@ -320,12 +345,10 @@ export async function deleteAdmin(req, res) {
 
 export async function createStationOwner(req, res) {
   try {
-    const { name, email, password, stationIds } = req.body;
+    const { name, email, stationIds } = req.body;
 
     if (!stationIds || !Array.isArray(stationIds) || stationIds.length === 0) {
-      return res
-        .status(400)
-        .json({ msg: "At least one stationId is required" });
+      return res.status(400).json({ msg: "At least one stationId is required" });
     }
 
     const stations = await prisma.fuelStock.findMany({
@@ -335,26 +358,17 @@ export async function createStationOwner(req, res) {
       return res.status(404).json({ msg: "One or more stations not found" });
     }
 
-    const exists = await prisma.admin.findUnique({
-      where: { email },
-    });
-    if (exists) {
-      return res.status(400).json({ msg: "Email already used" });
-    }
+    const exists = await prisma.admin.findUnique({ where: { email } });
+    if (exists) return res.status(400).json({ msg: "Email already used" });
 
-    const hashed = await bcrypt.hash(password, 10);
+    const tempPassword = generateTempPassword();
+    const hashed = await bcrypt.hash(tempPassword, 10);
 
     const owner = await prisma.admin.create({
-      data: {
-        name,
-        email,
-        password: hashed,
-        role: "stationOwner",
-        stationIds,
-      },
+      data: { name, email, password: hashed, role: "stationOwner", stationIds, mustChangePassword: true },
     });
 
-    res.status(201).json({ msg: "Station owner created", ownerId: owner.id });
+    res.status(201).json({ msg: "Station owner created", ownerId: owner.id, tempPassword });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error", error: err.message });

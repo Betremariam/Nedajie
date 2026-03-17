@@ -1,13 +1,14 @@
 import express from "express";
 import multer from "multer";
-import verifyToken from "../middleware/verifyToken.js";
-import authorizeRoles from "../middleware/authorizeRoles.js";
-import attachAdmin from "../middleware/attachAdmin.js"; 
+import verifyToken from "../middleWare/verifyToken.js";
+import authorizeRoles from "../middleWare/authorizeRoles.js";
+import attachAdmin from "../middleWare/attachAdmin.js"; 
 
 import {
   createAdmin,
   getAllAdmins,
   deleteAdmin,
+  blockAdmin,
   getAllFuelTransactions,
   getAllFuelStocks,
   addFuelStock,
@@ -62,9 +63,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Admin management
-router.post("/admins", protectSuper, createAdmin);             // Create registerer/approver admin
-router.get("/admins", protectSuper, getAllAdmins);             // Get all admins
-router.delete("/admins/:adminId", protectSuper, deleteAdmin);  // Delete admin
+router.post("/admins", protectSuper, createAdmin);
+router.get("/admins", protectSuper, getAllAdmins);
+router.patch("/admins/:adminId/block", protectSuper, blockAdmin);  // Block/unblock admin
+router.delete("/admins/:adminId", protectSuper, deleteAdmin);       // Keep for emergency use
 
 // Fuel management
 router.get("/transactions", protectSuper, getAllFuelTransactions);  // All transactions
