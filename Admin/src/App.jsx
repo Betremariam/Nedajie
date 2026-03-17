@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminLogin from "./pages/AdminLogin";
+import ChangePassword from "./pages/ChangePassword";
 import SuperAdminDashboard from "./pages/SuperAdmin/SuperAdminDashboard";
 import ManageAdmins from "./pages/SuperAdmin/ManageAdmins";
 import FuelStockManager from "./pages/SuperAdmin/FuelStockManager";
@@ -47,6 +48,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<AdminLogin />} />
+          <Route path="/change-password" element={<ChangePassword />} />
 
           {/* Super Admin Routes */}
           <Route path="/super-admin" element={<DashboardLayout Sidebar={SuperAdminSidebar} />}>

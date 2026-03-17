@@ -18,8 +18,11 @@ import {
   useSidebar,
 } from "./ui/Sidebar"
 
+import { useNavigate } from "react-router-dom"
+
 export function NavUser() {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
   
   // Placeholder user for now, as Admin doesn't have an AuthContext yet
   const user = {
@@ -34,8 +37,10 @@ export function NavUser() {
   const initials = "A"
 
   const handleLogout = () => {
-    // Implement logout logic here
-    console.log("Logging out...")
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    localStorage.removeItem("stationIds");
+    navigate("/");
   }
 
   return (
