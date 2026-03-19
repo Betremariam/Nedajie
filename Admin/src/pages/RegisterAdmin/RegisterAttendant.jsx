@@ -1,5 +1,28 @@
 import React, { useState } from "react";
 import API from "../../services/api.js"; 
+import { 
+  UserPlus, 
+  Phone, 
+  Lock, 
+  MapPin, 
+  Building2, 
+  Upload, 
+  FileCheck, 
+  ShieldCheck, 
+  UserCheck,
+  AlertCircle,
+  Loader2,
+  ChevronRight,
+  Zap,
+  Briefcase
+} from "lucide-react";
+import { Input } from "../../components/ui/Input";
+import { Button } from "../../components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/Card";
+import { Label } from "../../components/ui/Label";
+import { Badge } from "../../components/ui/Badge";
+import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { cn } from "../../lib/utils";
 
 const RegisterAttendant = () => {
   const [form, setForm] = useState({
@@ -11,6 +34,8 @@ const RegisterAttendant = () => {
     document: null,
   });
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     if (e.target.name === "document") {
@@ -23,6 +48,9 @@ const RegisterAttendant = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
+    setError("");
+    setLoading(true);
+
     const formData = new FormData();
     formData.append("name", form.name);
     formData.append("phone", form.phone);
@@ -39,7 +67,7 @@ const RegisterAttendant = () => {
       });
 
       console.log("Attendant registered:", res.data);
-      setSuccess("Attendant registered successfully");
+      setSuccess("Attendant credentials synthesized and stored successfully.");
       
       // Reset form
       setForm({
@@ -52,139 +80,178 @@ const RegisterAttendant = () => {
       });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
-      alert(err?.response?.data?.msg || "Something went wrong");
+      setError(err?.response?.data?.msg || "Identity enrollment protocol failure.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Register Fuel Attendant</h1>
-        <p className="text-muted-foreground">Register new fuel attendants for station operations</p>
+    <div className="p-8 space-y-8 max-w-5xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1 text-primary">
+            <UserPlus className="w-5 h-5" />
+            <span className="text-[10px] font-mono font-black tracking-[0.2em] uppercase text-primary/60">Personnel Enrollment</span>
+          </div>
+          <h1 className="text-4xl font-black tracking-tight text-foreground italic">Register Attendant</h1>
+          <p className="text-muted-foreground text-lg mt-1 italic">Create secure identity profiles for fuel station staff.</p>
+        </div>
+        <div className="hidden md:flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+           <ShieldCheck className="w-3 h-3 text-emerald-500" />
+           E2EE Identity Synthesis
+        </div>
       </div>
 
       {success && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center gap-3">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          {success}
-        </div>
+        <Alert className="border-emerald-500/50 bg-emerald-500/5 text-emerald-600">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">Enrollment Success</AlertTitle>
+          <AlertDescription className="font-bold italic">{success}</AlertDescription>
+        </Alert>
       )}
 
-      <div className="bg-card rounded-xl shadow-sm border border-border p-8">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Full Name *
-              </label>
-              <input
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter attendant's full name"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
+      {error && (
+        <Alert variant="destructive" className="border-red-500/50 bg-red-500/5">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">Sequence Error</AlertTitle>
+          <AlertDescription className="font-bold">{error}</AlertDescription>
+        </Alert>
+      )}
 
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Phone Number *
-              </label>
-              <input
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter phone number"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
+      <Card className="border-border/50 shadow-2xl shadow-primary/5 overflow-hidden group">
+        <CardHeader className="bg-muted/30 border-b border-border/20 py-8 px-10">
+          <div className="flex items-center gap-4">
+             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner group-hover:scale-110 transition-transform">
+                <Briefcase className="w-7 h-7" />
+             </div>
+             <div>
+                <CardTitle className="text-2xl font-black italic underline decoration-primary/30 underline-offset-4 uppercase tracking-tight">Staff Identity Form</CardTitle>
+                <CardDescription className="italic font-medium">Populate the matrix with verified attendant credentials.</CardDescription>
+             </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-10">
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Full Legal Name</Label>
+                <div className="relative group/input">
+                  <UserCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all"
+                    placeholder="Enter attendant's full name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Password *
-              </label>
-              <input
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Create password"
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Mobile Communications Link</Label>
+                <div className="relative group/input">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all font-mono"
+                    placeholder="Enter phone number"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Station Name *
-              </label>
-              <input
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter station name"
-                name="stationName"
-                value={form.stationName}
-                onChange={handleChange}
-                required
-              />
-            </div>
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Access Passcode</Label>
+                <div className="relative group/input">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all font-mono"
+                    placeholder="Generate secure password"
+                    type="password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                City *
-              </label>
-              <input
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter city"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                required
-              />
-            </div>
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Operational Station Node</Label>
+                <div className="relative group/input">
+                  <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all"
+                    placeholder="Enter station name"
+                    name="stationName"
+                    value={form.stationName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Attendant Document
-              </label>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                <input
-                  className="hidden"
-                  type="file"
-                  name="document"
-                  id="document"
-                  onChange={handleChange}
-                />
-                <label htmlFor="document" className="cursor-pointer">
-                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <p className="text-muted-foreground mb-1">Upload attendant document</p>
-                  <p className="text-sm text-muted-foreground">Click to browse files</p>
-                  {form.document && (
-                    <p className="text-sm text-blue-600 mt-2">Selected: {form.document.name}</p>
-                  )}
-                </label>
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Deployment City</Label>
+                <div className="relative group/input">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                  <Input
+                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all"
+                    placeholder="Enter city"
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Identity Manifest [.PDF/IMG]</Label>
+                <div className="relative group/input">
+                  <input
+                    className="hidden"
+                    type="file"
+                    name="document"
+                    id="document"
+                    onChange={handleChange}
+                  />
+                  <Label 
+                    htmlFor="document" 
+                    className="flex items-center h-14 px-4 rounded-2xl border border-dashed border-border/50 bg-muted/20 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-all text-muted-foreground/60 font-medium italic overflow-hidden"
+                  >
+                    <Upload className="w-4 h-4 mr-3 text-primary opacity-40 shrink-0" />
+                    <span className="truncate flex-1">
+                      {form.document ? form.document.name : "Upload identity document"}
+                    </span>
+                    {form.document && <FileCheck className="w-4 h-4 ml-2 text-emerald-500 shrink-0" />}
+                  </Label>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex justify-end pt-6">
-            <button 
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
-              type="submit"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Register Attendant
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-border/10">
+               <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">
+                  <span className="flex items-center gap-2"><Lock className="w-3 h-3" /> Data Sovereign</span>
+                  <span className="w-1 h-1 rounded-full bg-border" />
+                  <span>Cycle: {new Date().getFullYear()}_REV_A</span>
+               </div>
+               <Button 
+                disabled={loading}
+                className="w-full md:w-auto h-16 px-12 bg-foreground text-background hover:bg-primary hover:text-primary-foreground font-black uppercase tracking-widest text-xs rounded-2xl shadow-2xl transition-all hover:-translate-y-1 gap-3 group/btn"
+                type="submit"
+               >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5 fill-primary text-primary shadow-glow group-hover/btn:scale-110 transition-transform" />}
+                {loading ? "Synthesizing..." : "Register Attendant"}
+               </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

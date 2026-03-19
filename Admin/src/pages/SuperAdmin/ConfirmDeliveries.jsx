@@ -1,16 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Truck, CheckCircle, Clock, AlertCircle, MapPin } from "lucide-react";
+import { Truck, CheckCircle, Clock, AlertCircle, MapPin, Loader2, ShieldCheck, ChevronRight } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { 
   getPendingDeliveriesForSuperAdmin, 
   confirmDeliveryBySuperAdmin 
 } from "../../services/api";
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent,
+  CardFooter
+} from "../../components/ui/Card";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "../../components/ui/AlertDialog";
+import { Alert, AlertTitle, AlertDescription } from "../../components/ui/Alert";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ConfirmDeliveries = () => {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [confirmingDelivery, setConfirmingDelivery] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const fetchPendingDeliveries = async () => {
     try {
@@ -28,73 +51,177 @@ const ConfirmDeliveries = () => {
     fetchPendingDeliveries();
   }, []);
 
-  const handleConfirm = async (id) => {
-    if (!window.confirm("Confirm this fuel delivery for your region?")) return;
+  const handleConfirm = async () => {
+    if (!confirmingDelivery) return;
+    
+    setIsProcessing(true);
+    setError("");
+    setSuccess("");
+    
     try {
-      await confirmDeliveryBySuperAdmin(id);
-      alert("Delivery confirmed successfully!");
+      await confirmDeliveryBySuperAdmin(confirmingDelivery.id);
+      setSuccess(`Delivery ${confirmingDelivery.fdcNo} confirmed successfully!`);
+      setConfirmingDelivery(null);
       fetchPendingDeliveries();
     } catch (err) {
-      alert(err.response?.data?.msg || "Failed to confirm delivery");
+      setError(err.response?.data?.msg || "Failed to confirm delivery");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
+        <Loader2 className="animate-spin h-10 w-10 text-primary mb-4" />
+        <p className="text-muted-foreground animate-pulse">Retrieving regional logistics data...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Federal Delivery Confirmation</h1>
-        <p className="text-muted-foreground">Verify and confirm fuel dispatches from Federal authority for your region</p>
+    <div className="p-8 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Federal Delivery Confirmation</h1>
+          <p className="text-muted-foreground text-lg italic">Verify and authorize incoming fuel shipments from Federal nodes</p>
+        </div>
+        <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2">
+          <Truck className="w-4 h-4" />
+          {deliveries.length} Pending Actions
+        </Badge>
       </div>
 
-      {error && <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}
+      <AnimatePresence>
+        {error && (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}>
+            <Alert variant="destructive" className="max-w-4xl mx-auto">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Operational Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
+        {success && (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}>
+            <Alert className="max-w-4xl mx-auto bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-200">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              <AlertTitle>Authorization Successful</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {deliveries.length === 0 ? (
-        <div className="bg-card rounded-xl border border-dashed border-border p-12 text-center">
-          <Truck className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-muted-foreground">No pending federal deliveries</h3>
-          <p className="text-muted-foreground">Everything is up to date in your region.</p>
-        </div>
-      ) : (
-        <div className="grid gap-6">
-          {deliveries.map((delivery) => (
-            <div key={delivery.id} className="bg-card rounded-xl shadow-sm border border-border p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none">
-                    {delivery.fuelType.toUpperCase()}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> {new Date(delivery.createdAt).toLocaleDateString()}
-                  </span>
-                  <span className="text-xs text-muted-foreground flex items-center gap-1 ml-2">
-                    <MapPin className="w-3 h-3" /> {delivery.region}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold">{delivery.volume.toLocaleString()} Liters</h3>
-                <p className="text-sm text-muted-foreground">
-                  FDC: <span className="font-mono font-medium text-foreground">{delivery.fdcNo}</span> • 
-                  Destination: <span className="font-medium text-foreground">{delivery.destination}</span> •
-                  City: <span className="font-medium text-foreground">{delivery.citter}</span>
-                </p>
-                <p className="text-xs text-muted-foreground pt-1">
-                  Customer: <span className="font-medium text-foreground">{delivery.customer}</span>
-                </p>
-              </div>
-
-              <div className="flex flex-col items-end gap-2">
-                <Button 
-                  onClick={() => handleConfirm(delivery.id)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-                >
-                  <CheckCircle className="w-4 h-4" /> Confirm & Forward to Owner
-                </Button>
-              </div>
+        <Card className="max-w-4xl mx-auto border-dashed border-2 py-20 bg-muted/5">
+          <CardContent className="flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
+              <Truck className="w-10 h-10 text-muted-foreground/30" />
             </div>
+            <CardTitle className="text-2xl font-bold mb-2">All Logs Synchronized</CardTitle>
+            <CardDescription className="text-lg">No pending federal deliveries require confirmation at this time.</CardDescription>
+            <Button variant="outline" onClick={fetchPendingDeliveries} className="mt-8 gap-2">
+              <RefreshCcw className="w-4 h-4" /> Check for New shipments
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6 max-w-5xl mx-auto">
+          {deliveries.map((delivery) => (
+            <Card key={delivery.id} className="overflow-hidden border-border/50 shadow-md group hover:border-primary/50 transition-all duration-300">
+              <div className="h-1.5 w-full bg-amber-500/20 group-hover:bg-amber-500 transition-colors" />
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="space-y-3 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 border-amber-200 px-3 py-1 font-bold uppercase tracking-wider">
+                        {delivery.fuelType}
+                      </Badge>
+                      <Badge variant="outline" className="gap-1.5 px-3 py-1 text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5" />
+                        {new Date(delivery.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                      </Badge>
+                      <Badge variant="outline" className="gap-1.5 px-3 py-1 text-muted-foreground">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {delivery.region}
+                      </Badge>
+                    </div>
+
+                    <div className="space-y-1">
+                      <h3 className="text-3xl font-black text-foreground tracking-tight flex items-baseline gap-2">
+                        {delivery.volume.toLocaleString()} 
+                        <span className="text-sm font-normal text-muted-foreground">Liters</span>
+                      </h3>
+                      <div className="flex flex-wrap items-center text-sm gap-x-4 gap-y-1">
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          FDC Number: <span className="font-mono font-bold text-foreground bg-muted px-1.5 py-0.5 rounded">{delivery.fdcNo}</span>
+                        </span>
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          Client: <span className="font-bold text-foreground">{delivery.customer}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-muted/30 rounded-lg flex items-center gap-4 border border-border/10">
+                       <div className="flex flex-col">
+                          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Destination Node</span>
+                          <span className="font-semibold">{delivery.destination}</span>
+                       </div>
+                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                       <div className="flex flex-col">
+                          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Point of Delivery</span>
+                          <span className="font-semibold">{delivery.citter}</span>
+                       </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-border/50">
+                    <Button 
+                      onClick={() => setConfirmingDelivery(delivery)}
+                      className="w-full h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 flex items-center justify-center gap-3 rounded-xl font-bold group"
+                    >
+                      <ShieldCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      Authorize Delivery
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!confirmingDelivery} onOpenChange={(open) => !open && setConfirmingDelivery(null)}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Truck className="w-8 h-8 text-blue-600" />
+            </div>
+            <AlertDialogTitle className="text-center text-2xl">Confirm Logistics Action?</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              You are about to authorize the receipt of <span className="font-bold text-foreground">{confirmingDelivery?.volume.toLocaleString()}L</span> of <span className="font-bold text-foreground">{confirmingDelivery?.fuelType.toUpperCase()}</span> for the <span className="font-bold text-foreground">{confirmingDelivery?.region}</span> region.
+              <br /><br />
+              This will forward the delivery to the station owner for final validation.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="grid grid-cols-2 gap-3 sm:space-x-0">
+            <AlertDialogCancel asChild>
+              <Button variant="outline" className="h-11">Abeyance</Button>
+            </AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Button 
+                onClick={handleConfirm}
+                disabled={isProcessing}
+                className="h-11 bg-blue-600 hover:bg-blue-700 font-bold"
+              >
+                {isProcessing ? <Loader2 className="animate-spin h-4 w-4" /> : "Authorize Now"}
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

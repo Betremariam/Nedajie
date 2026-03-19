@@ -1,5 +1,50 @@
 import React, { useEffect, useState } from "react";
 import API from "../../services/api";
+import { 
+  PlusCircle, 
+  RefreshCcw, 
+  UserPlus, 
+  Table as TableIcon, 
+  Droplets, 
+  Locate, 
+  Fuel, 
+  CheckCircle2, 
+  AlertCircle,
+  Loader2
+} from "lucide-react";
+import { 
+  Tabs, 
+  TabsList, 
+  TabsTrigger, 
+  TabsContent 
+} from "../../components/ui/Tabs";
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "../../components/ui/Card";
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableHead, 
+  TableRow, 
+  TableCell 
+} from "../../components/ui/Table";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { Label } from "../../components/ui/Label";
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from "../../components/ui/Select";
+import { Alert, AlertTitle, AlertDescription } from "../../components/ui/Alert";
+import { Badge } from "../../components/ui/Badge";
 
 const FuelStockManager = () => {
   const [stations, setStations] = useState([]);
@@ -19,15 +64,20 @@ const FuelStockManager = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("stock");
 
   // Fetch stations
   const fetchStations = async () => {
+    setLoading(true);
     try {
       const res = await API.get("/admins/fuel-stocks");
       setStations(res.data);
     } catch (err) {
       console.error("Failed to fetch stations:", err);
+      setError("Failed to load fuel stations data.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,6 +90,7 @@ const FuelStockManager = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
     try {
       await API.post("/admins/fuel-stocks", stockForm);
@@ -53,6 +104,8 @@ const FuelStockManager = () => {
       fetchStations();
     } catch (err) {
       setError("Failed to add fuel stock.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,6 +132,7 @@ const FuelStockManager = () => {
       return;
     }
 
+    setLoading(true);
     try {
       await API.put(`/admins/fuel-stocks/${existing.id}/refill`, {
         additionalLiters: stockForm.litersReceived,
@@ -95,6 +149,8 @@ const FuelStockManager = () => {
     } catch (err) {
       console.error(err);
       setError("Failed to update fuel stock.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,6 +173,7 @@ const FuelStockManager = () => {
 
     const stationIds = matchedStations.map((s) => s.id);
 
+    setLoading(true);
     try {
       await API.post("/admins/owners", {
         name: ownerForm.name,
@@ -135,6 +192,8 @@ const FuelStockManager = () => {
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.msg || "Failed to create owner.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -156,282 +215,292 @@ const FuelStockManager = () => {
   );
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-8 space-y-8">
+      <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Fuel Stock Management</h1>
-        <p className="text-muted-foreground">Manage fuel stocks and station owners across all stations</p>
+        <p className="text-muted-foreground text-lg">Centralized inventory and ownership control</p>
       </div>
 
       {/* Alert Messages */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-3">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center gap-3">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          {success}
-        </div>
-      )}
-
-      {/* Tab Navigation */}
-      <div className="mb-8">
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-          <button
-            onClick={() => setActiveTab("stock")}
-            className={`px-6 py-3 rounded-md font-medium transition-colors ${
-              activeTab === "stock" 
-                ? "bg-card text-foreground shadow-sm" 
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Manage Fuel Stock
-          </button>
-          <button
-            onClick={() => setActiveTab("owner")}
-            className={`px-6 py-3 rounded-md font-medium transition-colors ${
-              activeTab === "owner" 
-                ? "bg-card text-foreground shadow-sm" 
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Create Station Owner
-          </button>
-          <button
-            onClick={() => setActiveTab("view")}
-            className={`px-6 py-3 rounded-md font-medium transition-colors ${
-              activeTab === "view" 
-                ? "bg-card text-foreground shadow-sm" 
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            View Stocks
-          </button>
-        </div>
-      </div>
-
-      {/* Fuel Stock Management Tab */}
-      {activeTab === "stock" && (
-        <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">Manage Fuel Stock</h2>
-          <form className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Station Name *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter station name"
-                  value={stockForm.stationName}
-                  onChange={(e) => setStockForm({ ...stockForm, stationName: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  City *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter city"
-                  value={stockForm.city}
-                  onChange={(e) => setStockForm({ ...stockForm, city: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Fuel Type *
-                </label>
-                <select
-                  value={stockForm.gasType}
-                  onChange={(e) => setStockForm({ ...stockForm, gasType: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                >
-                  <option value="benzene">Benzene</option>
-                  <option value="diesel">Diesel</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Liters *
-                </label>
-                <input
-                  type="number"
-                  placeholder="Enter liters"
-                  value={stockForm.litersReceived}
-                  onChange={(e) => setStockForm({ ...stockForm, litersReceived: Number(e.target.value) })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 pt-4">
-              <button
-                onClick={handleAddStock}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Fuel Stock
-              </button>
-              <button
-                onClick={handleUpdateStock}
-                className="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Update Fuel Stock
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Create Station Owner Tab */}
-      {activeTab === "owner" && (
-        <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">Create Station Owner</h2>
-          <form className="space-y-6" onSubmit={handleAddOwner}>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Select Station *
-              </label>
-              <select
-                value={ownerForm.stationKey}
-                onChange={(e) => setOwnerForm({ ...ownerForm, stationKey: e.target.value })}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                required
-              >
-                <option value="">Choose a station...</option>
-                {groupedStations.map((g) => (
-                  <option key={g.key} value={g.key}>
-                    {g.stationName} - {g.city} ({g.stocks.length} fuel types)
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Owner Full Name *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter owner name"
-                  value={ownerForm.name}
-                  onChange={(e) => setOwnerForm({ ...ownerForm, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  placeholder="Enter email address"
-                  value={ownerForm.email}
-                  onChange={(e) => setOwnerForm({ ...ownerForm, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  placeholder="Create password"
-                  value={ownerForm.password}
-                  onChange={(e) => setOwnerForm({ ...ownerForm, password: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-            </div>
-            <div className="pt-4">
-              <button type="submit" className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Create Station Owner
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* View Stocks Tab */}
-      {activeTab === "view" && (
-        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-          <div className="px-6 py-4 border-b border-border">
-            <h2 className="text-xl font-semibold text-foreground">Current Fuel Stocks</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Station Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    City
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Fuel Type
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Available Liters
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {stations.map((stock) => (
-                  <tr key={stock.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-foreground">{stock.stationName}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-muted-foreground">{stock.city}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
-                        {stock.gasType}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-foreground">
-                        {stock.litersReceived - stock.litersDispensed} L
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {stations.length === 0 && (
-            <div className="p-12 text-center">
-              <div className="text-6xl mb-4">⛽</div>
-              <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Fuel Stocks</h3>
-              <p className="text-muted-foreground">No fuel stocks have been added yet.</p>
-            </div>
+      {(error || success) && (
+        <div className="max-w-4xl mx-auto">
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert className="mb-4 bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-200">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
           )}
         </div>
       )}
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex justify-center mb-8">
+          <TabsList className="h-12 p-1 bg-muted/60">
+            <TabsTrigger value="stock" className="px-6 gap-2">
+              <PlusCircle className="w-4 h-4" />
+              Inventory
+            </TabsTrigger>
+            <TabsTrigger value="owner" className="px-6 gap-2">
+              <UserPlus className="w-4 h-4" />
+              Ownership
+            </TabsTrigger>
+            <TabsTrigger value="view" className="px-6 gap-2">
+              <TableIcon className="w-4 h-4" />
+              Review
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        {/* Inventory Management Tab */}
+        <TabsContent value="stock" className="space-y-6">
+          <Card className="max-w-4xl mx-auto border-border/50 shadow-lg">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Droplets className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle>Manage Fuel Stock</CardTitle>
+                  <CardDescription>Update or add new fuel inventory records</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="stationName">Station Name *</Label>
+                    <div className="relative">
+                      <Fuel className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="stationName"
+                        placeholder="e.g. TotalEnergies Bole"
+                        value={stockForm.stationName}
+                        onChange={(e) => setStockForm({ ...stockForm, stationName: e.target.value })}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City *</Label>
+                    <div className="relative">
+                      <Locate className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="city"
+                        placeholder="e.g. Addis Ababa"
+                        value={stockForm.city}
+                        onChange={(e) => setStockForm({ ...stockForm, city: e.target.value })}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fuel-type">Fuel Type *</Label>
+                    <Select 
+                      value={stockForm.gasType} 
+                      onValueChange={(val) => setStockForm({ ...stockForm, gasType: val })}
+                    >
+                      <SelectTrigger id="fuel-type" className="h-10">
+                        <SelectValue placeholder="Select fuel type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="benzene">Benzene</SelectItem>
+                        <SelectItem value="diesel">Diesel</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="liters">Amount in Liters *</Label>
+                    <Input
+                      id="liters"
+                      type="number"
+                      placeholder="Enter quantity"
+                      value={stockForm.litersReceived}
+                      onChange={(e) => setStockForm({ ...stockForm, litersReceived: Number(e.target.value) })}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border/50">
+                  <Button
+                    onClick={handleAddStock}
+                    className="flex-1 h-11 gap-2"
+                    disabled={loading}
+                  >
+                    {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
+                    Create New Entry
+                  </Button>
+                  <Button
+                    onClick={handleUpdateStock}
+                    variant="outline"
+                    className="flex-1 h-11 gap-2 border-amber-200 text-amber-700 hover:bg-amber-50"
+                    disabled={loading}
+                  >
+                    <RefreshCcw className="w-4 h-4" />
+                    Apply as Refill
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Ownership Management Tab */}
+        <TabsContent value="owner" className="space-y-6">
+          <Card className="max-w-4xl mx-auto border-border/50 shadow-lg">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <UserPlus className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle>Assign Station Owner</CardTitle>
+                  <CardDescription>Grant administrative control to station personnel</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-6" onSubmit={handleAddOwner}>
+                <div className="space-y-2">
+                  <Label htmlFor="station-select">Select Station Hub *</Label>
+                  <Select 
+                    value={ownerForm.stationKey} 
+                    onValueChange={(val) => setOwnerForm({ ...ownerForm, stationKey: val })}
+                  >
+                    <SelectTrigger id="station-select" className="h-11">
+                      <SelectValue placeholder="Choose a registered station hub..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {groupedStations.map((g) => (
+                        <SelectItem key={g.key} value={g.key}>
+                          {g.stationName} — {g.city} ({g.stocks.length} fuels)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="owner-name">Full Name *</Label>
+                    <Input
+                      id="owner-name"
+                      placeholder="e.g. Abebe Bikila"
+                      value={ownerForm.name}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="owner-email">Email Address *</Label>
+                    <Input
+                      id="owner-email"
+                      type="email"
+                      placeholder="e.g. owner@example.com"
+                      value={ownerForm.email}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="owner-pass">Access Password *</Label>
+                    <Input
+                      id="owner-pass"
+                      type="password"
+                      placeholder="Set initial password"
+                      value={ownerForm.password}
+                      onChange={(e) => setOwnerForm({ ...ownerForm, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-border/50">
+                  <Button type="submit" className="w-full sm:w-auto px-10 h-11 gap-2" disabled={loading}>
+                    {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                    Authorize Station Owner
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Review/View Tab */}
+        <TabsContent value="view" className="space-y-6">
+          <Card className="border-border/50 shadow-lg overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 bg-muted/20">
+              <div>
+                <CardTitle>Inventory Audit</CardTitle>
+                <CardDescription>Real-time status of all registered fuel stocks</CardDescription>
+              </div>
+              <Badge variant="outline" className="px-3 py-1">Total: {stations.length}</Badge>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent bg-muted/40">
+                      <TableHead className="pl-6 h-12 uppercase text-[10px] font-bold tracking-wider">Station Name</TableHead>
+                      <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Locality</TableHead>
+                      <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Product Type</TableHead>
+                      <TableHead className="pr-6 h-12 text-right uppercase text-[10px] font-bold tracking-wider">Volume Remaining</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {stations.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="h-48 text-center text-muted-foreground">
+                          {loading ? <Loader2 className="animate-spin h-6 w-6 mx-auto" /> : "No fuel stocks registered."}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      stations.map((stock) => (
+                        <TableRow key={stock.id} className="group transition-colors hover:bg-muted/30">
+                          <TableCell className="pl-6 font-semibold">{stock.stationName}</TableCell>
+                          <TableCell className="text-muted-foreground">{stock.city}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="capitalize px-2 py-0">
+                              {stock.gasType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="pr-6 text-right">
+                            <div className="flex flex-col items-end">
+                              <span className="text-sm font-bold text-foreground">
+                                {(stock.litersReceived - stock.litersDispensed).toLocaleString()} L
+                              </span>
+                              <div className="w-24 h-1 bg-muted rounded-full overflow-hidden mt-1">
+                                <div 
+                                  className={`h-full ${
+                                    (stock.litersReceived - stock.litersDispensed) / stock.litersReceived < 0.2 
+                                      ? "bg-red-500" 
+                                      : "bg-emerald-500"
+                                  }`}
+                                  style={{ 
+                                    width: `${Math.min(100, ((stock.litersReceived - stock.litersDispensed) / stock.litersReceived) * 100)}%` 
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

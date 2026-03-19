@@ -1,6 +1,51 @@
 import React, { useEffect, useState } from "react";
 import API from "../../services/api";
-import { Copy, Check, ShieldAlert, ShieldCheck, KeyRound } from "lucide-react";
+import { Copy, Check, ShieldAlert, ShieldCheck, KeyRound, Loader2, UserPlus, Trash2, Ban, Unlock } from "lucide-react";
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableHead, 
+  TableRow, 
+  TableCell 
+} from "../../components/ui/Table";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { Label } from "../../components/ui/Label";
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from "../../components/ui/Select";
+import { Checkbox } from "../../components/ui/Checkbox";
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "../../components/ui/Card";
+import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { Badge } from "../../components/ui/Badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/AlertDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/Dialog";
 
 const ManageAdmins = () => {
   const [admins, setAdmins] = useState([]);
@@ -18,6 +63,9 @@ const ManageAdmins = () => {
   // Temp password modal state
   const [newAdminCreds, setNewAdminCreds] = useState(null);
   const [copied, setCopied] = useState(false);
+
+  // Alert Dialog State
+  const [blockingAdmin, setBlockingAdmin] = useState(null);
 
   const fetchAdmins = async () => {
     setLoading(true);
@@ -49,6 +97,10 @@ const ManageAdmins = () => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleRoleChange = (role) => {
+    setFormData(prev => ({ ...prev, role }));
+  };
+
   const handleStationToggle = (stationId) => {
     setFormData(prev => {
       const current = prev.stationIds;
@@ -72,10 +124,14 @@ const ManageAdmins = () => {
       return setError("Please fill all required fields");
     }
 
+    setLoading(true);
     try {
       let res;
       if (role === "stationOwner") {
-        if (stationIds.length === 0) return setError("Please select at least one station.");
+        if (stationIds.length === 0) {
+          setLoading(false);
+          return setError("Please select at least one station.");
+        }
         res = await API.post("/admins/owners", { name, email, stationIds });
       } else {
         res = await API.post("/admins/admins", { name, email, role });
@@ -87,12 +143,19 @@ const ManageAdmins = () => {
       fetchAdmins();
     } catch (err) {
       setError(err.response?.data?.msg || "Failed to create admin");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleToggleBlock = async (id, currentStatus) => {
-    const action = currentStatus ? "unblock" : "block";
-    if (!window.confirm(`Are you sure you want to ${action} this admin?`)) return;
+  const confirmToggleBlock = (admin) => {
+    setBlockingAdmin(admin);
+  };
+
+  const handleToggleBlock = async () => {
+    if (!blockingAdmin) return;
+    const { id, isBlocked } = blockingAdmin;
+    const action = isBlocked ? "unblock" : "block";
     setError("");
     setSuccess("");
     try {
@@ -101,6 +164,8 @@ const ManageAdmins = () => {
       fetchAdmins();
     } catch (err) {
       setError(err.response?.data?.msg || `Failed to ${action} admin`);
+    } finally {
+      setBlockingAdmin(null);
     }
   };
 
@@ -113,215 +178,274 @@ const ManageAdmins = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-8 space-y-8">
+      <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Manage Administrators</h1>
-        <p className="text-muted-foreground">Create and manage system administrators</p>
+        <p className="text-muted-foreground text-lg">System-wide command and access control</p>
       </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-3">
-          <ShieldAlert className="w-5 h-5" />
-          {error}
-        </div>
-      )}
-      {success && !newAdminCreds && (
-        <div className="mb-6 p-4 bg-emerald-100 border border-emerald-400 text-emerald-800 rounded-lg flex items-center gap-3">
-          <ShieldCheck className="w-5 h-5" />
-          {success}
-        </div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+            <Alert variant="destructive">
+              <ShieldAlert className="w-4 h-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
+        {success && !newAdminCreds && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+            <Alert className="bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-200">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Temp Password Modal / Alert */}
-      {newAdminCreds && (
-        <div className="mb-8 p-6 bg-brand-50 border-2 border-brand-200 rounded-xl shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
-          <h3 className="text-lg font-bold text-brand-900 mb-2 flex items-center gap-2">
-            <KeyRound className="w-5 h-5 text-brand-600" />
-            Admin Created Successfully!
-          </h3>
-          <p className="text-brand-700 mb-4 text-sm">
-            Please share these temporary credentials securely. The user will be required to change this password on their first login.
-          </p>
-          <div className="bg-white p-4 rounded-lg border border-brand-100 flex items-center justify-between">
-            <div className="font-mono text-sm">
-              <div><span className="text-gray-500">Email:</span> <span className="font-semibold text-gray-900">{newAdminCreds.email}</span></div>
-              <div className="mt-1"><span className="text-gray-500">Temp Password:</span> <span className="font-bold text-brand-600 text-lg">{newAdminCreds.tempPassword}</span></div>
-            </div>
-            <button
-              onClick={copyToClipboard}
-              className="px-4 py-2 bg-brand-100 hover:bg-brand-200 text-brand-700 rounded-md transition-colors flex items-center gap-2 font-medium"
-            >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copied ? "Copied!" : "Copy"}
-            </button>
+      <Card className="border-border/50 shadow-md">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-primary/10 rounded-lg">
+                <UserPlus className="w-5 h-5 text-primary" />
+             </div>
+             <div>
+                <CardTitle>Create New Admin</CardTitle>
+                <CardDescription>Grant system access with specific roles</CardDescription>
+             </div>
           </div>
-        </div>
-      )}
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name *</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter admin's full name"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Admin Role *</Label>
+                <Select value={formData.role} onValueChange={handleRoleChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="register">Registration Admin</SelectItem>
+                    <SelectItem value="approver">Approval Admin</SelectItem>
+                    <SelectItem value="stationOwner">Station Owner</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-      {/* Create Admin Form */}
-      <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
-        <h2 className="text-xl font-semibold text-foreground mb-6">Create New Admin</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Full Name *</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
-                placeholder="Enter admin's full name"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address *</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
-                placeholder="Enter email address"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Admin Role *</label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+            {formData.role === "stationOwner" && (
+              <div className="mt-4 p-5 border border-border rounded-xl bg-muted/20 space-y-4">
+                <Label className="text-sm font-semibold text-foreground">Assigned Stations *</Label>
+                {stations.length === 0 ? (
+                  <p className="text-sm text-yellow-600 font-medium">No stations available. Please add fuel stock first.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {stations.map(station => (
+                      <div key={station.id} className="flex items-center space-x-3 p-3 border border-border rounded-lg bg-card hover:bg-muted/50 transition-all">
+                        <Checkbox 
+                          id={`station-${station.id}`}
+                          checked={formData.stationIds.includes(station.id)}
+                          onCheckedChange={() => handleStationToggle(station.id)}
+                        />
+                        <Label htmlFor={`station-${station.id}`} className="text-sm cursor-pointer leading-tight">
+                          <span className="font-semibold block">{station.stationName}</span>
+                          <span className="text-xs text-muted-foreground">{station.city}</span>
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="pt-2">
+              <Button
+                type="submit"
+                className="w-full sm:w-auto h-11 px-8 gap-2"
+                disabled={loading}
               >
-                <option value="register">Registration Admin</option>
-                <option value="approver">Approval Admin</option>
-                <option value="stationOwner">Station Owner</option>
-              </select>
+                {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <KeyRound className="w-4 h-4" />}
+                {loading ? "Processing..." : "Generate Admin Access"}
+              </Button>
             </div>
-          </div>
+          </form>
+        </CardContent>
+      </Card>
 
-          {formData.role === "stationOwner" && (
-            <div className="mt-4 p-4 border border-border rounded-lg bg-muted/30">
-              <label className="block text-sm font-medium text-foreground mb-3">Select Assigned Stations *</label>
-              {stations.length === 0 ? (
-                <p className="text-sm text-yellow-600">No stations available. Please add fuel stock first.</p>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {stations.map(station => (
-                    <label key={station.id} className="flex items-center space-x-2 p-2 border border-border rounded-md bg-card hover:bg-muted/50 cursor-pointer transition-colors">
-                      <input 
-                        type="checkbox" 
-                        checked={formData.stationIds.includes(station.id)}
-                        onChange={() => handleStationToggle(station.id)}
-                        className="rounded text-brand-600 focus:ring-brand-500 w-4 h-4" 
-                      />
-                      <span className="text-sm font-medium">{station.stationName} <span className="text-xs text-muted-foreground">({station.city})</span></span>
-                    </label>
-                  ))}
-                </div>
-              )}
+      <Card className="border-border/50 shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Registered Administrators</CardTitle>
+            <CardDescription>View and manage all system access levels</CardDescription>
+          </div>
+          <Badge variant="outline" className="px-3 py-1">Total: {admins.length}</Badge>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loading && admins.length === 0 ? (
+            <div className="p-12 text-center">
+              <Loader2 className="animate-spin h-8 w-8 text-primary mx-auto mb-4" />
+              <p className="text-muted-foreground">Synchronizing records...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[300px] pl-6">Administrator</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right pr-6">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {admins.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="h-48 text-center text-muted-foreground">
+                        No administrator records found.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    admins.map((admin) => (
+                      <TableRow key={admin.id} className="group">
+                        <TableCell className="pl-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20">
+                              <span className="text-primary font-bold text-sm">
+                                {admin.name?.charAt(0) || 'A'}
+                              </span>
+                            </div>
+                            <div className="font-semibold text-foreground">{admin.name}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{admin.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="capitalize">
+                            {admin.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1.5 items-start">
+                            {admin.isBlocked ? (
+                              <Badge className="bg-red-500/10 text-red-700 border-red-200 hover:bg-red-500/20 gap-1">
+                                <Ban className="w-3 h-3" /> Blocked
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-emerald-500/10 text-emerald-700 border-emerald-200 hover:bg-emerald-500/20 gap-1">
+                                <ShieldCheck className="w-3 h-3" /> Active
+                              </Badge>
+                            )}
+                            {admin.mustChangePassword && (
+                              <span className="text-[10px] bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Needs Password Change</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right pr-6">
+                          <Button
+                            variant={admin.isBlocked ? "outline" : "destructive"}
+                            size="sm"
+                            onClick={() => confirmToggleBlock(admin)}
+                            className={admin.isBlocked ? "border-emerald-200 text-emerald-700 hover:bg-emerald-50 gap-2" : "gap-2"}
+                          >
+                            {admin.isBlocked ? <Unlock className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                            {admin.isBlocked ? "Restore Access" : "Block User"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          <div className="pt-4">
-            <button
-              type="submit"
-              className="bg-brand-600 text-white px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
-              disabled={loading}
+      {/* Credential Display Dialog */}
+      <Dialog open={!!newAdminCreds} onOpenChange={(open) => !open && setNewAdminCreds(null)}>
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-950">
+          <DialogHeader className="items-center text-center">
+            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+              <KeyRound className="w-6 h-6 text-emerald-600" />
+            </div>
+            <DialogTitle className="text-xl">Admin Created Successfully</DialogTitle>
+            <DialogDescription>
+              Share these temporary credentials with the new administrator.
+            </DialogDescription>
+          </DialogHeader>
+          {newAdminCreds && (
+            <div className="space-y-4 pt-4">
+              <div className="p-4 rounded-xl border-2 border-dashed border-emerald-200 bg-emerald-50/50 space-y-3">
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Email Address</span>
+                  <span className="font-mono text-sm break-all">{newAdminCreds.email}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Temporary Password</span>
+                  <span className="font-mono text-xl font-bold text-emerald-700 select-all">{newAdminCreds.tempPassword}</span>
+                </div>
+              </div>
+              <Button onClick={copyToClipboard} className="w-full h-11 gap-2" variant={copied ? "secondary" : "default"}>
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? "Copied to Clipboard!" : "Copy Credentials"}
+              </Button>
+              <p className="text-[10px] text-center text-muted-foreground uppercase font-bold tracking-widest">
+                Security Warning: Share via encrypted channels only
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Block/Unblock Confirmation */}
+      <AlertDialog open={!!blockingAdmin} onOpenChange={(open) => !open && setBlockingAdmin(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              {blockingAdmin?.isBlocked ? "Unblock" : "Block"} Administrator?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {blockingAdmin?.isBlocked 
+                ? `This will restore system access for ${blockingAdmin?.name}. They will be able to log in and perform actions according to their role.`
+                : `This will immediately revoke system access for ${blockingAdmin?.name}. All active sessions will eventually be invalidated.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleToggleBlock}
+              className={blockingAdmin?.isBlocked ? "bg-emerald-600 hover:bg-emerald-700" : "bg-destructive hover:bg-destructive/90"}
             >
-              {loading ? "Creating..." : "Generate Admin & Password"}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Admins List */}
-      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-        <div className="px-6 py-4 border-b border-border">
-          <h2 className="text-xl font-semibold text-foreground">Registered Administrators</h2>
-        </div>
-
-        {loading && admins.length === 0 ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600 mx-auto"></div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Administrator</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {admins.length === 0 ? (
-                  <tr>
-                    <td colSpan="5" className="px-6 py-12 text-center text-muted-foreground">
-                      No administrators found.
-                    </td>
-                  </tr>
-                ) : (
-                  admins.map((admin) => (
-                    <tr key={admin.id} className="hover:bg-muted/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center mr-3">
-                            <span className="text-brand-700 font-semibold text-sm">
-                              {admin.name?.charAt(0) || 'A'}
-                            </span>
-                          </div>
-                          <div className="text-sm font-medium text-foreground">{admin.name}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{admin.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize bg-blue-100 text-blue-800">
-                          {admin.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col gap-1 items-start">
-                          {admin.isBlocked ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs gap-1 font-medium bg-red-100 text-red-800 border border-red-200">
-                              <ShieldAlert className="w-3 h-3" /> Blocked
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs gap-1 font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                              <ShieldCheck className="w-3 h-3" /> Active
-                            </span>
-                          )}
-                          {admin.mustChangePassword && (
-                            <span className="text-[10px] text-amber-600 font-medium px-1 bg-amber-50 rounded">Pending First Login</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleToggleBlock(admin.id, admin.isBlocked)}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${
-                            admin.isBlocked 
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" 
-                              : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
-                          }`}
-                        >
-                          {admin.isBlocked ? "Unblock" : "Block"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              Confirm {blockingAdmin?.isBlocked ? "Restore" : "Block"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

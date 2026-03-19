@@ -1,5 +1,28 @@
 import React, { useEffect, useState } from "react";
 import API from "../../services/api";
+import { 
+  Users, 
+  Search, 
+  Sprout, 
+  CheckCircle2, 
+  AlertCircle, 
+  Loader2,
+  Contact,
+  ShieldCheck,
+  MapPinned
+} from "lucide-react";
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableHead, 
+  TableRow, 
+  TableCell 
+} from "../../components/ui/Table";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../components/ui/Card";
+import { Input } from "../../components/ui/Input";
+import { Badge } from "../../components/ui/Badge";
+import { Button } from "../../components/ui/Button";
 
 const FarmerLists = () => {
   const [farmers, setFarmers] = useState([]);
@@ -26,129 +49,117 @@ const FarmerLists = () => {
   );
 
   if (loading) return (
-    <div className="flex justify-center items-center p-8">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Loading farmers...</p>
-      </div>
+    <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <p className="text-muted-foreground animate-pulse font-medium">Synchronizing agricultural registry...</p>
     </div>
   );
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Registered Farmers</h1>
-        <p className="text-muted-foreground">View and manage all registered farmers in the system</p>
+    <div className="p-8 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Registered Farmers</h1>
+          <p className="text-muted-foreground text-lg">Central directory of verified agricultural stakeholders</p>
+        </div>
+        <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2 bg-emerald-500/5 border-emerald-200 text-emerald-700">
+          <Sprout className="w-4 h-4" />
+          {farmers.length} Verified Producers
+        </Badge>
       </div>
 
-      <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-muted-foreground mb-2">
-              Search Farmers
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search by farmer name..."
-                className="w-full px-4 py-3 pl-10 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <svg className="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Filter by farmer name..."
+              className="pl-10 h-11"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <div className="bg-green-50 rounded-lg p-4">
-            <div className="text-sm text-green-600 font-semibold">
-              Total Farmers: {farmers.length}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {filteredFarmers.length === 0 ? (
-        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
-          <div className="text-6xl mb-4">👨‍🌾</div>
-          <h3 className="text-xl font-semibold text-muted-foreground mb-2">
-            {search ? "No Farmers Found" : "No Farmers Registered"}
-          </h3>
-          <p className="text-muted-foreground">
-            {search 
-              ? "No farmers match your search criteria" 
-              : "There are no farmers registered in the system yet"
-            }
-          </p>
-        </div>
-      ) : (
-        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+        </CardHeader>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Farmer
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Woreda
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Kebele
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Approval Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {filteredFarmers.map((farmer) => (
-                  <tr key={farmer.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-green-600 font-semibold text-sm">
-                            {farmer.fullName?.charAt(0) || 'F'}
-                          </span>
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent bg-muted/30">
+                  <TableHead className="pl-6 h-12 uppercase text-[10px] font-bold tracking-wider">Farmer Identity</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Contact Details</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Administrative Zone</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Local Jurisdiction</TableHead>
+                  <TableHead className="pr-6 h-12 uppercase text-[10px] font-bold tracking-wider">Verification Source</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredFarmers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-64 text-center">
+                      <div className="flex flex-col items-center justify-center text-muted-foreground gap-3">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                          <Sprout className="w-8 h-8 opacity-20" />
                         </div>
-                        <div className="text-sm font-medium text-foreground">{farmer.fullName}</div>
+                        <p className="text-lg font-medium">{search ? "No farmers match" : "Registry is empty"}</p>
+                        <Button variant="link" onClick={() => setSearch("")} className="text-primary">Clear search</Button>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-muted-foreground">{farmer.phoneNumber}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-foreground">{farmer.woreda}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-foreground">{farmer.kebele}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {farmer.approvedBy ? (
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <div className="text-sm text-muted-foreground">
-                            {farmer.approvedBy.name} ({farmer.approvedBy.email})
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredFarmers.map((farmer) => (
+                    <TableRow key={farmer.id} className="group transition-colors hover:bg-muted/40">
+                      <TableCell className="pl-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20">
+                            <span className="text-emerald-600 font-bold text-sm">
+                              {farmer.fullName?.charAt(0) || 'F'}
+                            </span>
+                          </div>
+                          <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {farmer.fullName}
                           </div>
                         </div>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          Pending Approval
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Contact className="w-3.5 h-3.5" />
+                          {farmer.phoneNumber}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <MapPinned className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-sm">{farmer.woreda}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono text-[11px] px-2 py-0">
+                          {farmer.kebele}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="pr-6">
+                        {farmer.approvedBy ? (
+                          <div className="flex items-center gap-2 text-xs py-1 px-2 bg-emerald-500/5 border border-emerald-500/20 rounded-md w-fit">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            <div className="flex flex-col">
+                              <span className="font-bold text-emerald-800 dark:text-emerald-400">{farmer.approvedBy.name}</span>
+                              <span className="text-[10px] opacity-60">{farmer.approvedBy.email}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="bg-amber-500/5 text-amber-600 border-amber-200 italic font-normal">
+                            Pending Validation
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

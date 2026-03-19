@@ -21,6 +21,8 @@ model Admin {
   isApproved          Boolean   @default(true)
   isBlocked           Boolean   @default(false)
   mustChangePassword  Boolean   @default(false)
+  region              String?
+  companyName         String?
   stationIds          String[]
   createdAt           DateTime  @default(now())
 
@@ -30,6 +32,7 @@ model Admin {
 }
 
 enum AdminRole {
+  federal
   super
   approver
   register
@@ -48,6 +51,7 @@ model Driver {
   lastFuelDate    DateTime?
   isApproved      Boolean  @default(false)
   documentPath    String?
+  region          String?
   approvedBy      Admin?   @relation(fields: [approvedById], references: [id])
   approvedById    String?
   createdAt       DateTime @default(now())
@@ -71,6 +75,7 @@ model Farmer {
   litersUsed15Days Float    @default(0)
   limitStartDate  DateTime? @default(now())
   documentPath    String?
+  region          String?
   approvedBy      Admin?   @relation(fields: [approvedById], references: [id])
   approvedById    String?
   isApproved      Boolean  @default(false)
@@ -86,6 +91,7 @@ model FuelAttendant {
   password     String
   stationName  String
   city         String
+  region       String?
   isApproved   Boolean  @default(false)
   documentPath String
   createdAt    DateTime @default(now())
@@ -93,17 +99,27 @@ model FuelAttendant {
 }
 
 model FuelDelivery {
-  id          String   @id @default(cuid())
-  date        String
-  customer    String
-  destination String
-  citter      String
-  fdcNo       String
-  volume      Float
-  region      String
-  fuelType    FuelType
-  isConfirmed Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id                String             @id @default(cuid())
+  date              String
+  customer          String
+  destination       String
+  citter            String
+  fdcNo             String
+  volume            Float
+  region            String
+  fuelType          FuelType
+  status            FuelDeliveryStatus @default(PENDING)
+  isConfirmed       Boolean            @default(false)
+  superAdminId      String?
+  ownerId           String?
+  createdAt         DateTime           @default(now())
+}
+
+enum FuelDeliveryStatus {
+  PENDING
+  SUPERADMIN_ACCEPTED
+  OWNER_ACCEPTED
+  REJECTED
 }
 
 enum FuelType {
@@ -117,6 +133,7 @@ model FuelReceived {
   stationId   String
   stationName String
   city        String
+  region      String?
   gasType     FuelType
   liters      Float
   date        DateTime  @default(now())
@@ -128,6 +145,7 @@ model FuelStock {
   id              String   @id @default(cuid())
   stationName     String
   city            String
+  region          String?
   gasType         FuelType
   litersReceived  Float
   litersDispensed Float    @default(0)
@@ -151,6 +169,7 @@ model FuelTransaction {
   stationName   String
   attendantName String
   city          String
+  region        String?
   date          DateTime  @default(now())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -163,6 +182,7 @@ model OtherUser {
   fuelType       FuelType
   dailyLimitUsed Float    @default(0)
   documentPath   String?
+  region         String?
   isApproved     Boolean  @default(false)
   approvedBy     Admin?   @relation(fields: [approvedById], references: [id])
   approvedById   String?

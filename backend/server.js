@@ -11,6 +11,8 @@ import farmerRoutes from "./routes/farmerRoutes.js";
 import adminsRoutes from "./routes/adminsRoutes.js";
 import adminsAuthRoutes from "./routes/adminsAuthRoutes.js";
 import stationOwnerRoutes from './routes/stationOwnerRoutes.js';
+import federalRoutes from "./routes/federalRoutes.js";
+import fuelWorkflowRoutes from "./routes/fuelWorkflowRoutes.js";
 
 const app = express();
 
@@ -27,32 +29,52 @@ app.use("/api/attendants", attendantRoutes);
 app.use("/api/admins", adminsRoutes);
 app.use("/api/admin-auth", adminsAuthRoutes);
 app.use("/api/owners", stationOwnerRoutes);
+app.use("/api/federal", federalRoutes);
+app.use("/api/fuel-workflow", fuelWorkflowRoutes);
 
 app.use('/uploads', express.static('uploads'));
 
-// Create super admin if not exists
-const createSuperAdmin = async () => {
+// Initialize System - Create Federal/Super admins if not exists
+const initializeSystem = async () => {
   try {
+    // 1. Create Federal Admin from ENV
+    const existingFederal = await prisma.admin.findFirst({
+      where: { role: "federal" },
+    });
+    if (!existingFederal && process.env.FEDERAL_EMAIL) {
+      const hashedPassword = await bcrypt.hash(process.env.FEDERAL_PASSWORD || "FederalSecure123", 10);
+      await prisma.admin.create({
+        data: {
+          name: "Federal Admin",
+          email: process.env.FEDERAL_EMAIL,
+          password: hashedPassword,
+          role: "federal",
+          isApproved: true,
+        },
+      });
+      console.log("✅ Federal Admin created successfully.");
+    }
+
+    // 2. Create fallback Super Admin if none exists
     const existingSuperAdmin = await prisma.admin.findFirst({
       where: { role: "super" },
     });
     if (!existingSuperAdmin) {
-      const hashedPassword = await bcrypt.hash(process.env.SUPER_ADMIN_PASSWORD, 10);
+      const hashedPassword = await bcrypt.hash("SuperSecure123", 10);
       await prisma.admin.create({
         data: {
-          name: "Super Admin",
-          email: process.env.SUPER_ADMIN_EMAIL,
+          name: "System Super Admin",
+          email: "super@admin.com",
           password: hashedPassword,
           role: "super",
           isApproved: true,
+          region: "National"
         },
       });
-      console.log("✅ Super Admin created successfully.");
-    } else {
-      console.log("ℹ️ Super Admin already exists.");
+      console.log("✅ Default Super Admin created successfully.");
     }
   } catch (err) {
-    console.error("❌ Failed to create Super Admin:", err.message);
+    console.error("❌ initialization error:", err.message);
   }
 };
 
@@ -61,9 +83,9 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     // Optional: await prisma.$connect(); 
-    await createSuperAdmin();
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on 0.0.0.0:${PORT}`);
+    await initializeSystem();
+    const server = app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
     
     server.on('close', () => {

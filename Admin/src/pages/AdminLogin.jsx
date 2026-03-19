@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { loginAdmin } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, Loader2 } from "lucide-react";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Label } from "../components/ui/Label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "../components/ui/Card";
+import { Alert, AlertDescription } from "../components/ui/Alert";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -44,7 +49,6 @@ const AdminLogin = () => {
       const res = await loginAdmin({ email, password });
       const { token, admin, mustChangePassword } = res.data;
 
-      // Ensure mustChangePassword is part of what we store to easily recheck
       const adminData = { ...admin, mustChangePassword };
 
       localStorage.setItem("adminToken", token);
@@ -87,71 +91,62 @@ const AdminLogin = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-[420px] z-10 mx-4"
       >
-        <div className="bg-[#111827]/60 backdrop-blur-2xl border border-white/5 rounded-3xl shadow-2xl overflow-hidden relative">
-          
+        <Card className="bg-[#111827]/60 backdrop-blur-2xl border-white/5 rounded-3xl shadow-2xl overflow-hidden relative py-0 gap-0">
           {/* Subtle top highlight */}
           <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-brand-400/50 to-transparent" />
 
-          <div className="p-10 pt-12">
-            <div className="text-center mb-10">
-              <motion.div 
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="w-16 h-16 bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(37,99,235,0.3)] border border-brand-400/20"
-              >
-                <div className="w-8 h-8 flex items-center justify-center relative">
-                    <svg className="w-full h-full text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                </div>
-              </motion.div>
-              <motion.h1 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                transition={{ delay: 0.3 }}
-                className="text-3xl font-bold text-white mb-2 tracking-tight"
-              >
-                Admin Portal
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                transition={{ delay: 0.4 }}
-                className="text-brand-200/60 font-medium"
-              >
-                Secure access to the ecosystem
-              </motion.p>
-            </div>
+          <CardHeader className="p-10 pb-0 pt-12 items-center text-center">
+            <motion.div 
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="w-16 h-16 bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(37,99,235,0.3)] border border-brand-400/20"
+            >
+              <div className="w-8 h-8 flex items-center justify-center relative">
+                  <svg className="w-full h-full text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+              </div>
+            </motion.div>
+            <CardTitle className="text-3xl font-bold text-white tracking-tight">
+              Admin Portal
+            </CardTitle>
+            <CardDescription className="text-brand-200/60 font-medium mt-2">
+              Secure access to the ecosystem
+            </CardDescription>
+          </CardHeader>
 
+          <CardContent className="p-10 pt-8">
             <AnimatePresence>
               {error && (
                 <motion.div 
                   initial={{ opacity: 0, height: 0, y: -10 }}
                   animate={{ opacity: 1, height: "auto", y: 0 }}
                   exit={{ opacity: 0, height: 0, y: -10 }}
-                  className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3"
+                  className="mb-6"
                 >
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-red-200 text-sm leading-relaxed">{error}</span>
+                  <Alert variant="destructive" className="bg-red-500/10 border-red-500/20 text-red-200">
+                    <AlertCircle className="w-4 h-4 text-red-400" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
                 </motion.div>
               )}
             </AnimatePresence>
 
             <form onSubmit={handleLogin} className="space-y-5 relative z-20">
-              
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
-                <label className="block text-sm font-medium text-gray-300 mb-2 pl-1">
+                <Label htmlFor="email" className="text-gray-300 mb-2 pl-1 block">
                   Email Address
-                </label>
+                </Label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-brand-400 transition-colors">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-brand-400 transition-colors z-10">
                     <Mail className="h-5 w-5" />
                   </div>
-                  <input
+                  <Input
+                    id="email"
                     type="email"
                     placeholder="name@example.com"
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#1f2937]/40 border border-gray-700/50 text-white rounded-xl focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all outline-none placeholder:text-gray-600 shadow-inner"
+                    className="pl-11 h-12 bg-[#1f2937]/40 border-gray-700/50 text-white rounded-xl focus-visible:ring-brand-500/50 focus-visible:border-brand-500 transition-all placeholder:text-gray-600 shadow-inner"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -160,26 +155,25 @@ const AdminLogin = () => {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>
-                <div className="flex justify-between mb-2 pl-1 pr-1">
-                  <label className="block text-sm font-medium text-gray-300">
-                    Password
-                  </label>
-                </div>
+                <Label htmlFor="password" title="Password" className="text-gray-300 mb-2 pl-1 block">
+                  Password
+                </Label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-brand-400 transition-colors">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-brand-400 transition-colors z-10">
                     <Lock className="h-5 w-5" />
                   </div>
-                  <input
+                  <Input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="w-full pl-11 pr-12 py-3.5 bg-[#1f2937]/40 border border-gray-700/50 text-white rounded-xl focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all outline-none placeholder:text-gray-600 shadow-inner"
+                    className="pl-11 pr-12 h-12 bg-[#1f2937]/40 border-gray-700/50 text-white rounded-xl focus-visible:ring-brand-500/50 focus-visible:border-brand-500 transition-all placeholder:text-gray-600 shadow-inner"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 focus:outline-none transition-colors"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 focus:outline-none transition-colors z-10"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -193,40 +187,37 @@ const AdminLogin = () => {
                 transition={{ delay: 0.7 }}
                 className="pt-4"
               >
-                <button
+                <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-brand-600 to-brand-500 text-white py-3.5 px-4 rounded-xl hover:from-brand-500 hover:to-brand-400 transition-all duration-300 font-semibold shadow-[0_4px_20px_0_rgba(37,99,235,0.2)] hover:shadow-[0_4px_25px_0_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group"
+                  className="w-full h-12 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl hover:from-brand-500 hover:to-brand-400 transition-all duration-300 font-semibold shadow-[0_4px_20px_0_rgba(37,99,235,0.2)] hover:shadow-[0_4px_25px_0_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group border-0 text-md"
                 >
                   {loading ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <Loader2 className="animate-spin h-5 w-5" />
                       <span className="tracking-wide">Authenticating...</span>
                     </>
                   ) : (
                     <>
-                      <span className="tracking-wider text-sm uppercase">Sign In</span>
+                      <span className="tracking-wider uppercase text-sm">Sign In</span>
                       <motion.div
                         initial={{ x: 0 }}
                         whileHover={{ x: 4 }}
                         transition={{ duration: 0.2 }}
                       >
-                         <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                         </svg>
+                         <ArrowRight className="w-5 h-5 ml-1" />
                       </motion.div>
                     </>
                   )}
-                </button>
+                </Button>
               </motion.div>
             </form>
-          </div>
+          </CardContent>
           
-          {/* Footer inside card */}
-          <div className="bg-[#1f2937]/30 py-4 px-8 border-t border-gray-800/60 text-center">
+          <CardFooter className="bg-[#1f2937]/30 py-4 px-8 border-t border-gray-800/60 justify-center">
              <p className="text-xs text-gray-500 font-medium">NigdBureau Bureau System v2.0</p>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </motion.div>
     </div>
   );
