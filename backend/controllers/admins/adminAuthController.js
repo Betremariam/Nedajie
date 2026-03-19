@@ -5,26 +5,43 @@ import jwt from "jsonwebtoken";
 export const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
-  // Super admin - env-based credentials
+  // Federal admin - env-based credentials
   if (
-    email === process.env.SUPER_ADMIN_EMAIL &&
-    password === process.env.SUPER_ADMIN_PASSWORD
+    email === process.env.FEDERAL_EMAIL &&
+    password === process.env.FEDERAL_PASSWORD
   ) {
-    const token = jwt.sign(
-      { role: "super" },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    try {
+      const federalUser = await prisma.admin.findUnique({ where: { email } });
+      const payload = { role: "federal" };
+      if (federalUser) payload.id = federalUser.id;
 
-    return res.json({
-      token,
-      admin: {
-        name: "Super Admin",
-        email: process.env.SUPER_ADMIN_EMAIL,
-        role: "super",
-      },
-      mustChangePassword: false,
-    });
+      const token = jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+      console.log("Federal login successful via ENV");
+
+      return res.json({
+        token,
+        admin: {
+          id: federalUser?.id,
+          name: federalUser?.name || "Federal Admin",
+          email: process.env.FEDERAL_EMAIL,
+          role: "federal",
+        },
+        mustChangePassword: false,
+      });
+    } catch (err) {
+      console.error("Federal login lookup error:", err);
+      // Fallback if DB lookup fails but credentials match
+      const token = jwt.sign({ role: "federal" }, process.env.JWT_SECRET, { expiresIn: "1d" });
+      return res.json({
+        token,
+        admin: { name: "Federal Admin", email, role: "federal" },
+        mustChangePassword: false
+      });
+    }
   }
 
   try {

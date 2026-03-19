@@ -31,8 +31,12 @@ export async function approveDriver(req, res) {
 
 export async function getUnapprovedDrivers(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const where = { isApproved: false };
+    if (admin.region) where.region = admin.region;
+
     const drivers = await prisma.driver.findMany({
-      where: { isApproved: false },
+      where: where,
     });
 
     const baseUrl = 'http://192.168.43.237:5000';
@@ -76,8 +80,12 @@ export async function approveAttendant(req, res) {
 
 export async function getUnapprovedAttendants(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const where = { isApproved: false };
+    if (admin.region) where.region = admin.region;
+
     const attendants = await prisma.fuelAttendant.findMany({
-      where: { isApproved: false },
+      where: where,
     });
 
     const baseUrl = 'http://192.168.43.237:5000';
@@ -133,8 +141,12 @@ export async function approveFarmer(req, res) {
 
 export async function getUnapprovedFarmers(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const where = { isApproved: false };
+    if (admin.region) where.region = admin.region;
+
     const farmers = await prisma.farmer.findMany({
-      where: { isApproved: false },
+      where: where,
     });
 
     const baseUrl = 'http://192.168.43.237:5000';
@@ -204,8 +216,12 @@ export const rejectOther = async (req, res) => {
 
 export const getUnapprovedOthers = async (req, res) => {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const where = { isApproved: false };
+    if (admin.region) where.region = admin.region;
+
     const unapproved = await prisma.otherUser.findMany({
-      where: { isApproved: false },
+      where: where,
       orderBy: { createdAt: "desc" },
     });
     res.status(200).json(unapproved);

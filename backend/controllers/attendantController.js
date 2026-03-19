@@ -4,9 +4,9 @@ import prisma from "../lib/prisma.js";
 
 export async function registerAttendant(req, res) {
   try {
-    const { name, phone, password, stationName, city } = req.body;
+    const { name, phone, password, stationName, city, region } = req.body;
 
-    if (!name || !phone || !password || !stationName || !city) {
+    if (!name || !phone || !password || !stationName || !city || !region) {
       return res.status(400).json({ msg: "All fields are required." });
     }
 
@@ -30,6 +30,7 @@ export async function registerAttendant(req, res) {
         password: hashedPassword,
         stationName,
         city,
+        region,
         documentPath: req.file.path,
       },
     });
@@ -79,6 +80,7 @@ export async function loginAttendant(req, res) {
         phone: attendant.phone,
         stationName: attendant.stationName,
         city: attendant.city,
+        region: attendant.region,
       },
     });
   } catch (err) {
@@ -97,6 +99,7 @@ export async function getAttendantProfile(req, res) {
         phone: true,
         stationName: true,
         city: true,
+        region: true,
         isApproved: true,
         documentPath: true,
         createdAt: true,
@@ -266,6 +269,7 @@ export const dispenseFuel = async (req, res) => {
             stationName: fuelAttendant.stationName,
             attendantName: fuelAttendant.name,
             city: fuelAttendant.city,
+            region: fuelAttendant.region,
           },
         }),
       ]);
@@ -337,6 +341,7 @@ export const dispenseFuel = async (req, res) => {
             stationName: fuelAttendant.stationName,
             attendantName: fuelAttendant.name,
             city: fuelAttendant.city,
+            region: fuelAttendant.region,
           },
         }),
       ]);

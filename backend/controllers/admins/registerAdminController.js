@@ -16,6 +16,7 @@ export async function registerDriver(req, res) {
     if (existing) return res.status(400).json({ msg: "Driver already registered" });
 
     const hashed = await hash(password, 10);
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
 
     const driver = await prisma.driver.create({
       data: {
@@ -26,6 +27,7 @@ export async function registerDriver(req, res) {
         password: hashed,
         isApproved: false,
         documentPath: req.file.path,
+        region: admin.region,
       },
     });
 
@@ -59,6 +61,7 @@ export async function registerAttendant(req, res) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
 
     const newAttendant = await prisma.fuelAttendant.create({
       data: {
@@ -67,6 +70,7 @@ export async function registerAttendant(req, res) {
         password: hashedPassword,
         stationName,
         city,
+        region: admin.region,
         documentPath: req.file.path,
       },
     });
@@ -98,6 +102,8 @@ export async function registerFarmer(req, res) {
       return res.status(400).json({ msg: "Phone number already registered." });
     }
 
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+
     const newFarmer = await prisma.farmer.create({
       data: {
         fullName,
@@ -105,6 +111,7 @@ export async function registerFarmer(req, res) {
         woreda,
         phoneNumber,
         documentPath: req.file.path,
+        region: admin.region,
         isApproved: false,
       },
     });
@@ -126,12 +133,15 @@ export const registerOtherUser = async (req, res) => {
 
     const documentPath = req.file ? req.file.path : null;
 
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+
     const newOtherUser = await prisma.otherUser.create({
       data: {
         fullName,
         phoneNumber,
         fuelType: fuelType.toLowerCase(),
         documentPath,
+        region: admin.region,
       },
     });
 

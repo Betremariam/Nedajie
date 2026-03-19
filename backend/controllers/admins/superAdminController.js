@@ -6,7 +6,14 @@ import path from "path";
 
 export async function getAllFuelTransactions(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    
+    const where = (admin && admin.role === "super" && admin.region) 
+      ? { region: admin.region } 
+      : {};
+    
     const transactions = await prisma.fuelTransaction.findMany({
+      where,
       include: {
         driver: {
           select: {
@@ -34,7 +41,14 @@ export async function getAllFuelTransactions(req, res) {
 
 export async function getAllFuelStocks(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    
+    const where = (admin && admin.role === "super" && admin.region) 
+      ? { region: admin.region } 
+      : {};
+    
     const stocks = await prisma.fuelStock.findMany({
+      where,
       orderBy: {
         createdAt: "desc",
       },
@@ -164,7 +178,11 @@ export async function getFarmerDetails(req, res) {
 
 export async function getAllFarmers(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
+
     const farmers = await prisma.farmer.findMany({
+      where,
       include: {
         approvedBy: {
           select: {
@@ -220,7 +238,11 @@ export async function getDriverDetails(req, res) {
 
 export async function getAllDrivers(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
+
     const drivers = await prisma.driver.findMany({
+      where,
       include: {
         approvedBy: {
           select: {
@@ -259,8 +281,9 @@ export async function createAdmin(req, res) {
       return res.status(400).json({ msg: "Name, email, and role are required." });
     }
 
-    if (!["approver", "register"].includes(role)) {
-      return res.status(400).json({ msg: "Invalid role. Must be approver or register." });
+    const allowedRoles = ["approver", "register", "federal", "super"];
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({ msg: `Invalid role. Must be one of: ${allowedRoles.join(", ")}` });
     }
 
     const existing = await prisma.admin.findUnique({ where: { email } });
@@ -271,8 +294,18 @@ export async function createAdmin(req, res) {
     const tempPassword = generateTempPassword();
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
+    const { region, companyName } = req.body;
+
     await prisma.admin.create({
-      data: { name, email, password: hashedPassword, role, mustChangePassword: true },
+      data: { 
+        name, 
+        email, 
+        password: hashedPassword, 
+        role, 
+        mustChangePassword: true,
+        region,
+        companyName
+      },
     });
 
     res.status(201).json({
@@ -290,12 +323,18 @@ export async function createAdmin(req, res) {
  */
 export async function getAllAdmins(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
+
     const admins = await prisma.admin.findMany({
+      where,
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        region: true,
+        companyName: true,
         stationIds: true,
         isBlocked: true,
         mustChangePassword: true,
@@ -377,7 +416,11 @@ export async function createStationOwner(req, res) {
 
 export async function getAllOthers(req, res) {
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
+
     const others = await prisma.otherUser.findMany({
+      where,
       include: {
         approvedBy: {
           select: {
@@ -458,8 +501,12 @@ export async function getFuelDeliveries(req, res) {
   }
 
   try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const where = { fuelType };
+    if (admin && admin.region) where.region = admin.region;
+
     const deliveries = await prisma.fuelDelivery.findMany({
-      where: { fuelType },
+      where,
       orderBy: {
         createdAt: "desc",
       },
