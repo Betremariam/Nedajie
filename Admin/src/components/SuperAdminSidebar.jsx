@@ -5,7 +5,8 @@ import {
   Fuel, 
   History, 
   Users2,
-  Activity
+  Activity,
+  Truck
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,6 +40,11 @@ const SuperAdminSidebar = () => {
       title: "History",
       url: "/super-admin/transactions",
       icon: History,
+    },
+    {
+      title: "Confirm Deliveries",
+      url: "/super-admin/confirm-deliveries",
+      icon: Truck,
     },
     {
       title: "Users",

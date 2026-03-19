@@ -4,7 +4,8 @@ import {
   Fuel, 
   Users, 
   History, 
-  BarChart3
+  BarChart3,
+  Truck
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,6 +33,11 @@ const OwnerSidebar = () => {
       title: "Fuel Inflow",
       url: "/owner/fuel-received",
       icon: Fuel,
+    },
+    {
+      title: "Pending Deliveries",
+      url: "/owner/pending-deliveries",
+      icon: Truck,
     },
     {
       title: "Transactions",

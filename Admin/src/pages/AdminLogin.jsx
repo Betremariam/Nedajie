@@ -22,6 +22,7 @@ const AdminLogin = () => {
         navigate("/change-password");
       } else {
         if (admin.role === "super") navigate("/super-admin/dashboard");
+        else if (admin.role === "federal") navigate("/federal/dashboard");
         else if (admin.role === "approver") navigate("/approver/dashboard");
         else if (admin.role === "register") navigate("/register/register-dashboard");
         else if (admin.role === "stationOwner") navigate("/owner/dashboard");
@@ -57,6 +58,7 @@ const AdminLogin = () => {
         navigate("/change-password");
       } else {
         if (admin.role === "super") navigate("/super-admin/dashboard");
+        else if (admin.role === "federal") navigate("/federal/dashboard");
         else if (admin.role === "approver") navigate("/approver/dashboard");
         else if (admin.role === "register") navigate("/register/register-dashboard");
         else if (admin.role === "stationOwner") navigate("/owner/dashboard");

@@ -9,6 +9,7 @@ import DriverLists from "./pages/SuperAdmin/DriverLists";
 import FarmerLists from "./pages/SuperAdmin/FarmerLists";
 import OtherLists from "./pages/SuperAdmin/OtherLists";
 import FuelDilevery from "./pages/SuperAdmin/FuelDilevery";
+import ConfirmDeliveries from "./pages/SuperAdmin/ConfirmDeliveries";
 
 // Layouts
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -41,6 +42,14 @@ import OwnerTransactions from "./pages/Owner/OwnerTransactions";
 import OwnerReports from "./pages/Owner/Reports";
 import FuelReceived from "./pages/Owner/FuelReceived";
 import OwnerFuelStock from "./pages/Owner/OwnerFuelStock";
+import PendingDeliveries from "./pages/Owner/PendingDeliveries";
+
+// Federal Pages
+import FederalSidebar from "./components/FederalSidebar";
+import FederalDashboard from "./pages/Federal/FederalDashboard";
+import ManageSuperAdmins from "./pages/Federal/ManageSuperAdmins";
+import ManageOwners from "./pages/Federal/ManageOwners";
+import FuelDeliveries from "./pages/Federal/FuelDeliveries";
 
 function App() {
   return (
@@ -60,6 +69,7 @@ function App() {
             <Route path="farmers-list" element={<FarmerLists />} />
             <Route path="others-list" element={<OtherLists />} />
             <Route path="fuel-delivery" element={<FuelDilevery />} />
+            <Route path="confirm-deliveries" element={<ConfirmDeliveries />} />
           </Route>
 
           {/* Register Admin Routes */}
@@ -87,6 +97,15 @@ function App() {
             <Route path="transactions" element={<OwnerTransactions />} />
             <Route path="reports" element={<OwnerReports />} />
             <Route path="fuel-received" element={<FuelReceived />} />
+            <Route path="pending-deliveries" element={<PendingDeliveries />} />
+          </Route>
+
+          {/* Federal Routes */}
+          <Route path="/federal" element={<DashboardLayout Sidebar={FederalSidebar} />}>
+            <Route path="dashboard" element={<FederalDashboard />} />
+            <Route path="manage-super-admins" element={<ManageSuperAdmins />} />
+            <Route path="manage-owners" element={<ManageOwners />} />
+            <Route path="fuel-deliveries" element={<FuelDeliveries />} />
           </Route>
         </Routes>
       </Router>

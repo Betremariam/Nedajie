@@ -29,5 +29,27 @@ API.interceptors.response.use(
 
 // Login function
 export const loginAdmin = (credentials) => API.post("/admin-auth/login", credentials);
+export const changePassword = (data) => API.post("/admin-auth/change-password", data);
+
+// Federal APIs
+export const createRegionalSuperAdmin = (data) => API.post("/federal/create-super-admin", data);
+export const createOwner = (data) => API.post("/federal/create-owner", data);
+export const addFuelDelivery = (data) => API.post("/federal/add-fuel", data);
+export const getAllFederalFuelDeliveries = () => API.get("/federal/fuel-deliveries");
+
+// Fuel Workflow APIs
+export const getPendingDeliveriesForSuperAdmin = () => API.get("/fuel-workflow/superadmin/pending");
+export const confirmDeliveryBySuperAdmin = (deliveryId) => API.post(`/fuel-workflow/superadmin/confirm/${deliveryId}`);
+export const getPendingDeliveriesForOwner = () => API.get("/fuel-workflow/owner/pending");
+export const acceptDeliveryByOwner = (deliveryId) => API.post(`/fuel-workflow/owner/accept/${deliveryId}`);
+
+// Super Admin APIs (Original but now regionally filtered in backend)
+export const getAllAdmins = () => API.get("/admins/admins");
+export const blockAdmin = (id) => API.patch(`/admins/admins/${id}/block`);
+export const getAllFuelTransactions = () => API.get("/admins/transactions");
+export const getAllFuelStocks = () => API.get("/admins/fuel-stocks");
+export const getDrivers = () => API.get("/admins/drivers");
+export const getFarmers = () => API.get("/admins/farmers");
+export const getOthers = () => API.get("/admins/others");
 
 export default API;

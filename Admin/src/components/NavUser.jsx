@@ -24,17 +24,17 @@ export function NavUser() {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
   
-  // Placeholder user for now, as Admin doesn't have an AuthContext yet
+  const adminData = JSON.parse(localStorage.getItem("admin") || "{}");
+  
   const user = {
-    first_name: "Admin",
-    last_name: "User",
-    email: "admin@fuelcontrol.com",
-    role: "super_admin"
+    name: adminData.name || "Admin",
+    email: adminData.email || "admin@nigdbureau.com",
+    role: adminData.role || "unknown"
   }
 
-  const userName = `${user.first_name} ${user.last_name}`
+  const userName = user.name
   const userEmail = user.email
-  const initials = "A"
+  const initials = user.name?.charAt(0) || "A"
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
