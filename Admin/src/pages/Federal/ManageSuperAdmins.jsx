@@ -1,302 +1,311 @@
 import React, { useEffect, useState } from "react";
-import { 
-  getAllAdmins, 
-  createRegionalSuperAdmin 
-} from "../../services/api";
-import { 
-  Copy, 
-  Check, 
-  ShieldAlert, 
-  ShieldCheck, 
-  KeyRound, 
-  Globe,
-  UserPlus,
+import { getAllAdmins, createRegionalSuperAdmin } from "../../services/api";
+import {
+  User,
+  Mail,
+  MapPin,
+  KeyRound,
+  ShieldCheck,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+  Copy,
+  Check,
+  Loader2,
+  ShieldAlert,
   Users,
   Search,
-  MapPin,
-  Mail,
-  Loader2,
-  ChevronRight,
-  Terminal,
-  Fingerprint,
-  Zap,
-  Activity,
-  UserCheck
 } from "lucide-react";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableHead, 
-  TableRow, 
-  TableCell 
-} from "../../components/ui/Table";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
-import { Label } from "../../components/ui/Label";
 import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
-import { Badge } from "../../components/ui/Badge";
-import { cn } from "../../lib/utils";
+import { Switch } from "../../components/ui/Switch";
 
 const ManageSuperAdmins = () => {
   const [admins, setAdmins] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    region: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", region: "" });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: null, text: "" });
-  
-  const [newAdminCreds, setNewAdminCreds] = useState(null);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [newCreds, setNewCreds] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [sendAlert, setSendAlert] = useState(true);
+  const [search, setSearch] = useState("");
 
-  const fetchSuperAdmins = async () => {
+  const fetchAdmins = async () => {
     try {
-      setLoading(true);
       const res = await getAllAdmins();
-      const filtered = res.data.filter(admin => admin.role === "super");
-      setAdmins(filtered);
-    } catch (err) {
-      setMessage({ type: "error", text: "Critical failure: Regional node list unreachable." });
-    } finally {
-      setLoading(false);
+      setAdmins(res.data.filter((a) => a.role === "regionalSuperAdmin"));
+    } catch {
+      setError("Failed to load admin list.");
     }
   };
 
   useEffect(() => {
-    fetchSuperAdmins();
+    fetchAdmins();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleGeneratePassword = () => {
+    // Not used for super admins — passwords are system-generated on backend
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: null, text: "" });
-    setNewAdminCreds(null);
-
-    const { name, email, region } = formData;
-    if (!name || !email || !region) {
-      setMessage({ type: "error", text: "Integrity check failed: All parameters are required." });
-      return;
-    }
-
+    setSuccess("");
+    setError("");
+    setNewCreds(null);
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await createRegionalSuperAdmin({ name, email, region });
-      
-      setMessage({ type: "success", text: "Regional authority established successfully." });
-      setNewAdminCreds({ email, tempPassword: res.data.tempPassword });
-      setFormData({ name: "", email: "", region: "" });
-      fetchSuperAdmins();
+      const res = await createRegionalSuperAdmin(form);
+      setSuccess("Regional Super Admin created successfully.");
+      setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
+      setForm({ name: "", email: "", region: "" });
+      fetchAdmins();
     } catch (err) {
-      setMessage({ type: "error", text: err.response?.data?.msg || "Provisioning failure. Protocol rejected." });
+      setError(err?.response?.data?.msg || "Registration failed.");
     } finally {
       setLoading(false);
     }
   };
 
   const copyToClipboard = () => {
-    if (newAdminCreds) {
-      navigator.clipboard.writeText(`Email: ${newAdminCreds.email}\nPassword: ${newAdminCreds.tempPassword}`);
+    if (newCreds) {
+      navigator.clipboard.writeText(`Email: ${newCreds.email}\nPassword: ${newCreds.tempPassword}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1 text-blue-600">
-            <Globe className="w-5 h-5 animate-spin-slow" />
-            <span className="text-[10px] font-mono font-black tracking-[0.2em] uppercase">Global Interface Layer</span>
-          </div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground italic">Regional Authorities</h1>
-          <p className="text-muted-foreground text-lg mt-1 italic">Federal orchestration of provincial super-administrative nodes.</p>
-        </div>
-        <div className="bg-blue-500/5 p-4 rounded-2xl border border-blue-500/20 flex items-center gap-4">
-           <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
-              <UserCheck className="w-5 h-5" />
-           </div>
-           <div>
-              <p className="text-[10px] font-black uppercase text-blue-600/60 tracking-widest">Active nodes</p>
-              <p className="text-xl font-black">{admins.length}</p>
-           </div>
-        </div>
-      </div>
+  const filtered = admins.filter(
+    (a) =>
+      a.name?.toLowerCase().includes(search.toLowerCase()) ||
+      a.email?.toLowerCase().includes(search.toLowerCase()) ||
+      a.region?.toLowerCase().includes(search.toLowerCase())
+  );
 
-      {message.text && !newAdminCreds && (
-        <Alert variant={message.type === "error" ? "destructive" : "default"} className={message.type === "success" ? "border-blue-500 bg-blue-500/5 text-blue-600" : ""}>
-          {message.type === "error" ? <ShieldAlert className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4 text-blue-600" />}
-          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">System Response</AlertTitle>
-          <AlertDescription className="font-bold">{message.text}</AlertDescription>
+  return (
+    <div className="p-6 md:p-8 space-y-8 max-w-5xl mx-auto font-sans">
+
+      {/* Alerts */}
+      {success && !newCreds && (
+        <Alert className="border-emerald-500/50 bg-emerald-50 text-emerald-800">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle className="font-bold">Success</AlertTitle>
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
+      {error && (
+        <Alert variant="destructive" className="bg-red-50 text-red-800 border-red-200">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle className="font-bold">Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      {newAdminCreds && (
-        <Alert className="border-blue-500 bg-blue-500/10 p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-             <Globe className="w-24 h-24" />
-          </div>
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <AlertTitle className="text-xl font-black text-blue-900 flex items-center gap-2">
-                <Fingerprint className="w-6 h-6 text-blue-600" />
-                Regional Access Tokens Initialized
-              </AlertTitle>
-              <AlertDescription className="text-blue-800/80 font-medium italic">
-                Strategic administrative node established. Transmit these one-time access parameters to the regional commander.
-              </AlertDescription>
-              <div className="flex flex-col md:flex-row gap-6 mt-4">
-                <div className="bg-white/60 p-3 rounded-xl border border-blue-200/50 backdrop-blur-sm">
-                   <p className="text-[10px] font-black uppercase text-blue-800/50 tracking-widest mb-1">Commander Email</p>
-                   <p className="text-sm font-black font-mono">{newAdminCreds.email}</p>
-                </div>
-                <div className="bg-white/60 p-3 rounded-xl border border-blue-200/50 backdrop-blur-sm">
-                   <p className="text-[10px] font-black uppercase text-blue-800/50 tracking-widest mb-1">Key Phrase</p>
-                   <p className="text-xl font-black font-mono text-blue-600 tracking-wider">{newAdminCreds.tempPassword}</p>
-                </div>
+      {/* Credentials Card */}
+      {newCreds && (
+        <Alert className="border-blue-200 bg-blue-50">
+          <KeyRound className="h-4 w-4 text-[#0d6efd]" />
+          <AlertTitle className="font-bold text-[#0d6efd]">Credentials Generated</AlertTitle>
+          <AlertDescription className="mt-3 space-y-3">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="bg-white border border-blue-100 rounded-xl px-4 py-3 flex-1">
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Email</p>
+                <p className="text-[14px] font-bold text-slate-800">{newCreds.email}</p>
+              </div>
+              <div className="bg-white border border-blue-100 rounded-xl px-4 py-3 flex-1">
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp Password</p>
+                <p className="text-[18px] font-black font-mono text-[#0d6efd] tracking-wider">{newCreds.tempPassword}</p>
               </div>
             </div>
-            <Button onClick={copyToClipboard} size="lg" className="bg-blue-600 hover:bg-blue-700 h-14 px-8 shadow-xl shadow-blue-500/20 gap-3 border-none ring-0">
-              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-              <span className="font-black uppercase tracking-widest text-xs">{copied ? "Copied" : "Copy Payload"}</span>
+            <Button onClick={copyToClipboard} size="sm" className="bg-[#0d6efd] hover:bg-blue-700 border-0 gap-2 h-9 px-5 text-[13px] font-semibold">
+              {copied ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy Credentials</>}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Registration Form Card */}
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 md:p-10">
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-100">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-[16px] bg-[#0f172a] flex items-center justify-center text-white shadow-md">
+              <ShieldAlert className="w-7 h-7" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Super Admin Registry</h1>
+              <p className="text-slate-500 text-[13px] font-medium">Provision regional super administrators</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button type="button" variant="outline" className="h-10 px-6 rounded-xl text-slate-600 border-slate-200 font-semibold hover:bg-slate-50">
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleSubmit} disabled={loading} className="h-10 px-6 rounded-xl bg-[#0d6efd] hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 font-semibold border-0">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Admin"}
             </Button>
           </div>
-        </Alert>
-      )}
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Form */}
-        <Card className="lg:col-span-4 border-border/50 shadow-xl overflow-hidden self-start sticky top-8">
-          <CardHeader className="bg-muted/30 border-b border-border/20">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-blue-600" />
-              Establish Node
-            </CardTitle>
-            <CardDescription>Deploy a new regional administrative authority.</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="p-6 space-y-5">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Terminal className="w-3 h-3 text-blue-500" /> 
-                  Representative Name
-                </Label>
-                <Input name="name" value={formData.name} onChange={handleChange} placeholder="Commander Name" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-blue-500/50 transition-all" required />
-              </div>
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
 
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Mail className="w-3 h-3 text-blue-500" /> 
-                  Administrative Axis
-                </Label>
-                <Input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="admin-link@regional.gov" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-blue-500/50 transition-all" required />
+            {/* Full Name */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Name</Label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <Input
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="Admin's full name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Globe className="w-3 h-3 text-blue-500" /> 
-                  Regional Jurisdiction
-                </Label>
-                <Input name="region" value={formData.region} onChange={handleChange} placeholder="Provincial Zone" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-blue-500/50 transition-all" required />
+            {/* Email */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Email Address</Label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <Input
+                  type="email"
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="admin@domain.com"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-            </CardContent>
-            <CardFooter className="bg-muted/10 border-t border-border/10 p-6">
-              <Button type="submit" className="w-full h-12 shadow-lg shadow-blue-500/20 font-black uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700" disabled={loading}>
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
-                {loading ? "Establishing..." : "Authorize Node"}
+            </div>
+
+            {/* Region */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#0d6efd]" />
+                Region / Zone
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="e.g., Addis Ababa Region"
+                  name="region"
+                  value={form.region}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom Status + Submit */}
+          <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="flex flex-col gap-6 w-full max-w-lg">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-slate-600" />
+                <h3 className="text-[14px] font-bold text-slate-800">Admin Settings</h3>
+              </div>
+              <div className="flex items-start gap-3 pl-1">
+                <Switch id="send-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-[#0d6efd]" />
+                <div className="flex flex-col gap-1 text-left">
+                  <Label htmlFor="send-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Send credentials alert</Label>
+                  <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[200px]">Notify admin via email with login credentials</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 min-w-[200px]">
+              <Button disabled={loading} className="w-full h-11 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2" type="submit">
+                {loading ? "Creating..." : "Create Super Admin"}
+                {!loading && <ArrowRight className="w-4 h-4 ml-1 opacity-90" />}
               </Button>
-            </CardFooter>
-          </form>
-        </Card>
+              <Button type="button" variant="outline" className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl" onClick={() => setForm({ name: "", email: "", region: "" })}>
+                Clear
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
 
-        {/* Table */}
-        <Card className="lg:col-span-8 border-border/50 shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-border/20 pb-4 mb-4 bg-muted/5">
+      {/* Admins Table Card */}
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 md:p-8 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-[12px] bg-[#0f172a] flex items-center justify-center text-white shadow-sm">
+              <Users className="w-5 h-5" />
+            </div>
             <div>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-400" />
-                Regional Topology
-              </CardTitle>
-              <CardDescription>Federal registry of active regional administrative commanders.</CardDescription>
+              <h2 className="text-[17px] font-bold text-slate-900 tracking-tight">Regional Super Admins</h2>
+              <p className="text-slate-500 text-[13px] font-medium">{admins.length} admin{admins.length !== 1 ? "s" : ""} registered</p>
             </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/30" />
-              <Input placeholder="Search nodes..." className="pl-9 h-9 w-[200px] text-xs" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            {loading && admins.length === 0 ? (
-               <div className="h-[400px] flex flex-col items-center justify-center gap-4">
-                  <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-                  <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-widest animate-pulse">Synchronizing regional cloud...</p>
-               </div>
-            ) : admins.length === 0 ? (
-               <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground italic">No regional authorities initialized.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/30 border-none">
-                      <TableHead className="pl-6 h-12 text-[10px] font-black uppercase tracking-widest">Regional Commander</TableHead>
-                      <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest">Axis</TableHead>
-                      <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest">Jurisdiction</TableHead>
-                      <TableHead className="pr-6 text-right h-12 text-[10px] font-black uppercase tracking-widest">Node Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {admins.map((admin) => (
-                      <TableRow key={admin.id} className="group hover:bg-muted/40 transition-all border-b border-border/30 h-20">
-                        <TableCell className="pl-6">
-                           <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-700 font-black text-xs border border-blue-500/20 group-hover:scale-110 transition-transform">
-                                {admin.name?.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <span className="text-sm font-black group-hover:text-blue-600 transition-colors">{admin.name}</span>
-                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="text-xs font-medium text-muted-foreground">{admin.email}</span>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="bg-blue-50 text-blue-700 shadow-none border border-blue-100 font-black uppercase tracking-tighter text-[9px] px-2 h-5">
-                            <MapPin className="w-2.5 h-2.5 mr-1" /> {admin.region}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="pr-6 text-right">
-                          <Badge variant="outline" className={cn(
-                            "px-3 py-1 font-black uppercase tracking-widest text-[9px] shadow-none",
-                            admin.isBlocked ? "bg-red-500/10 text-red-700 border-red-500/20" : "bg-emerald-500/10 text-emerald-700 border-emerald-500/20"
-                          )}>
-                            {admin.isBlocked ? "Decommissioned" : "Online"}
-                          </Badge>
-                          <div className="mt-1 flex items-center justify-end gap-1 text-[9px] text-muted-foreground/60 italic font-medium">
-                            {admin.isBlocked ? "Circuit Broken" : "Telemetry Active"}
-                            <div className={cn(
-                              "w-1.5 h-1.5 rounded-full",
-                              admin.isBlocked ? "bg-red-500" : "bg-emerald-500 animate-pulse"
-                            )} />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-          <CardFooter className="bg-muted/5 border-t border-border/10 p-4">
-             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <ShieldCheck className="w-3 h-3 text-blue-500" />
-                All regional provisioning is subject to federal oversight and audit logging.
-             </p>
-          </CardFooter>
-        </Card>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              placeholder="Search admins..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-10 pl-11 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[13px] w-full sm:w-[220px]"
+            />
+          </div>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="h-48 flex flex-col items-center justify-center text-slate-400 gap-3">
+            <Users className="w-10 h-10 opacity-30" />
+            <p className="text-[13px] font-medium">{search ? "No admins match your search." : "No super admins registered yet."}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Admin</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Region</th>
+                  <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((admin) => (
+                  <tr key={admin._id || admin.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/70 transition-colors">
+                    <td className="pl-6 md:pl-8 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-[13px]">
+                          {admin.name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                        </div>
+                        <span className="text-[14px] font-semibold text-slate-800">{admin.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-[13px] text-slate-500 font-medium">{admin.email}</td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-slate-600">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        {admin.region || "—"}
+                      </div>
+                    </td>
+                    <td className="pr-6 md:pr-8 py-4 text-right">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Active
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

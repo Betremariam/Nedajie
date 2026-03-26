@@ -3,7 +3,8 @@ import {
   createRegionalSuperAdmin, 
   createOwner, 
   addFuelDelivery, 
-  getAllFuelDeliveries 
+  getAllFuelDeliveries,
+  getFederalAdmins
 } from "../controllers/admins/federalController.js";
 import verifyToken from "../middleWare/verifyToken.js";
 
@@ -23,5 +24,6 @@ router.post("/create-super-admin", createRegionalSuperAdmin);
 router.post("/create-owner", createOwner);
 router.post("/add-fuel", addFuelDelivery);
 router.get("/fuel-deliveries", getAllFuelDeliveries);
+router.get("/admins", getFederalAdmins);
 
 export default router;

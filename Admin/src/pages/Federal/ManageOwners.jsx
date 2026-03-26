@@ -1,66 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { 
-  getAllAdmins, 
-  createOwner 
-} from "../../services/api";
-import { 
-  Copy, 
-  Check, 
-  ShieldAlert, 
-  ShieldCheck, 
-  KeyRound, 
-  MapPin, 
+import { getAllAdmins, createOwner } from "../../services/api";
+import {
+  User,
+  Mail,
+  MapPin,
+  Building,
+  KeyRound,
+  ShieldCheck,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+  Copy,
+  Check,
+  Loader2,
   Building2,
-  UserPlus,
   Users,
   Search,
-  Building,
-  Mail,
-  Loader2,
-  ChevronRight,
-  Terminal,
-  Fingerprint,
-  Zap
 } from "lucide-react";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableHead, 
-  TableRow, 
-  TableCell 
-} from "../../components/ui/Table";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
-import { Label } from "../../components/ui/Label";
 import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
-import { Badge } from "../../components/ui/Badge";
+import { Switch } from "../../components/ui/Switch";
 
 const ManageOwners = () => {
   const [owners, setOwners] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    companyName: "",
-    region: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", companyName: "", region: "" });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: null, text: "" });
-  
-  const [newOwnerCreds, setNewOwnerCreds] = useState(null);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [newCreds, setNewCreds] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [sendAlert, setSendAlert] = useState(true);
+  const [search, setSearch] = useState("");
 
   const fetchOwners = async () => {
     try {
-      setLoading(true);
       const res = await getAllAdmins();
-      const filtered = res.data.filter(admin => admin.role === "stationOwner");
-      setOwners(filtered);
-    } catch (err) {
-      setMessage({ type: "error", text: "Failed to load administrative node list." });
-    } finally {
-      setLoading(false);
+      setOwners(res.data.filter((a) => a.role === "stationOwner"));
+    } catch {
+      setError("Failed to load owners.");
     }
   };
 
@@ -68,244 +47,288 @@ const ManageOwners = () => {
     fetchOwners();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: null, text: "" });
-    setNewOwnerCreds(null);
-
-    const { name, email, companyName, region } = formData;
-    if (!name || !email || !companyName || !region) {
-      setMessage({ type: "error", text: "Integrity check failed: All parameters are required." });
-      return;
-    }
-
+    setSuccess("");
+    setError("");
+    setNewCreds(null);
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await createOwner({ name, email, companyName, region });
-      
-      setMessage({ type: "success", text: "Entity created and authorized successfully." });
-      setNewOwnerCreds({ email, tempPassword: res.data.tempPassword });
-      setFormData({ name: "", email: "", companyName: "", region: "" });
+      const res = await createOwner(form);
+      setSuccess("Station owner created successfully.");
+      setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
+      setForm({ name: "", email: "", companyName: "", region: "" });
       fetchOwners();
     } catch (err) {
-      setMessage({ type: "error", text: err.response?.data?.msg || "Provisioning failure. Access denied." });
+      setError(err?.response?.data?.msg || "Registration failed.");
     } finally {
       setLoading(false);
     }
   };
 
   const copyToClipboard = () => {
-    if (newOwnerCreds) {
-      navigator.clipboard.writeText(`Email: ${newOwnerCreds.email}\nPassword: ${newOwnerCreds.tempPassword}`);
+    if (newCreds) {
+      navigator.clipboard.writeText(`Email: ${newCreds.email}\nPassword: ${newCreds.tempPassword}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1 text-emerald-600">
-            <ShieldCheck className="w-5 h-5" />
-            <span className="text-[10px] font-mono font-black tracking-[0.2em] uppercase">Security Layer Active</span>
-          </div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground italic">Entity Management</h1>
-          <p className="text-muted-foreground text-lg mt-1 italic">Administrative provisioning of fuel station proprietors and corporate entities.</p>
-        </div>
-        <div className="bg-muted/40 p-4 rounded-2xl border border-border/50 flex items-center gap-4">
-           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-              <Users className="w-5 h-5" />
-           </div>
-           <div>
-              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Active Entities</p>
-              <p className="text-xl font-black">{owners.length}</p>
-           </div>
-        </div>
-      </div>
+  const filtered = owners.filter(
+    (o) =>
+      o.name?.toLowerCase().includes(search.toLowerCase()) ||
+      o.email?.toLowerCase().includes(search.toLowerCase()) ||
+      o.companyName?.toLowerCase().includes(search.toLowerCase()) ||
+      o.region?.toLowerCase().includes(search.toLowerCase())
+  );
 
-      {message.text && !newOwnerCreds && (
-        <Alert variant={message.type === "error" ? "destructive" : "default"} className={message.type === "success" ? "border-emerald-500 bg-emerald-500/5 text-emerald-600" : ""}>
-          {message.type === "error" ? <ShieldAlert className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4 text-emerald-600" />}
-          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">Protocol Response</AlertTitle>
-          <AlertDescription className="font-bold">{message.text}</AlertDescription>
+  return (
+    <div className="p-6 md:p-8 space-y-8 max-w-5xl mx-auto font-sans">
+
+      {/* Alerts */}
+      {success && !newCreds && (
+        <Alert className="border-emerald-500/50 bg-emerald-50 text-emerald-800">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle className="font-bold">Success</AlertTitle>
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
+      {error && (
+        <Alert variant="destructive" className="bg-red-50 text-red-800 border-red-200">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle className="font-bold">Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      {newOwnerCreds && (
-        <Alert className="border-emerald-500 bg-emerald-500/10 p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-             <KeyRound className="w-24 h-24" />
-          </div>
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <AlertTitle className="text-xl font-black text-emerald-900 flex items-center gap-2">
-                <Fingerprint className="w-6 h-6 text-emerald-600" />
-                Security Credentials Generated
-              </AlertTitle>
-              <AlertDescription className="text-emerald-800/80 font-medium italic">
-                Permanent record created. Provide these temporary access tokens to the entity representative immediately.
-              </AlertDescription>
-              <div className="flex flex-col md:flex-row gap-6 mt-4">
-                <div className="bg-white/60 p-3 rounded-xl border border-emerald-200/50 backdrop-blur-sm">
-                   <p className="text-[10px] font-black uppercase text-emerald-800/50 tracking-widest mb-1">Access Email</p>
-                   <p className="text-sm font-black font-mono">{newOwnerCreds.email}</p>
-                </div>
-                <div className="bg-white/60 p-3 rounded-xl border border-emerald-200/50 backdrop-blur-sm">
-                   <p className="text-[10px] font-black uppercase text-emerald-800/50 tracking-widest mb-1">Entry Token</p>
-                   <p className="text-xl font-black font-mono text-emerald-600 tracking-wider">{newOwnerCreds.tempPassword}</p>
-                </div>
+      {/* Credentials Card */}
+      {newCreds && (
+        <Alert className="border-blue-200 bg-blue-50">
+          <KeyRound className="h-4 w-4 text-[#0d6efd]" />
+          <AlertTitle className="font-bold text-[#0d6efd]">Credentials Generated</AlertTitle>
+          <AlertDescription className="mt-3 space-y-3">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="bg-white border border-blue-100 rounded-xl px-4 py-3 flex-1">
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Email</p>
+                <p className="text-[14px] font-bold text-slate-800">{newCreds.email}</p>
+              </div>
+              <div className="bg-white border border-blue-100 rounded-xl px-4 py-3 flex-1">
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp Password</p>
+                <p className="text-[18px] font-black font-mono text-[#0d6efd] tracking-wider">{newCreds.tempPassword}</p>
               </div>
             </div>
-            <Button onClick={copyToClipboard} size="lg" className="bg-emerald-600 hover:bg-emerald-700 h-14 px-8 shadow-xl shadow-emerald-500/20 gap-3 border-none ring-0">
-              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-              <span className="font-black uppercase tracking-widest text-xs">{copied ? "Copied" : "Copy Payload"}</span>
+            <Button onClick={copyToClipboard} size="sm" className="bg-[#0d6efd] hover:bg-blue-700 border-0 gap-2 h-9 px-5 text-[13px] font-semibold">
+              {copied ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy Credentials</>}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Registration Form Card */}
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 md:p-10">
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-100">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-[16px] bg-[#0f172a] flex items-center justify-center text-white shadow-md">
+              <Building2 className="w-7 h-7" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Owner Registry</h1>
+              <p className="text-slate-500 text-[13px] font-medium">Register fuel station proprietors and entities</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button type="button" variant="outline" className="h-10 px-6 rounded-xl text-slate-600 border-slate-200 font-semibold hover:bg-slate-50">
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleSubmit} disabled={loading} className="h-10 px-6 rounded-xl bg-[#0d6efd] hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 font-semibold border-0">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Owner"}
             </Button>
           </div>
-        </Alert>
-      )}
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Form */}
-        <Card className="lg:col-span-4 border-border/50 shadow-xl overflow-hidden self-start sticky top-8">
-          <CardHeader className="bg-muted/30 border-b border-border/20">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-emerald-600" />
-              Provision Entity
-            </CardTitle>
-            <CardDescription>Authorize a new fuel station owner node.</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="p-6 space-y-5">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Terminal className="w-3 h-3 text-emerald-500" /> 
-                  Representative Name
-                </Label>
-                <Input name="name" value={formData.name} onChange={handleChange} placeholder="Full Legal Name" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-emerald-500/50 transition-all" required />
-              </div>
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
 
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Mail className="w-3 h-3 text-emerald-500" /> 
-                  Communication Axis
-                </Label>
-                <Input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="auth-link@domain.com" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-emerald-500/50 transition-all" required />
+            {/* Full Name */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Name</Label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <Input
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="Owner's full name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Building className="w-3 h-3 text-emerald-500" /> 
-                  Corporate Identity
-                </Label>
-                <Input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Company Legal Title" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-emerald-500/50 transition-all" required />
+            {/* Email */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Email Address</Label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <Input
+                  type="email"
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="owner@company.com"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <MapPin className="w-3 h-3 text-emerald-500" /> 
-                  Administrative Zone
-                </Label>
-                <Input name="region" value={formData.region} onChange={handleChange} placeholder="Provincial Jurisdiction" className="h-11 font-medium bg-muted/20 border-none shadow-none ring-1 ring-border/50 focus-visible:ring-emerald-500/50 transition-all" required />
+            {/* Company Name */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <Building className="w-4 h-4 text-[#0d6efd]" />
+                Company Name
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="Company or business name"
+                  name="companyName"
+                  value={form.companyName}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-            </CardContent>
-            <CardFooter className="bg-muted/10 border-t border-border/10 p-6">
-              <Button type="submit" className="w-full h-12 shadow-lg shadow-emerald-500/20 font-black uppercase tracking-wider text-xs bg-emerald-600 hover:bg-emerald-700" disabled={loading}>
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
-                {loading ? "Authorizing..." : "Initialize Entity"}
+            </div>
+
+            {/* Region */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#0d6efd]" />
+                Region / Zone
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="e.g., Addis Ababa"
+                  name="region"
+                  value={form.region}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom Status + Submit */}
+          <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="flex flex-col gap-6 w-full max-w-lg">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-slate-600" />
+                <h3 className="text-[14px] font-bold text-slate-800">Owner Settings</h3>
+              </div>
+              <div className="flex items-start gap-3 pl-1">
+                <Switch id="send-alert-owner" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-[#0d6efd]" />
+                <div className="flex flex-col gap-1 text-left">
+                  <Label htmlFor="send-alert-owner" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Send credentials alert</Label>
+                  <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[200px]">Notify owner via email with login credentials</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 min-w-[200px]">
+              <Button disabled={loading} className="w-full h-11 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2" type="submit">
+                {loading ? "Creating..." : "Create Owner"}
+                {!loading && <ArrowRight className="w-4 h-4 ml-1 opacity-90" />}
               </Button>
-            </CardFooter>
-          </form>
-        </Card>
+              <Button type="button" variant="outline" className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl" onClick={() => setForm({ name: "", email: "", companyName: "", region: "" })}>
+                Clear
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
 
-        {/* Table */}
-        <Card className="lg:col-span-8 border-border/50 shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-border/20 pb-4 mb-4 bg-muted/5">
+      {/* Owners Table Card */}
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 md:p-8 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-[12px] bg-[#0f172a] flex items-center justify-center text-white shadow-sm">
+              <Users className="w-5 h-5" />
+            </div>
             <div>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Users className="w-5 h-5 text-emerald-400" />
-                Entity Registry
-              </CardTitle>
-              <CardDescription>National ledger of authorized station proprietors.</CardDescription>
+              <h2 className="text-[17px] font-bold text-slate-900 tracking-tight">Registered Owners</h2>
+              <p className="text-slate-500 text-[13px] font-medium">{owners.length} owner{owners.length !== 1 ? "s" : ""} in the system</p>
             </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/30" />
-              <Input placeholder="Search entities..." className="pl-9 h-9 w-[200px] text-xs" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            {loading && owners.length === 0 ? (
-               <div className="h-[400px] flex flex-col items-center justify-center gap-4">
-                  <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
-                  <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-widest animate-pulse">Syncing entity cloud...</p>
-               </div>
-            ) : owners.length === 0 ? (
-               <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground italic">No entities registered in this cycle.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/30 border-none">
-                      <TableHead className="pl-6 h-12 text-[10px] font-black uppercase tracking-widest">Stakeholder</TableHead>
-                      <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest">Axis</TableHead>
-                      <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest">Entity</TableHead>
-                      <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest">Zone</TableHead>
-                      <TableHead className="pr-6 text-right h-12 text-[10px] font-black uppercase tracking-widest">Trust Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {owners.map((owner) => (
-                      <TableRow key={owner.id} className="group hover:bg-muted/40 transition-all border-b border-border/30 h-20">
-                        <TableCell className="pl-6">
-                           <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-700 font-black text-xs border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                                {owner.name?.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <span className="text-sm font-black group-hover:text-emerald-600 transition-colors">{owner.name}</span>
-                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="text-xs font-medium text-muted-foreground">{owner.email}</span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center text-xs font-bold text-foreground">
-                            <Building2 className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-                            {owner.companyName || "NOT_SPECIFIED"}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center text-xs font-bold text-foreground italic">
-                            <MapPin className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-                            {owner.region || "NOT_MAPPED"}
-                          </div>
-                        </TableCell>
-                        <TableCell className="pr-6 text-right">
-                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 border-emerald-500/20 px-3 py-1 font-black uppercase tracking-widest text-[9px] shadow-none">
-                            Authorized
-                          </Badge>
-                          <div className="mt-1 flex items-center justify-end gap-1 text-[9px] text-muted-foreground/60 italic font-medium">
-                            Circuit Active
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-          <CardFooter className="bg-muted/5 border-t border-border/10 p-4">
-             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                All administrative actions are encrypted and logged for federal audit.
-             </p>
-          </CardFooter>
-        </Card>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              placeholder="Search owners..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-10 pl-11 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[13px] w-full sm:w-[220px]"
+            />
+          </div>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="h-48 flex flex-col items-center justify-center text-slate-400 gap-3">
+            <Building2 className="w-10 h-10 opacity-30" />
+            <p className="text-[13px] font-medium">{search ? "No owners match your search." : "No owners registered yet."}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Owner</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Company</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Region</th>
+                  <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((owner) => (
+                  <tr key={owner._id || owner.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/70 transition-colors">
+                    <td className="pl-6 md:pl-8 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-[13px]">
+                          {owner.name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                        </div>
+                        <span className="text-[14px] font-semibold text-slate-800">{owner.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-[13px] text-slate-500 font-medium">{owner.email}</td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-slate-700">
+                        <Building className="w-3.5 h-3.5 text-slate-400" />
+                        {owner.companyName || "—"}
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-slate-600">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        {owner.region || "—"}
+                      </div>
+                    </td>
+                    <td className="pr-6 md:pr-8 py-4 text-right">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Active
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

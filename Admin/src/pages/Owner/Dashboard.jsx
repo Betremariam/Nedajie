@@ -19,9 +19,6 @@ import {
   ChevronRight
 } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
-import { Button } from "../../components/ui/Button";
 
 const OwnerDashboard = () => {
   const stats = [
@@ -38,191 +35,212 @@ const OwnerDashboard = () => {
   ];
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1 text-primary">
-            <ShieldCheck className="w-5 h-5" />
-            <span className="text-[10px] font-mono font-black tracking-[0.2em] uppercase text-primary/60">Node Operations Active</span>
+    <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto font-sans">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-[#0d6efd]">
+            <ShieldCheck className="w-5 h-5 animate-pulse" />
+            <span className="text-[11px] font-bold tracking-wider uppercase text-blue-600/80">Node Operations Active</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground italic">Station Control</h1>
-          <p className="text-muted-foreground text-lg mt-1 italic">Tactical oversight of fuel assets and personnel.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
+             Station Control
+          </h1>
+          <p className="text-slate-500 text-[14px] font-medium max-w-xl">Tactical oversight of fuel assets and personnel.</p>
         </div>
-        <div className="flex items-center gap-3 bg-muted/40 p-2 rounded-2xl border border-border/50">
-           <Button variant="ghost" size="sm" className="h-10 px-6 rounded-xl bg-background shadow-xl shadow-black/5 font-black uppercase tracking-widest text-[10px]">Real-time</Button>
-           <Button variant="ghost" size="sm" className="h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] text-muted-foreground/60">Historical</Button>
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+           <button className="h-9 px-6 rounded-xl bg-white shadow-sm border border-slate-200 font-bold uppercase tracking-widest text-[11px] text-[#0d6efd]">Real-time</button>
+           <button className="h-9 px-6 rounded-xl font-bold uppercase tracking-widest text-[11px] text-slate-500 hover:text-slate-700 transition-colors">Historical</button>
         </div>
       </div>
 
+      {/* Metric Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
-          <Card key={i} className="border-border/50 shadow-xl shadow-primary/5 group hover:border-primary/30 transition-all duration-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors">
+          <div key={i} className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6 relative overflow-hidden group hover:border-blue-100 hover:shadow-md transition-all duration-300">
+            <div className={`absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-150 group-hover:opacity-[0.05] transition-all duration-500`}>
+               <stat.icon className="w-24 h-24" />
+            </div>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-800 transition-colors">
                 {stat.label}
-              </CardTitle>
+              </h3>
               <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
-                stat.color === 'red' ? "bg-red-500/10 text-red-500" : "bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                "p-2 rounded-xl transition-colors",
+                 stat.color === 'blue' ? "bg-blue-50 text-[#0d6efd]" : 
+                 stat.color === 'emerald' ? "bg-emerald-50 text-emerald-500" :
+                 stat.color === 'red' ? "bg-red-50 text-red-500" : "bg-slate-50 text-slate-500"
               )}>
                 <stat.icon className="h-4 w-4" />
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black tracking-tighter tabular-nums mb-1">{stat.value}</div>
+            </div>
+            <div className="relative z-10">
+              <div className="text-3xl font-black tracking-tight text-slate-900 mb-2">
+                {stat.value}
+              </div>
               <div className="flex items-center justify-between">
                  {stat.trend.startsWith('+') ? (
-                   <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/10 text-[10px] font-black uppercase tracking-tighter shadow-sm">
+                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold uppercase tracking-wider">
                       <TrendingUp className="h-3 w-3" /> {stat.trend}
                    </div>
                  ) : (
                    <span className={cn(
-                     "text-[10px] font-black uppercase tracking-widest flex items-center gap-2",
-                     stat.color === 'red' ? "text-red-500 animate-pulse" : "text-muted-foreground/40"
+                     "text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-2.5 py-1 rounded-lg border",
+                     stat.color === 'red' ? "text-red-600 bg-red-50 border-red-100 animate-pulse" : "text-slate-500 bg-slate-50 border-slate-200"
                    )}>
                       {stat.color === 'red' && <AlertTriangle className="w-3 h-3" />}
                       {stat.trend}
                    </span>
                  )}
-                 <div className="flex items-center gap-1 text-[8px] font-bold text-muted-foreground/40 italic">
-                    Circuit Active
+                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+                    Active
                     <div className={cn(
-                      "w-1 h-1 rounded-full",
+                      "w-1.5 h-1.5 rounded-full",
                       stat.color === 'red' ? "bg-red-500" : "bg-emerald-500 animate-pulse"
                     )} />
                  </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12">
-        <Card className="lg:col-span-8 border-border/50 shadow-2xl overflow-hidden bg-muted/5 relative group">
-          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
-             <Box className="w-48 h-48" />
+        
+        {/* Inventory Matrix */}
+        <div className="lg:col-span-8 bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:scale-110 transition-transform pointer-events-none">
+             <Box className="w-48 h-48 text-[#0d6efd]" />
           </div>
-          <CardHeader className="pb-2">
-             <CardTitle className="flex items-center gap-3 text-xl">
-                <Package className="h-5 w-5 text-primary" />
+          <div className="p-6 md:p-8 pb-4 border-b border-slate-100">
+             <h2 className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900">
+                <Package className="h-5 w-5 text-[#0d6efd]" />
                 Inventory Matrix
-             </CardTitle>
-             <CardDescription className="italic font-medium">
+             </h2>
+             <p className="text-slate-500 text-[13px] font-medium mt-1">
                 Live synchronization of regional fuel reservoirs.
-             </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-12 py-8 relative z-10">
+             </p>
+          </div>
+          
+          <div className="p-6 md:p-8 space-y-12 relative z-10">
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                   <h2 className="text-7xl font-black tracking-tighter italic">142.8k <span className="text-xl font-medium text-muted-foreground ml-1 uppercase not-italic tracking-widest">Liters</span></h2>
-                   <div className="flex items-center gap-3 mt-2">
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-black px-3 py-1 text-[10px] uppercase tracking-widest">76% Utilization</Badge>
-                      <p className="text-xs font-bold text-muted-foreground/60 italic flex items-center gap-2">
-                         <Activity className="w-3 h-3" /> System pressure nominal
+                   <h2 className="text-6xl font-black tracking-tight text-slate-900">142.8k <span className="text-lg font-bold text-slate-400 ml-1 uppercase tracking-widest">Liters</span></h2>
+                   <div className="flex flex-wrap items-center gap-3 mt-4">
+                      <span className="bg-blue-50 text-[#0d6efd] border border-blue-100 font-bold px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider">76% Utilization</span>
+                      <p className="text-[12px] font-bold text-slate-500 flex items-center gap-2">
+                         <Activity className="w-3.5 h-3.5 text-emerald-500" /> System pressure nominal
                       </p>
                    </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                   <div className="h-10 flex items-center gap-4 bg-background/50 backdrop-blur-md px-4 rounded-xl border border-border/50">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">All Tanks Online</span>
+                   <div className="h-10 flex items-center gap-3 bg-slate-50 px-4 rounded-xl border border-slate-200">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">All Tanks Online</span>
                    </div>
                 </div>
              </div>
              
              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {/* Tank 1 */}
                 <div className="space-y-4">
                    <div className="flex justify-between items-end">
                       <div>
-                         <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Unleaded Premium</p>
-                         <h4 className="text-2xl font-black flex items-center gap-2 tabular-nums">82,450 <span className="text-[10px] font-bold text-muted-foreground uppercase">L</span></h4>
+                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Unleaded Premium</p>
+                         <h4 className="text-2xl font-black text-slate-900 flex items-center gap-2 tabular-nums">82,450 <span className="text-[11px] font-bold text-slate-400 uppercase">L</span></h4>
                       </div>
-                      <span className="text-xs font-black text-primary font-mono bg-primary/10 px-2 py-1 rounded-md">65%</span>
+                      <span className="text-[12px] font-black text-[#0d6efd] bg-blue-50 px-2.5 py-1 rounded-lg">65%</span>
                    </div>
-                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden border border-border/50">
-                      <div className="h-full bg-primary w-[65%] rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)] transition-all duration-1000" />
+                   <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
+                      <div className="h-full bg-[#0d6efd] w-[65%] rounded-full shadow-[0_0_10px_rgba(13,110,253,0.3)] transition-all duration-1000" />
                    </div>
-                   <p className="text-[9px] font-bold text-muted-foreground/40 italic flex items-center gap-2"><ChevronRight className="w-2.5 h-2.5" /> Est. depletion: 14 days based on trajectory</p>
+                   <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5"><ChevronRight className="w-3 h-3 text-slate-300" /> Est. depletion: 14 days based on trajectory</p>
                 </div>
+                
+                {/* Tank 2 */}
                 <div className="space-y-4">
                    <div className="flex justify-between items-end">
                       <div>
-                         <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Diesel Max</p>
-                         <h4 className="text-2xl font-black flex items-center gap-2 tabular-nums">60,350 <span className="text-[10px] font-bold text-muted-foreground uppercase">L</span></h4>
+                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Diesel Max</p>
+                         <h4 className="text-2xl font-black text-slate-900 flex items-center gap-2 tabular-nums">60,350 <span className="text-[11px] font-bold text-slate-400 uppercase">L</span></h4>
                       </div>
-                      <span className="text-xs font-black text-emerald-500 font-mono bg-emerald-500/10 px-2 py-1 rounded-md">88%</span>
+                      <span className="text-[12px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">88%</span>
                    </div>
-                   <div className="h-3 w-full bg-muted rounded-full overflow-hidden border border-border/50">
-                      <div className="h-full bg-emerald-500 w-[88%] rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-1000" />
+                   <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
+                      <div className="h-full bg-emerald-500 w-[88%] rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000" />
                    </div>
-                   <p className="text-[9px] font-bold text-muted-foreground/40 italic flex items-center gap-2"><ChevronRight className="w-2.5 h-2.5" /> Next replenishment: Priority Normal</p>
+                   <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5"><ChevronRight className="w-3 h-3 text-slate-300" /> Next replenishment: Priority Normal</p>
                 </div>
              </div>
-          </CardContent>
-          <CardFooter className="border-t border-border/10 bg-muted/20 py-4 px-8">
-             <p className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-                <Clock className="h-3 w-3 text-primary" /> Delivery sequence initiation: Tomorrow 09:00 GST
+          </div>
+          
+          <div className="bg-slate-50 border-t border-slate-100 py-4 px-6 md:px-8">
+             <p className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2 tracking-wider">
+                <Clock className="h-3.5 w-3.5 text-[#0d6efd]" /> Delivery sequence initiation: Tomorrow 09:00 GST
              </p>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="lg:col-span-4 border-border/50 shadow-2xl overflow-hidden bg-muted/5 self-start">
-          <CardHeader className="border-b border-border/10">
-            <CardTitle className="flex items-center gap-3 text-xl">
-               <History className="h-5 w-5 text-primary" />
+        {/* Asset Inflow */}
+        <div className="lg:col-span-4 bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden self-start">
+          <div className="p-6 md:p-8 border-b border-slate-100 pb-4">
+            <h2 className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900">
+               <History className="h-5 w-5 text-[#0d6efd]" />
                Asset Inflow
-            </CardTitle>
-            <CardDescription className="italic font-medium">
+            </h2>
+            <p className="text-slate-500 text-[13px] font-medium mt-1">
                Recent verified bulk replenishments.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-             <div className="divide-y divide-border/20">
+            </p>
+          </div>
+          
+          <div className="p-0">
+             <div className="divide-y divide-slate-100">
                 {recentDeliveries.map((delivery) => (
-                  <div key={delivery.id} className="flex items-center justify-between p-6 group hover:bg-primary/5 transition-all">
+                  <div key={delivery.id} className="flex items-center justify-between p-5 md:p-6 group hover:bg-slate-50 transition-all cursor-pointer">
                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-muted rounded-2xl flex items-center justify-center font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all border border-border/30">
+                        <div className="h-12 w-12 bg-slate-100 rounded-[14px] flex items-center justify-center font-bold text-slate-500 group-hover:bg-blue-50 group-hover:text-[#0d6efd] transition-all border border-slate-200">
                            <Fuel className="h-5 w-5" />
                         </div>
                         <div className="min-w-0">
-                           <p className="font-black text-sm truncate uppercase tracking-tight">{delivery.type}</p>
-                           <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tighter flex items-center gap-1.5">
-                              {delivery.volume} <span className="w-1 h-1 rounded-full bg-border" /> {delivery.time}
+                           <p className="font-bold text-[14px] text-slate-800 truncate tracking-tight">{delivery.type}</p>
+                           <p className="text-[11px] font-medium text-slate-500 tracking-wider flex items-center gap-1.5 mt-1">
+                              {delivery.volume} <span className="w-1 h-1 rounded-full bg-slate-300" /> {delivery.time}
                            </p>
                         </div>
                      </div>
-                     <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                     <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 group-hover:bg-emerald-100 transition-colors">
                         <ArrowDownRight className="h-4 w-4" />
                      </div>
                   </div>
                 ))}
              </div>
-          </CardContent>
-          <CardFooter className="p-0">
-             <Button variant="ghost" className="w-full h-14 font-black uppercase tracking-widest text-[10px] text-muted-foreground/60 rounded-none border-t border-border/10 hover:bg-muted/50 transition-all gap-2">
-                Detailed Audit Log <ChevronRight className="w-3 h-3" />
-             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+          
+          <button className="w-full h-14 font-bold uppercase tracking-wider text-[11px] text-slate-500 bg-slate-50 border-t border-slate-100 hover:text-[#0d6efd] transition-colors flex items-center justify-center gap-2">
+             Detailed Audit Log <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
-      <Card className="bg-foreground text-background border-none shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden relative group">
-         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-50 transition-opacity group-hover:opacity-70" />
-         <CardContent className="py-12 flex flex-col items-center justify-center text-center space-y-6 relative z-10 px-8">
-            <div className="h-16 w-16 bg-background/10 backdrop-blur-xl rounded-3xl flex items-center justify-center mb-4 border border-background/20 group-hover:scale-110 transition-transform duration-500">
-               <Zap className="h-8 w-8 text-primary fill-primary shadow-[0_0_20px_rgba(var(--primary),0.5)]" />
+      {/* Operational Intelligence Banner */}
+      <div className="bg-[#0f172a] rounded-[24px] border border-slate-800 shadow-xl overflow-hidden relative group mt-8">
+         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-transparent opacity-50 transition-opacity group-hover:opacity-100" />
+         <div className="py-12 md:py-16 flex flex-col items-center justify-center text-center space-y-6 relative z-10 px-8">
+            <div className="h-16 w-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-2 border border-blue-500/20 group-hover:scale-110 transition-transform duration-500">
+               <Zap className="h-8 w-8 text-blue-400 fill-blue-400/20" />
             </div>
             <div className="space-y-3">
-               <h3 className="text-3xl font-black tracking-tight italic">Operational Intelligence</h3>
-               <p className="text-muted-foreground max-w-lg mx-auto font-medium text-lg leading-relaxed italic">
-                  Peak demand detected on <span className="text-primary font-black not-italic px-1">TUESDAY</span> cycles. Node optimization suggested for maximum throughput during these high-velocity windows.
+               <h3 className="text-3xl font-extrabold tracking-tight text-white">Operational Intelligence</h3>
+               <p className="text-slate-400 max-w-lg mx-auto font-medium text-[15px] leading-relaxed">
+                  Peak demand detected on <span className="text-blue-400 font-bold px-1">TUESDAY</span> cycles. Node optimization suggested for maximum throughput during these high-velocity windows.
                </p>
             </div>
-            <Button className="h-14 px-12 font-black uppercase tracking-widest text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xl shadow-primary/40 rounded-2xl transition-all hover:-translate-y-1">
+            <button className="h-12 mt-4 px-8 font-bold uppercase tracking-wider text-[12px] bg-[#0d6efd] text-white hover:bg-blue-600 shadow-lg shadow-blue-500/20 rounded-xl transition-all">
                Synthesize Full Analytics
-            </Button>
-         </CardContent>
-      </Card>
+            </button>
+         </div>
+      </div>
     </div>
   );
 };

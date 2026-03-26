@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 import API from "../../services/api.js";
 import { 
-  UserPlus, 
-  Phone, 
-  Lock, 
+  User, 
+  PhoneCall, 
+  KeyRound, 
   Car, 
-  Hash, 
-  Upload, 
-  FileCheck, 
+  Link as LinkIcon, 
+  CloudUpload, 
   ShieldCheck, 
-  UserCheck,
-  AlertCircle,
-  Loader2,
-  ChevronRight,
-  Zap,
-  Truck,
-  CheckCircle2
+  ArrowRight,
+  BusFront,
+  IdCard,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import { 
   Select, 
@@ -26,10 +23,9 @@ import {
 } from "../../components/ui/Select";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../../components/ui/Card";
 import { Label } from "../../components/ui/Label";
-import { Badge } from "../../components/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { Switch } from "../../components/ui/Switch";
 import { cn } from "../../lib/utils";
 
 const RegisterDriver = () => {
@@ -41,6 +37,9 @@ const RegisterDriver = () => {
     carPlate: "",
     document: null,
   });
+
+  const [isActive, setIsActive] = useState(true);
+  const [sendAlert, setSendAlert] = useState(true);
 
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -58,6 +57,10 @@ const RegisterDriver = () => {
     setForm({ ...form, carType: value });
   };
 
+  const handleGeneratePassword = () => {
+    setForm({ ...form, password: Math.random().toString(36).slice(-8) });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
@@ -70,7 +73,7 @@ const RegisterDriver = () => {
     formData.append("password", form.password);
     formData.append("carType", form.carType);
     formData.append("carPlate", form.carPlate);
-    formData.append("document", form.document);
+    if(form.document) formData.append("document", form.document);
 
     try {
       const res = await API.post("/admins/register-driver", formData, {
@@ -79,8 +82,7 @@ const RegisterDriver = () => {
         },
       });
 
-      setSuccess(res.data.msg || "Logistics operator credentials synthesized and verified.");
-
+      setSuccess(res.data.msg || "Driver registered successfully.");
       setForm({
         name: "",
         phone: "",
@@ -91,177 +93,241 @@ const RegisterDriver = () => {
       });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
-      setError(err?.response?.data?.msg || "Logistics enrollment protocol failure.");
+      setError(err?.response?.data?.msg || "Registration failed.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1 text-primary">
-            <Truck className="w-5 h-5" />
-            <span className="text-[10px] font-mono font-black tracking-[0.2em] uppercase text-primary/60">Logistics Enrollment</span>
-          </div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground italic">Register Driver</h1>
-          <p className="text-muted-foreground text-lg mt-1 italic">Register commercial vehicle operators for the autonomous fuel circuit.</p>
-        </div>
-        <div className="hidden md:flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-           <ShieldCheck className="w-3 h-3 text-primary" />
-           Identity Registry Active
-        </div>
-      </div>
-
+    <div className="p-6 md:p-8 space-y-8 max-w-6xl mx-auto font-sans">
+      
       {success && (
-        <Alert className="border-emerald-500/50 bg-emerald-500/5 text-emerald-600">
+        <Alert className="border-emerald-500/50 bg-emerald-50 text-emerald-800">
           <CheckCircle2 className="h-4 w-4" />
-          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">Enrollment Success</AlertTitle>
-          <AlertDescription className="font-bold italic">{success}</AlertDescription>
+          <AlertTitle className="font-bold">Success</AlertTitle>
+          <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
 
       {error && (
-        <Alert variant="destructive" className="border-red-500/50 bg-red-500/5">
+        <Alert variant="destructive" className="bg-red-50 text-red-800 border-red-200">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">Sequence Error</AlertTitle>
-          <AlertDescription className="font-bold">{error}</AlertDescription>
+          <AlertTitle className="font-bold">Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <Card className="border-border/50 shadow-2xl shadow-primary/5 overflow-hidden group">
-        <CardHeader className="bg-muted/30 border-b border-border/20 py-8 px-10">
-          <div className="flex items-center gap-4">
-             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner group-hover:scale-110 transition-transform">
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 md:p-10">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-100">
+          <div className="flex items-center gap-5">
+             <div className="w-14 h-14 rounded-[16px] bg-[#0f172a] flex items-center justify-center text-white shadow-md">
                 <Car className="w-7 h-7" />
              </div>
-             <div>
-                <CardTitle className="text-2xl font-black italic underline decoration-primary/30 underline-offset-4 uppercase tracking-tight">Driver Registry Matrix</CardTitle>
-                <CardDescription className="italic font-medium">Map driver identities to designated transit assets.</CardDescription>
+             <div className="space-y-1">
+                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Driver Registry</h1>
+                <p className="text-slate-500 text-[13px] font-medium">Map driver identities to assigned assets</p>
              </div>
           </div>
-        </CardHeader>
-        <CardContent className="p-10">
-          <form className="space-y-8" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2.5">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Full Legal Name</Label>
-                <div className="relative group/input">
-                  <UserCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                  <Input
-                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all"
-                    placeholder="Enter driver's full name"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
+          <div className="flex items-center gap-3">
+             <Button type="button" variant="outline" className="h-10 px-6 rounded-xl text-slate-600 border-slate-200 font-semibold hover:bg-slate-50">
+                Cancel
+             </Button>
+             <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-[#0d6efd] hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 font-semibold border-0">
+                Register Driver
+             </Button>
+          </div>
+        </div>
 
-              <div className="space-y-2.5">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Mobile Communications Link</Label>
-                <div className="relative group/input">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                  <Input
-                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all font-mono"
-                    placeholder="Enter phone number"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Access Passcode</Label>
-                <div className="relative group/input">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                  <Input
-                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all font-mono"
-                    placeholder="Generate secure password"
-                    type="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Asset Asset Categorization</Label>
-                <Select value={form.carType} onValueChange={handleSelectChange}>
-                  <SelectTrigger className="h-14 rounded-2xl border-border/50 bg-background/50 font-bold italic transition-all">
-                    <SelectValue placeholder="Select Asset Class" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-border/50 bg-background/95 backdrop-blur-xl">
-                    <SelectItem value="bajaj" className="font-bold italic py-3">Light Transport [Bajaj]</SelectItem>
-                    <SelectItem value="taxi" className="font-bold italic py-3">Public Transit [Taxi]</SelectItem>
-                    <SelectItem value="heavy" className="font-bold italic py-3">Logistics Rig [Heavy]</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2.5">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Registry Plate ID</Label>
-                <div className="relative group/input">
-                  <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
-                  <Input
-                    className="h-14 pl-12 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover/input:border-primary/20 transition-all font-mono uppercase"
-                    placeholder="Enter car plate number"
-                    name="carPlate"
-                    value={form.carPlate}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Transit Credentials [.PDF/IMG]</Label>
-                <div className="relative group/input">
-                  <input
-                    className="hidden"
-                    type="file"
-                    name="document"
-                    id="document"
-                    onChange={handleChange}
-                  />
-                  <Label 
-                    htmlFor="document" 
-                    className="flex items-center h-14 px-4 rounded-2xl border border-dashed border-border/50 bg-muted/20 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-all text-muted-foreground/60 font-medium italic overflow-hidden"
-                  >
-                    <Upload className="w-4 h-4 mr-3 text-primary opacity-40 shrink-0" />
-                    <span className="truncate flex-1">
-                      {form.document ? form.document.name : "Upload operator document"}
-                    </span>
-                    {form.document && <FileCheck className="w-4 h-4 ml-2 text-emerald-500 shrink-0" />}
-                  </Label>
-                </div>
+        {/* Form Body */}
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+            
+            {/* Full Name */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Name</Label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <Input
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="Enter driver's full name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-border/10">
-               <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">
-                  <span className="flex items-center gap-2"><Lock className="w-3 h-3" /> Data Sovereign</span>
-                  <span className="w-1 h-1 rounded-full bg-border" />
-                  <span>Cycle: {new Date().getFullYear()}_REV_A</span>
-               </div>
+            {/* Phone Number */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Phone Number</Label>
+              <div className="relative group flex items-center">
+                <div className="absolute left-4 flex items-center gap-2 text-slate-500">
+                  <PhoneCall className="w-3.5 h-3.5 group-focus-within:text-[#0d6efd] transition-colors" />
+                  <span className="text-[13px] font-medium ml-1">🇪🇹 +251</span>
+                  <div className="w-px h-4 bg-slate-300 mx-1"></div>
+                </div>
+                <Input
+                  className="h-12 pl-[100px] rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="Enter phone number"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Passcode */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Passcode</Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 pr-32 rounded-xl border-slate-200 bg-slate-50/50 font-black text-xl tracking-[0.3em] text-slate-600 focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  placeholder="••••••••"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button 
+                  type="button" 
+                  onClick={handleGeneratePassword}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-[#eff6ff] text-[#0d6efd] hover:bg-blue-100 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors"
+                >
+                  <KeyRound className="w-3.5 h-3.5" /> Generate
+                </button>
+              </div>
+            </div>
+
+            {/* Asset Class */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <BusFront className="w-4 h-4 text-[#0d6efd]" /> 
+                Asset Class
+              </Label>
+              <Select value={form.carType} onValueChange={handleSelectChange} required>
+                <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] transition-all">
+                  <SelectValue placeholder="Select asset class" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-slate-100 shadow-xl bg-white">
+                  <SelectItem value="bajaj" className="font-medium py-2.5">Light Transport (Bajaj)</SelectItem>
+                  <SelectItem value="taxi" className="font-medium py-2.5">Public Transit (Taxi)</SelectItem>
+                  <SelectItem value="heavy" className="font-medium py-2.5">Heavy Freight</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* License Plate */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <IdCard className="w-4 h-4 text-[#0d6efd]" /> 
+                License Plate
+              </Label>
+              <div className="relative group">
+                <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <Input
+                  className="h-12 pl-11 pr-24 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all uppercase"
+                  placeholder="Enter plate number"
+                  name="carPlate"
+                  value={form.carPlate}
+                  onChange={handleChange}
+                  required
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-medium text-slate-400 pointer-events-none">e.g., AA-12345</span>
+              </div>
+            </div>
+
+            {/* Driver License Upload */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Driver License</Label>
+              <div className="relative group">
+                <input
+                  className="hidden"
+                  type="file"
+                  name="document"
+                  id="document"
+                  onChange={handleChange}
+                  accept=".pdf,image/*"
+                />
+                <Label 
+                  htmlFor="document" 
+                  className="flex items-center justify-between p-4 rounded-xl border-[1.5px] border-dashed border-slate-300 bg-white hover:border-[#0d6efd] hover:bg-[#eff6ff] transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-4">
+                     <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-[#0d6efd]">
+                       <CloudUpload className="w-5 h-5 text-slate-400 group-hover:text-[#0d6efd] transition-colors" />
+                     </div>
+                     <div className="flex flex-col">
+                       <span className="text-[13px] font-bold text-slate-800 mb-0.5 truncate max-w-[150px]">
+                         {form.document ? form.document.name : "Upload license"}
+                       </span>
+                       <span className="text-[11px] text-slate-500 font-medium">PDF or image, max 5MB</span>
+                     </div>
+                  </div>
+                  <div className="bg-[#0d6efd] hover:bg-blue-700 text-white text-[12px] font-bold px-4 py-2 rounded-lg shadow-sm transition-colors cursor-pointer">
+                    Upload File
+                  </div>
+                </Label>
+              </div>
+            </div>
+            
+          </div>
+
+          {/* Bottom Driver Status Section */}
+          <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+             <div className="flex flex-col gap-6 w-full max-w-lg">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-slate-600" />
+                  <h3 className="text-[14px] font-bold text-slate-800">Driver Status</h3>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-8 pl-1">
+                  {/* Toggle 1 */}
+                  <div className="flex items-start gap-3">
+                    <Switch id="active-driver" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
+                    <div className="flex flex-col gap-1 text-left">
+                       <Label htmlFor="active-driver" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Active driver</Label>
+                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Driver can be assigned to assets</span>
+                    </div>
+                  </div>
+                  {/* Toggle 2 */}
+                  <div className="flex items-start gap-3">
+                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-[#0d6efd]" />
+                    <div className="flex flex-col gap-1 text-left">
+                       <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Credentials alert</Label>
+                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Email/SMS invite driver to download credentials</span>
+                    </div>
+                  </div>
+                </div>
+             </div>
+             
+             {/* Right Action Buttons */}
+             <div className="flex flex-col gap-3 min-w-[200px]">
                <Button 
                 disabled={loading}
-                className="w-full md:w-auto h-16 px-12 bg-foreground text-background hover:bg-primary hover:text-primary-foreground font-black uppercase tracking-widest text-xs rounded-2xl shadow-2xl transition-all hover:-translate-y-1 gap-3 group/btn"
+                className="w-full h-11 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
                 type="submit"
                >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5 fill-primary text-primary shadow-glow group-hover/btn:scale-110 transition-transform" />}
-                {loading ? "Synthesizing..." : "Register Driver"}
+                {loading ? "Registering..." : "Register Driver"}
+                <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
                </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+               <Button 
+                type="button" 
+                variant="outline"
+                className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
+                onClick={() => setForm({name:"", phone:"", password:"", carType:"", carPlate:"", document:null})}
+               >
+                Clear
+               </Button>
+             </div>
+          </div>
+          
+        </form>
+      </div>
     </div>
   );
 };

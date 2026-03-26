@@ -1,40 +1,50 @@
 import { ThemeToggle } from "./ThemeToggle";
-import { Fuel } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
+import { useSidebar } from "./ui/Sidebar";
 
 const Navbar = () => {
+  const { toggleSidebar } = useSidebar();
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center px-4 md:px-8">
-        <div className="flex items-center space-x-3">
-          <div className="bg-brand-gradient p-2 rounded-xl text-primary-foreground shadow-lg shadow-brand-500/20 ring-2 ring-brand-100 dark:ring-brand-900/50">
-            <Fuel className="w-6 h-6" />
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-xl font-bold tracking-tight text-foreground leading-none">
-              Fuel Control <span className="text-primary">System</span>
+    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800">
+      <div className="flex h-16 items-center px-4 md:px-6">
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={toggleSidebar}
+            className="p-2 -ml-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+          
+          <div className="flex flex-col ml-2 sm:ml-0">
+            <h1 className="text-[15px] font-bold text-slate-800 dark:text-slate-100 leading-tight">
+              Fuel Control <span className="text-blue-600">System</span>
             </h1>
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mt-0.5">
+            <span className="text-[9px] uppercase tracking-[0.15em] text-blue-500/80 font-semibold leading-none mt-0.5">
               Efficiency redefined
             </span>
           </div>
         </div>
         
-        <div className="ml-auto flex items-center space-x-6">
-          <div className="hidden md:flex flex-col items-end border-r pr-6 border-brand-100 dark:border-brand-900">
-            <p className="text-sm font-semibold text-foreground">Welcome, Admin</p>
-            <p className="text-xs text-primary font-semibold">Super Admin Portal</p>
+        <div className="ml-auto flex items-center space-x-5">
+          <div className="hidden md:flex flex-col items-end pr-2">
+            <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-tight">Welcome, Admin</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Super Admin Portal</p>
           </div>
           
-            <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <div className="group relative cursor-pointer">
-              <div className="h-10 w-10 rounded-full bg-primary p-[2px] transition-transform hover:scale-105 active:scale-95">
-                <div className="h-full w-full rounded-full bg-card flex items-center justify-center text-primary font-semibold border-2 border-background">
-                  A
-                </div>
-              </div>
-              <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-brand-500 border-2 border-background shadow-sm"></div>
-            </div>
+          <div className="flex items-center gap-3">
+             <div className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                <ThemeToggle />
+             </div>
+             
+             <button className="relative flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold flex items-center justify-center rounded-full border-2 border-white dark:border-slate-900">
+                  3
+                </span>
+             </button>
           </div>
         </div>
       </div>

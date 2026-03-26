@@ -141,3 +141,33 @@ export async function getAllFuelDeliveries(req, res) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
+
+/**
+ * Federal - Get all Super Admins and Owners
+ */
+export async function getFederalAdmins(req, res) {
+  try {
+    const admins = await prisma.admin.findMany({
+      where: {
+        role: { in: ["super", "stationOwner"] }
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        region: true,
+        companyName: true,
+        stationIds: true,
+        isBlocked: true,
+        isApproved: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" }
+    });
+    res.status(200).json(admins);
+  } catch (err) {
+    console.error("Get Federal Admins Error:", err);
+    res.status(500).json({ msg: "Failed to fetch administrative records", error: err.message });
+  }
+}
