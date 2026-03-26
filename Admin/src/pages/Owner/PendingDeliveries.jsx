@@ -90,7 +90,7 @@ const PendingDeliveries = () => {
       </div>
       <div className="text-center space-y-2">
         <p className="text-xl font-black tracking-tight italic text-foreground">Scanning Logistics Horizon</p>
-        <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">Detecting inbound dispatches...</p>
+        <p className="text-muted-foreground uppercase tracking-widest text-[10px]">Detecting inbound dispatches...</p>
       </div>
     </div>
   );
@@ -127,13 +127,13 @@ const PendingDeliveries = () => {
       ) : (
         <div className="grid gap-6 max-w-5xl mx-auto">
           {deliveries.map((delivery) => (
-            <Card key={delivery.id} className="border-border/50 shadow-xl shadow-primary/5 group hover:border-primary/30 transition-all duration-500 overflow-hidden bg-muted/5">
+            <Card key={delivery.id} className="border border-border shadow-sm group transition-all duration-300 overflow-hidden bg-card">
               <CardContent className="p-0 flex flex-col md:flex-row items-stretch">
                 <div className="p-8 flex-1 space-y-6">
                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                          <Badge className={cn(
-                            "font-black text-[9px] uppercase tracking-widest px-3 py-1 border-none shadow-lg",
+                            "font-black text-[9px] uppercase tracking-widest px-3 py-1 border-none",
                             delivery.fuelType.toLowerCase() === 'diesel' ? "bg-emerald-500 text-white" : "bg-primary text-primary-foreground"
                          )}>
                             {delivery.fuelType.toUpperCase()}
@@ -180,7 +180,7 @@ const PendingDeliveries = () => {
                    </div>
                    <Button 
                      onClick={() => handleAcceptInitiate(delivery)}
-                     className="w-full h-14 bg-foreground text-background hover:bg-forest-green hover:text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-2xl transition-all hover:-translate-y-1 gap-3 group/btn"
+                     className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-sm transition-all gap-3 group/btn"
                    >
                      <Zap className="w-5 h-5 fill-primary text-primary shadow-glow group-hover/btn:scale-110 transition-transform" />
                      Authorize Discharge
@@ -211,7 +211,7 @@ const PendingDeliveries = () => {
             <AlertDialogAction 
               onClick={handleConfirmAccept}
               disabled={accepting}
-              className="h-14 flex-1 rounded-2xl font-black uppercase tracking-widest text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xl shadow-primary/40 transition-all group gap-2"
+              className="h-14 flex-1 rounded-2xl font-black uppercase tracking-widest text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all group gap-2"
             >
               {accepting ? <Loader2 className="w-5 h-4 animate-spin" /> : <ShieldCheck className="w-5 h-4" />}
               {accepting ? "Processing..." : "Confirm Protocol"}

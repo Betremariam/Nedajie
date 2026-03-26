@@ -112,10 +112,10 @@ const RegisterAttendant = () => {
         </Alert>
       )}
 
-      <Card className="border-border/50 shadow-2xl shadow-primary/5 overflow-hidden">
+      <Card className="border border-border shadow-sm overflow-hidden">
         <CardHeader className="bg-muted/30 border-b border-border/20 py-8 px-10">
           <div className="flex items-center gap-4">
-             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <UserPlus className="w-7 h-7" />
              </div>
              <div>
@@ -174,7 +174,7 @@ const RegisterAttendant = () => {
                 </Label>
                 <div className={cn(
                   "border-2 border-dashed rounded-2xl p-8 text-center transition-all group relative cursor-pointer",
-                   form.document ? "border-primary/50 bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/20"
+                   form.document ? "border-primary/40 bg-primary/5" : "border-border hover:border-primary/20 hover:bg-muted/10"
                 )}>
                   <input
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -186,7 +186,7 @@ const RegisterAttendant = () => {
                   <div className="relative z-0">
                     <div className={cn(
                       "w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-all",
-                      form.document ? "bg-primary text-primary-foreground scale-110 shadow-xl shadow-primary/20" : "bg-muted text-muted-foreground/40 group-hover:scale-110"
+                      form.document ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground/40"
                     )}>
                       {form.document ? <FileCheck className="w-8 h-8" /> : <Upload className="w-8 h-8" />}
                     </div>
@@ -209,7 +209,7 @@ const RegisterAttendant = () => {
           <CardFooter className="bg-muted/30 border-t border-border/10 p-10 flex justify-end">
             <Button 
               type="submit" 
-              className="h-14 px-12 font-black uppercase tracking-widest text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xl shadow-primary/30 rounded-2xl transition-all hover:-translate-y-1 gap-3 border-none ring-0"
+              className="h-14 px-12 font-black uppercase tracking-widest text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm rounded-2xl transition-all gap-3 border-none ring-0"
               disabled={loading}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}

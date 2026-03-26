@@ -66,7 +66,7 @@ const OwnerFuelStock = () => {
       </div>
       <div className="text-center space-y-2">
         <p className="text-xl font-black tracking-tight italic text-foreground">Syncing Reservoir Levels</p>
-        <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">Scanning operational nodes...</p>
+        <p className="text-muted-foreground uppercase tracking-widest text-[10px]">Scanning operational nodes...</p>
       </div>
     </div>
   );
@@ -91,7 +91,7 @@ const OwnerFuelStock = () => {
           <p className="text-muted-foreground text-lg mt-1 italic">Real-time telemetry of liquid assets across operational nodes.</p>
         </div>
         <div className="hidden md:flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-           <Activity className="w-3 h-3 text-emerald-500 animate-pulse" />
+           <Activity className="w-3 h-3 text-emerald-500" />
            Live Telemetry Feed
         </div>
       </div>
@@ -107,7 +107,7 @@ const OwnerFuelStock = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {/* Benzene Card */}
         <Card className="border-border/50 shadow-2xl shadow-primary/5 group hover:border-primary/30 transition-all duration-500 overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
+          <div className="absolute top-0 right-0 p-8 opacity-5 transition-transform">
              <Droplets className="w-32 h-32" />
           </div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 relative z-10">
@@ -117,7 +117,7 @@ const OwnerFuelStock = () => {
               </CardTitle>
               <CardDescription className="italic font-medium">Unleaded Premium Reservoir</CardDescription>
             </div>
-            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary transition-all duration-300">
                <Zap className="h-6 w-6" />
             </div>
           </CardHeader>
@@ -136,7 +136,7 @@ const OwnerFuelStock = () => {
                </div>
                <div className="h-4 w-full bg-muted rounded-full overflow-hidden border border-border/50 p-0.5">
                   <div 
-                    className="h-full bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)] transition-all duration-1000 ease-out" 
+                    className="h-full bg-primary rounded-full transition-all duration-300 ease-out" 
                     style={{ width: `${benzenePercent}%` }}
                   />
                </div>
@@ -144,14 +144,14 @@ const OwnerFuelStock = () => {
 
             <div className="flex items-center justify-between pt-4 border-t border-border/10">
                <Badge className={cn(
-                  "font-black text-[9px] uppercase tracking-widest px-3 py-1 border-none shadow-lg",
-                  benzene > 10000 ? "bg-emerald-500/10 text-emerald-600 shadow-emerald-500/10" : benzene > 5000 ? "bg-amber-500/10 text-amber-600 shadow-amber-500/10" : "bg-red-500/10 text-red-500 shadow-red-500/10"
+                  "font-black text-[9px] uppercase tracking-widest px-3 py-1 border-none",
+                  benzene > 10000 ? "bg-emerald-500/10 text-emerald-600" : benzene > 5000 ? "bg-amber-500/10 text-amber-600" : "bg-red-500/10 text-red-500"
                )}>
                   {benzene > 10000 ? "Level Nominal" : benzene > 5000 ? "Threshold Alert" : "CRITICAL DEPLETION"}
                </Badge>
                <div className="flex items-center gap-1.5 text-[8px] font-bold text-muted-foreground/40 italic">
                   Node Link Secure
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                </div>
             </div>
           </CardContent>
@@ -159,7 +159,7 @@ const OwnerFuelStock = () => {
 
         {/* Diesel Card */}
         <Card className="border-border/50 shadow-2xl shadow-emerald-500/5 group hover:border-emerald-500/30 transition-all duration-500 overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform text-emerald-500">
+          <div className="absolute top-0 right-0 p-8 opacity-5 transition-transform text-emerald-500">
              <Waves className="w-32 h-32" />
           </div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 relative z-10">
@@ -169,7 +169,7 @@ const OwnerFuelStock = () => {
               </CardTitle>
               <CardDescription className="italic font-medium">Diesel Max Reservoir</CardDescription>
             </div>
-            <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 transition-all duration-300">
                <Droplets className="h-6 w-6" />
             </div>
           </CardHeader>
@@ -213,8 +213,8 @@ const OwnerFuelStock = () => {
       <Card className="bg-foreground text-background border-none shadow-2xl shadow-black/20 overflow-hidden relative group max-w-5xl mx-auto">
          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-50" />
          <CardContent className="py-10 flex flex-col items-center justify-center text-center space-y-6 relative z-10 px-10">
-            <div className="h-14 w-14 bg-background/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-2 border border-background/20 group-hover:scale-110 transition-transform duration-500">
-               <ShieldCheck className="h-7 w-7 text-primary shadow-glow" />
+            <div className="h-14 w-14 bg-background/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-2 border border-background/20 transition-transform duration-500">
+               <ShieldCheck className="h-7 w-7 text-primary" />
             </div>
             <div className="space-y-2">
                <h3 className="text-2xl font-black tracking-tight italic">Strategic Reservoir Oversight</h3>

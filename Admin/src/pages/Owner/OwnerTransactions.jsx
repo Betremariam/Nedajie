@@ -81,7 +81,7 @@ const OwnerTransactions = () => {
       </div>
       <div className="text-center space-y-2">
         <p className="text-xl font-black tracking-tight italic text-foreground">Syncing Transaction Ledger</p>
-        <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">Decrypting financial stream...</p>
+        <p className="text-muted-foreground uppercase tracking-widest text-[10px]">Decrypting financial stream...</p>
       </div>
     </div>
   );
@@ -122,14 +122,14 @@ const OwnerTransactions = () => {
           <p className="text-muted-foreground mt-2 max-w-sm font-medium">No sales transactions have been authorized in this administrative cycle.</p>
         </Card>
       ) : (
-        <Card className="border-border/50 shadow-2xl shadow-primary/5 overflow-hidden">
+        <Card className="border border-border shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 border-b border-border/20 py-6 px-8 flex flex-row items-center justify-between">
             <div className="flex items-center gap-4">
-               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                   <History className="w-6 h-6" />
                </div>
                <div>
-                  <CardTitle className="text-xl font-black italic underline decoration-primary/30 underline-offset-4">Asset Liquidation Log</CardTitle>
+                  <CardTitle className="text-xl font-black italic">Asset Liquidation Log</CardTitle>
                   <CardDescription className="italic font-medium">Real-time throughput metrics across nodes.</CardDescription>
                </div>
             </div>
@@ -152,7 +152,7 @@ const OwnerTransactions = () => {
                     <TableRow key={tx.id} className="group hover:bg-primary/5 transition-all border-b border-border/30 h-20">
                       <TableCell className="pl-8">
                         <div className="flex items-center gap-3">
-                           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground transition-all duration-300">
                               <User className="w-4 h-4" />
                            </div>
                            <div>

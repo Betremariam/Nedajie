@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API from "../../services/api";
 import { Copy, Check, ShieldAlert, ShieldCheck, KeyRound, Loader2, UserPlus, Trash2, Ban, Unlock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Table, 
   TableHeader, 

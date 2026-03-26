@@ -1,7 +1,7 @@
-import { EllipsisVertical, LogOut, BellDot, CircleUser } from "lucide-react"
-import { Link } from "react-router-dom"
+import { EllipsisVertical, LogOut, CircleUser } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/Avatar"
+import { Avatar, AvatarFallback } from "./ui/Avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,38 +10,30 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/DropdownMenu"
+} from "./ui/DropdownMenu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "./ui/Sidebar"
-
-import { useNavigate } from "react-router-dom"
+} from "./ui/Sidebar";
 
 export function NavUser() {
-  const { isMobile } = useSidebar()
-  const navigate = useNavigate()
-  
-  const adminData = JSON.parse(localStorage.getItem("admin") || "{}");
-  
-  const user = {
-    name: adminData.name || "Admin",
-    email: adminData.email || "admin@nigdbureau.com",
-    role: adminData.role || "unknown"
-  }
+  const { isMobile } = useSidebar();
+  const navigate = useNavigate();
 
-  const userName = user.name
-  const userEmail = user.email
-  const initials = user.name?.charAt(0) || "A"
+  const adminData = JSON.parse(localStorage.getItem("admin") || "{}");
+
+  const userName  = adminData.name  || "Admin";
+  const userEmail = adminData.email || "admin@nigdbureau.com";
+  const initials  = userName.charAt(0).toUpperCase() || "A";
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("admin");
     localStorage.removeItem("stationIds");
     navigate("/");
-  }
+  };
 
   return (
     <SidebarMenu>
@@ -50,22 +42,25 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-white/5 data-[state=open]:text-white cursor-pointer bg-slate-900 rounded-2xl border border-white/5 shadow-sm p-2 h-auto hover:bg-slate-800 transition-colors"
+              className="cursor-pointer bg-white/5 border border-white/10 rounded-2xl p-2 h-auto hover:bg-white/10 transition-colors data-[state=open]:bg-white/10"
             >
-              <Avatar className="h-9 w-9 rounded-full bg-white flex items-center justify-center p-0.5 shadow-sm">
-                <AvatarFallback className="rounded-full bg-white text-blue-600 font-bold text-sm h-full w-full flex items-center justify-center">
+              <Avatar className="h-9 w-9 rounded-full bg-white flex items-center justify-center p-0.5 shadow-sm shrink-0">
+                <AvatarFallback className="rounded-full bg-white text-blue-600 font-bold text-sm">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight ml-1">
-                <span className="truncate font-semibold text-white text-[13px] tracking-tight">{userName}</span>
-                <span className="text-slate-400 truncate text-[10px] tracking-wider mt-0.5">
+              <div className="grid flex-1 text-left text-sm leading-tight ml-1 overflow-hidden">
+                <span className="truncate font-semibold text-white text-[13px] tracking-tight">
+                  {userName}
+                </span>
+                <span className="truncate text-slate-400 text-[10px] tracking-wider mt-0.5">
                   {userEmail}
                 </span>
               </div>
-              <EllipsisVertical className="ml-auto size-4 text-slate-400" />
+              <EllipsisVertical className="ml-auto size-4 text-slate-400 shrink-0" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -87,7 +82,9 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem asChild className="cursor-pointer">
                 <Link to="/settings/account">
@@ -96,7 +93,9 @@ export function NavUser() {
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
               <LogOut />
               Log out
@@ -105,5 +104,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

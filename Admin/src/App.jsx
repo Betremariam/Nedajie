@@ -8,7 +8,7 @@ import TransactionHistory from "./pages/SuperAdmin/TransactionHistory";
 import DriverLists from "./pages/SuperAdmin/DriverLists";
 import FarmerLists from "./pages/SuperAdmin/FarmerLists";
 import OtherLists from "./pages/SuperAdmin/OtherLists";
-import FuelDilevery from "./pages/SuperAdmin/FuelDilevery";
+import FuelDelivery from "./pages/SuperAdmin/FuelDelivery";
 import ConfirmDeliveries from "./pages/SuperAdmin/ConfirmDeliveries";
 
 // Layouts
@@ -68,7 +68,7 @@ function App() {
             <Route path="drivers-list" element={<DriverLists />} />
             <Route path="farmers-list" element={<FarmerLists />} />
             <Route path="others-list" element={<OtherLists />} />
-            <Route path="fuel-delivery" element={<FuelDilevery />} />
+            <Route path="fuel-delivery" element={<FuelDelivery />} />
             <Route path="confirm-deliveries" element={<ConfirmDeliveries />} />
           </Route>
 
@@ -114,8 +114,6 @@ function App() {
 }
 
 export default App;
-
-
 
 
 

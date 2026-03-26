@@ -105,7 +105,7 @@ const Reports = () => {
       </div>
       <div className="text-center space-y-2">
         <p className="text-xl font-black tracking-tight italic text-foreground">Compiling Analytical Synthesis</p>
-        <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">Processing historical datasets...</p>
+        <p className="text-muted-foreground uppercase tracking-widest text-[10px]">Processing historical datasets...</p>
       </div>
     </div>
   );
@@ -128,14 +128,14 @@ const Reports = () => {
             disabled={!transactions.length}
             className="h-12 px-6 rounded-2xl bg-emerald-500/5 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest text-[10px] shadow-sm transition-all disabled:opacity-30 flex items-center gap-2 group"
           >
-            <FileSpreadsheet className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <FileSpreadsheet className="w-4 h-4 transition-transform" />
             Export Intelligence [.XLSX]
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-         <Card className="lg:col-span-1 border-border/50 shadow-2xl shadow-primary/5 bg-muted/5 group hover:border-primary/30 transition-all duration-500">
+         <Card className="lg:col-span-1 border border-border bg-card shadow-sm transition-all duration-300">
             <CardHeader>
                <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -149,7 +149,7 @@ const Reports = () => {
                <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Analysis Period</label>
                   <Select value={reportType} onValueChange={setReportType}>
-                    <SelectTrigger className="h-14 rounded-2xl border-border/50 bg-background/50 font-bold italic group-hover:border-primary/20 transition-all">
+                    <SelectTrigger className="h-14 rounded-2xl border-border bg-background font-bold transition-all">
                       <SelectValue placeholder="Select Period" />
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl border-border/50 bg-background/95 backdrop-blur-xl">
@@ -179,11 +179,11 @@ const Reports = () => {
 
          <Card className="lg:col-span-2 border-none bg-foreground text-background shadow-2xl shadow-black/20 overflow-hidden relative group">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent opacity-50" />
-            <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 group-hover:scale-175 transition-transform duration-1000">
+            <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 transition-transform duration-1000">
                <TrendingUp className="w-64 h-64" />
             </div>
             <CardHeader className="relative z-10 pb-2">
-               <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-primary shadow-glow">Dispensing Efficiency</CardTitle>
+               <CardTitle className="text-[10px] font-black uppercase tracking-wider text-primary">Dispensing Efficiency</CardTitle>
                <CardDescription className="text-background/40 font-medium italic">Aggregate volume metrics across authorized nodes.</CardDescription>
             </CardHeader>
             <CardContent className="relative z-10 py-10 flex flex-col items-center justify-center text-center">
@@ -260,7 +260,7 @@ const Reports = () => {
                 </TableHeader>
                 <TableBody>
                   {transactions.map((tx) => (
-                    <TableRow key={tx.id} className="group hover:bg-primary/5 transition-all border-b border-border/30 h-16">
+                    <TableRow key={tx.id} className="hover:bg-muted/50 transition-all border-b border-border h-16">
                       <TableCell className="pl-8">
                          <div className="flex flex-col">
                             <span className="text-xs font-black text-foreground/80 flex items-center gap-2">

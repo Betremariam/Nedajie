@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Truck, CheckCircle, Clock, AlertCircle, MapPin, Loader2, ShieldCheck, ChevronRight } from "lucide-react";
+import { Truck, CheckCircle, Clock, AlertCircle, MapPin, Loader2, ShieldCheck, ChevronRight, RefreshCcw } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { 
@@ -74,7 +74,7 @@ const ConfirmDeliveries = () => {
     return (
       <div className="p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
         <Loader2 className="animate-spin h-10 w-10 text-primary mb-4" />
-        <p className="text-muted-foreground animate-pulse">Retrieving regional logistics data...</p>
+        <p className="text-muted-foreground">Retrieving regional logistics data...</p>
       </div>
     );
   }
@@ -129,7 +129,7 @@ const ConfirmDeliveries = () => {
       ) : (
         <div className="grid gap-6 max-w-5xl mx-auto">
           {deliveries.map((delivery) => (
-            <Card key={delivery.id} className="overflow-hidden border-border/50 shadow-md group hover:border-primary/50 transition-all duration-300">
+            <Card key={delivery.id} className="overflow-hidden border-border/50 shadow-sm group hover:border-border transition-all duration-300">
               <div className="h-1.5 w-full bg-amber-500/20 group-hover:bg-amber-500 transition-colors" />
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -179,9 +179,9 @@ const ConfirmDeliveries = () => {
                   <div className="w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-border/50">
                     <Button 
                       onClick={() => setConfirmingDelivery(delivery)}
-                      className="w-full h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 flex items-center justify-center gap-3 rounded-xl font-bold group"
+                      className="w-full h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center justify-center gap-3 rounded-xl font-bold"
                     >
-                      <ShieldCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      <ShieldCheck className="w-5 h-5 transition-transform" />
                       Authorize Delivery
                     </Button>
                   </div>

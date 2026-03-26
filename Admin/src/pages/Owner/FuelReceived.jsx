@@ -108,7 +108,7 @@ const FuelReceived = () => {
       </div>
       <div className="text-center space-y-2">
         <p className="text-xl font-black tracking-tight italic">Syncing Inbound Logistics</p>
-        <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">Establishing secure data tunnel...</p>
+        <p className="text-muted-foreground uppercase tracking-widest text-[10px]">Establishing secure data tunnel...</p>
       </div>
     </div>
   );
@@ -132,10 +132,10 @@ const FuelReceived = () => {
               <span className="text-xs font-bold text-foreground">Operational Node</span>
             </div>
             <Select value={selectedStation} onValueChange={setSelectedStation}>
-              <SelectTrigger className="w-[200px] h-12 rounded-xl bg-background border-none shadow-xl shadow-black/5 font-black text-xs uppercase tracking-wider">
+              <SelectTrigger className="w-[200px] h-12 rounded-xl bg-background border border-border shadow-sm font-black text-xs uppercase tracking-wider">
                 <SelectValue placeholder="Select Node" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-border/50 shadow-2xl">
+              <SelectContent className="rounded-xl border-border shadow-md">
                 <SelectItem value="" className="font-bold text-xs">GLOBAL_FEED</SelectItem>
                 {stations.map((s) => (
                   <SelectItem key={s.id} value={s.id} className="font-bold text-xs uppercase">
@@ -169,7 +169,7 @@ const FuelReceived = () => {
           </Button>
         </Card>
       ) : (
-        <Card className="border-border/50 shadow-2xl shadow-primary/5 overflow-hidden">
+        <Card className="border border-border shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 border-b border-border/20 py-6 px-8 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-xl flex items-center gap-3">
@@ -202,7 +202,7 @@ const FuelReceived = () => {
                     <TableRow key={rec.id} className="group hover:bg-primary/5 transition-all border-b border-border/30 h-20">
                       <TableCell className="pl-8">
                         <div className="flex items-center gap-4">
-                           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center transition-all duration-300">
                               <MapPin className="w-5 h-5" />
                            </div>
                            <div>

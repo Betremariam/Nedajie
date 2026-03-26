@@ -184,7 +184,7 @@ function FuelDelivery() {
                       <Badge className="bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 border-none font-bold text-[8px] tracking-widest">{(file.size / 1024).toFixed(2)} KB INTEGRITY_OK</Badge>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center gap-2 transition-transform group-hover:scale-105 duration-500">
+                    <div className="flex flex-col items-center gap-2">
                       <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm border-2 border-dashed border-gray-100 dark:border-gray-800 mb-2">
                         <Upload className="h-6 w-6 text-gray-300 dark:text-gray-400 group-hover:text-emerald-500 transition-colors" />
                       </div>
@@ -192,13 +192,12 @@ function FuelDelivery() {
                       <span className="text-[8px] font-medium text-gray-300 dark:text-gray-400 uppercase tracking-widest">Accepts .xlsx only</span>
                     </div>
                   )}
-                  <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all" />
                 </div>
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] gap-3 shadow-lg shadow-emerald-500/10 transition-all active:scale-95"
+                className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[10px] gap-3 shadow-sm transition-all"
                 disabled={loading || !file || !fuelType}
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
@@ -266,7 +265,7 @@ function FuelDelivery() {
                     <TableCell className="py-5 text-center">
                       <Badge variant="outline" className="text-[9px] font-bold uppercase bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-200 px-3 rounded-full">#{d.fdcNo}</Badge>
                     </TableCell>
-                    <TableCell className="py-5 text-right font-bold tabular-nums tracking-tight text-emerald-700 dark:text-emerald-400 text-base group-hover:scale-110 transition-transform origin-right">
+                    <TableCell className="py-5 text-right font-bold tabular-nums tracking-tight text-emerald-700 dark:text-emerald-400 text-base">
                       {d.volume.toLocaleString()}
                     </TableCell>
                     <TableCell className="px-8 py-5 text-center">
@@ -278,7 +277,7 @@ function FuelDelivery() {
                         <Button
                           onClick={() => handleApprove(d.id)}
                           size="sm"
-                          className="h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[9px] gap-2 shadow-lg shadow-emerald-500/10 active:scale-95"
+                          className="h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-widest text-[9px] gap-2 shadow-sm"
                         >
                           Verify <ArrowRight className="w-3 h-3" />
                         </Button>
@@ -315,12 +314,12 @@ function FuelDelivery() {
       {/* Notifications */}
       {message.text && (
         <div className={cn(
-          "fixed bottom-8 right-8 z-50 w-[380px] border-2 shadow-2xl rounded-2xl overflow-hidden animate-fade-in bg-white dark:bg-gray-800",
+          "fixed bottom-8 right-8 z-50 w-[380px] border-2 shadow-sm rounded-2xl overflow-hidden animate-fade-in bg-white dark:bg-gray-800",
           message.type === "error" ? "border-red-500" : "border-emerald-500"
         )}>
            <div className="p-6 flex items-center gap-4">
               <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-900 shadow-lg flex-shrink-0 animate-pulse",
+                "w-12 h-12 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-900 shadow-lg flex-shrink-0",
                 message.type === "error" ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"
               )}>
                  {message.type === "error" ? <AlertCircle className="w-6 h-6" /> : <ShieldCheck className="w-6 h-6" />}
