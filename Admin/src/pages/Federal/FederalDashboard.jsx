@@ -17,10 +17,10 @@ import { cn } from "../../lib/utils";
 
 const FederalDashboard = () => {
   const stats = [
-    { label: "Regional Super Admins", value: "12",      icon: Globe,      trend: "Active Nodes",   color: "blue",    desc: "Provincial oversight" },
-    { label: "Verified Station Owners", value: "84",    icon: Building2,  trend: "Validated",      color: "emerald", desc: "Entity level auth" },
-    { label: "National Fuel Dispatch",  value: "312",   icon: Truck,      trend: "+24% increase",  color: "amber",   desc: "Weekly logistics flow" },
-    { label: "Regulatory Compliance",   value: "Optimal", icon: ShieldCheck, trend: "Audited",     color: "purple",  desc: "Standard alignment" },
+    { label: "Regional Super Admins", value: "12",      icon: Globe,         color: "blue",    desc: "Provincial oversight" },
+    { label: "Verified Station Owners", value: "84",    icon: Building2,     color: "emerald", desc: "Entity level auth" },
+    { label: "National Fuel Dispatch",  value: "312",   icon: Truck,         color: "amber",   desc: "Weekly logistics flow" },
+    { label: "Regulatory Compliance",   value: "Optimal", icon: ShieldCheck, color: "purple",  desc: "Standard alignment" },
   ];
 
   const recentDeliveries = [
@@ -48,12 +48,6 @@ const FederalDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-primary" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">
-              Federal Authority Layer
-            </span>
-          </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
             National Command Center
           </h1>
@@ -63,16 +57,6 @@ const FederalDashboard = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex -space-x-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-10 h-10 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shadow-sm"
-              >
-                AD
-              </div>
-            ))}
-          </div>
           <button className="h-10 px-5 flex items-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-sm">
             Export National Report
           </button>

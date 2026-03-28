@@ -138,14 +138,6 @@ const ManageSuperAdmins = () => {
               <p className="text-muted-foreground text-[13px] font-medium">Provision regional super administrators</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button type="button" variant="outline" className="h-10 px-6 rounded-xl text-muted-foreground border-border font-semibold hover:bg-muted/50">
-              Cancel
-            </Button>
-            <Button type="button" onClick={handleSubmit} disabled={loading} className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20 font-semibold border-0">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Admin"}
-            </Button>
-          </div>
         </div>
 
         {/* Form */}
@@ -207,19 +199,6 @@ const ManageSuperAdmins = () => {
 
           {/* Bottom Status + Submit */}
           <div className="pt-8 pb-4 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-            <div className="flex flex-col gap-6 w-full max-w-lg">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-muted-foreground" />
-                <h3 className="text-[14px] font-bold text-foreground">Admin Settings</h3>
-              </div>
-              <div className="flex items-start gap-3 pl-1">
-                <Switch id="send-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
-                <div className="flex flex-col gap-1 text-left">
-                  <Label htmlFor="send-alert" className="text-[13px] font-semibold text-foreground cursor-pointer">Send credentials alert</Label>
-                  <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[200px]">Notify admin via email with login credentials</span>
-                </div>
-              </div>
-            </div>
             <div className="flex flex-col gap-3 min-w-[200px]">
               <Button disabled={loading} className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2" type="submit">
                 {loading ? "Creating..." : "Create Super Admin"}

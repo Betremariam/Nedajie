@@ -10,12 +10,9 @@ export function SiteFooter() {
         <div className="flex flex-col items-center justify-center space-y-2 text-center">
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <span>
-              © {currentYear} Mekina Kiray Dotcom. All rights reserved.
+              © {currentYear} Nedajie. All rights reserved.
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Admin dashboard for managing vehicles, bookings, and operations.
-          </p>
         </div>
       </div>
     </footer>
