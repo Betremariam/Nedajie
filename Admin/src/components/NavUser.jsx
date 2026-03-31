@@ -42,22 +42,22 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="cursor-pointer bg-white/5 border border-white/10 rounded-2xl p-2 h-auto hover:bg-white/10 transition-colors data-[state=open]:bg-white/10"
+              className="cursor-pointer bg-sidebar-accent/50 border border-sidebar-border rounded-2xl p-2 h-auto hover:bg-sidebar-accent transition-colors data-[state=open]:bg-sidebar-accent"
             >
               <Avatar className="h-9 w-9 rounded-full bg-white flex items-center justify-center p-0.5 shadow-sm shrink-0">
-                <AvatarFallback className="rounded-full bg-white text-blue-600 font-bold text-sm">
+                <AvatarFallback className="rounded-full bg-white text-primary font-bold text-sm">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight ml-1 overflow-hidden">
-                <span className="truncate font-semibold text-white text-[13px] tracking-tight">
+                <span className="truncate font-semibold text-sidebar-foreground text-[13px] tracking-tight">
                   {userName}
                 </span>
-                <span className="truncate text-slate-400 text-[10px] tracking-wider mt-0.5">
+                <span className="truncate text-sidebar-foreground/60 text-[10px] tracking-wider mt-0.5">
                   {userEmail}
                 </span>
               </div>
-              <EllipsisVertical className="ml-auto size-4 text-slate-400 shrink-0" />
+              <EllipsisVertical className="ml-auto size-4 text-sidebar-foreground/50 shrink-0" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 

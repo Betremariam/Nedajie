@@ -62,7 +62,7 @@ const DriverLists = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">Registered Drivers</h1>
           <p className="text-muted-foreground text-lg">Comprehensive registry of authorized logistics personnel</p>
         </div>
-        <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2 bg-blue-500/5 border-blue-200 text-blue-700">
+        <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2 bg-primary/5 border-primary/20 text-primary">
           <Users className="w-4 h-4" />
           {drivers.length} Active Operators
         </Badge>
@@ -127,7 +127,7 @@ const DriverLists = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 border-blue-200/50 hover:bg-blue-500/20 capitalize font-medium">
+                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 capitalize font-medium">
                           {driver.carType}
                         </Badge>
                       </TableCell>

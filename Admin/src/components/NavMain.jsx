@@ -25,7 +25,7 @@ export function NavMain({ label, items }) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-[11px] font-bold text-slate-400 mb-2">
+      <SidebarGroupLabel className="text-[11px] font-bold text-sidebar-foreground/50 mb-2">
         {label}
       </SidebarGroupLabel>
 
@@ -47,7 +47,7 @@ export function NavMain({ label, items }) {
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
                         tooltip={item.title}
-                        className="cursor-pointer text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                        className="cursor-pointer text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors"
                       >
                         {item.icon && <item.icon className="w-4 h-4" />}
                         <span className="font-medium text-[13px]">{item.title}</span>
@@ -65,8 +65,8 @@ export function NavMain({ label, items }) {
                                 asChild
                                 className={`cursor-pointer transition-colors ${
                                   isSubActive
-                                    ? "text-white font-medium"
-                                    : "text-slate-400 hover:text-white"
+                                    ? "text-sidebar-foreground font-medium"
+                                    : "text-sidebar-foreground/50 hover:text-sidebar-accent-foreground"
                                 }`}
                               >
                                 <Link to={sub.url}>
@@ -86,8 +86,8 @@ export function NavMain({ label, items }) {
                     tooltip={item.title}
                     className={`cursor-pointer transition-all duration-200 font-medium ${
                       isActive
-                        ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white shadow-sm"
-                        : "text-slate-300 hover:bg-white/10 hover:text-white"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm"
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     }`}
                   >
                     <Link to={item.url} className="flex items-center w-full">

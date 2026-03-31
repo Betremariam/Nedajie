@@ -41,7 +41,7 @@ const ApproveAttendants = () => {
   if (loading) return (
     <div className="flex justify-center items-center p-8">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
         <p className="mt-4 text-muted-foreground">Loading attendants...</p>
       </div>
     </div>
@@ -70,8 +70,8 @@ const ApproveAttendants = () => {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-semibold text-lg">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="text-primary font-semibold text-lg">
                         {attendant.name?.charAt(0) || 'A'}
                       </span>
                     </div>
@@ -90,7 +90,7 @@ const ApproveAttendants = () => {
                         href={attendant.documentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                        className="text-primary hover:text-primary/90 font-medium transition-colors duration-200"
                       >
                         View Verification Document
                       </a>

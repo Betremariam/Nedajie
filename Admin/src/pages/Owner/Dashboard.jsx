@@ -32,7 +32,7 @@ const Dashboard = () => {
   ];
 
   const iconBg = {
-    blue: "bg-blue-500/10 text-blue-500",
+    blue: "bg-primary/10 text-primary",
     emerald: "bg-emerald-500/10 text-emerald-500",
     amber: "bg-amber-500/10 text-amber-500",
     purple: "bg-purple-500/10 text-purple-500",
@@ -45,17 +45,17 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-primary" />
+            <Building2 className="w-6 h-6 text-foreground" />
             <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Station Proprietor Node</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
              Station Overview
           </h1>
           <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Real-time asset telemetry and inventory management.</p>
         </div>
         <div className="flex items-center gap-4">
-           <div className="h-12 w-12 rounded-2xl bg-muted/40 border border-border flex items-center justify-center text-primary shadow-sm">
-              <Activity className="h-6 w-6" />
+           <div className="flex items-center justify-center text-foreground">
+              <Activity className="h-8 w-8" />
            </div>
            <button className="h-11 px-6 flex items-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-all shadow-sm">
              <Droplets className="w-4 h-4 opacity-80" />
@@ -68,28 +68,17 @@ const Dashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <div key={i} className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-border transition-all duration-300">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-              <h3 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
-                {stat.label}
-              </h3>
-              <div className={cn("p-2 rounded-xl transition-colors", iconBg[stat.color])}>
-                <stat.icon className="h-4 w-4" />
+            <div className="flex flex-col gap-4 relative z-10">
+              <div className="p-0 rounded-xl transition-colors">
+                <stat.icon className="h-10 w-10 text-foreground" />
               </div>
-            </div>
-            <div className="relative z-10">
-              <div className="text-3xl font-black tracking-tight text-foreground mb-1">
-                {stat.value}
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-[11px] font-medium text-muted-foreground">
-                  {stat.desc}
-                </p>
-                <span className={cn(
-                  "text-[10px] font-bold px-2 py-0.5 rounded-md border",
-                  stat.trend.startsWith('+') ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" : "text-muted-foreground bg-muted border-border"
-                )}>
-                  {stat.trend}
-                </span>
+              <div className="space-y-1">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                  {stat.label}
+                </h3>
+                <div className="text-3xl font-bold tracking-tight text-foreground">
+                  {stat.value}
+                </div>
               </div>
             </div>
           </div>
@@ -102,7 +91,7 @@ const Dashboard = () => {
         <div className="col-span-4 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden group/analytics shadow-sm">
           <div className="p-6 md:p-8 border-b border-border flex flex-row items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground flex items-center gap-2">
                 <Fuel className="h-5 w-5 text-primary" />
                 Live Storage Monitor
               </h2>
@@ -148,7 +137,7 @@ const Dashboard = () => {
                       <ShieldCheck className="h-5 w-5" />
                    </div>
                    <div>
-                      <p className="text-[13px] font-bold text-foreground">Stock Integrity SECURE</p>
+                      <p className="text-[13px] font-semibold text-foreground">Stock Integrity SECURE</p>
                       <p className="text-[11px] text-muted-foreground font-medium">Automatic sensors synchronized at 09:15 AM</p>
                    </div>
                 </div>
@@ -160,7 +149,7 @@ const Dashboard = () => {
         {/* Supply Ledger */}
         <div className="col-span-3 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden">
           <div className="p-6 md:p-8 border-b border-border pb-4">
-            <h2 className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-foreground">
+            <h2 className="flex items-center gap-3 text-xl font-semibold tracking-tight text-foreground">
                <History className="h-5 w-5 text-primary" />
                Supply Ledger
             </h2>
@@ -171,11 +160,8 @@ const Dashboard = () => {
              {recentDeliveries.map((delivery) => (
                 <div key={delivery.id} className="flex items-center justify-between p-4 rounded-2xl bg-muted/40 hover:bg-muted/60 border border-transparent hover:border-border transition-all cursor-pointer group">
                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-card rounded-[12px] flex items-center justify-center border border-border shadow-sm">
-                         <delivery.icon className={cn(
-                           "h-5 w-5",
-                           delivery.type === 'Benzene' ? 'text-primary' : 'text-emerald-600 dark:text-emerald-400'
-                         )} />
+                      <div className="h-10 w-10 flex items-center justify-center">
+                         <delivery.icon className="h-10 w-10 text-foreground" />
                       </div>
                      <div>
                         <p className="font-bold text-[14px] text-foreground group-hover:text-primary transition-colors">{delivery.type}</p>
@@ -184,7 +170,7 @@ const Dashboard = () => {
                   </div>
                   <div className="text-right">
                      <p className="font-black text-[15px] text-foreground tabular-nums">{delivery.vol}</p>
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">{delivery.status}</p>
+                     <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-500">{delivery.status}</p>
                   </div>
                </div>
              ))}

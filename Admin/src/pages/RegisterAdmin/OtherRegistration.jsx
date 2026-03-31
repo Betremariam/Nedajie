@@ -114,7 +114,7 @@ const OtherRegistration = () => {
              <Button type="button" variant="outline" className="h-10 px-6 rounded-xl text-slate-600 border-slate-200 font-semibold hover:bg-slate-50">
                 Cancel
              </Button>
-             <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-[#0d6efd] hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 font-semibold border-0">
+             <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 font-semibold border-0">
                 Register Entity
              </Button>
           </div>
@@ -128,9 +128,9 @@ const OtherRegistration = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Entity Name</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                 <Input
-                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
                   placeholder="Enter entity's full name"
                   name="fullName"
                   value={form.fullName}
@@ -145,12 +145,12 @@ const OtherRegistration = () => {
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Phone Number</Label>
               <div className="relative group flex items-center">
                 <div className="absolute left-4 flex items-center gap-2 text-slate-500">
-                  <PhoneCall className="w-3.5 h-3.5 group-focus-within:text-[#0d6efd] transition-colors" />
+                  <PhoneCall className="w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
                   <span className="text-[13px] font-medium ml-1">🇪🇹 +251</span>
                   <div className="w-px h-4 bg-slate-300 mx-1"></div>
                 </div>
                 <Input
-                  className="h-12 pl-[100px] rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  className="h-12 pl-[100px] rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
                   placeholder="Enter phone number"
                   name="phoneNumber"
                   value={form.phoneNumber}
@@ -163,11 +163,11 @@ const OtherRegistration = () => {
             {/* Fuel Type */}
             <div className="space-y-3 md:col-span-2">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
-                <Droplets className="w-4 h-4 text-[#0d6efd]" /> 
+                <Droplets className="w-4 h-4 text-primary" /> 
                 Resource Priority [Fuel Type]
               </Label>
               <Select value={form.fuelType} onValueChange={handleSelectChange} required>
-                <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus:ring-1 focus:ring-[#0d6efd] focus:border-[#0d6efd] transition-all">
+                <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus:ring-1 focus:ring-primary focus:border-primary transition-all">
                   <SelectValue placeholder="Select required resource" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border border-slate-200 bg-white shadow-lg">
@@ -191,17 +191,17 @@ const OtherRegistration = () => {
                 />
                 <Label 
                   htmlFor="document" 
-                  className="flex flex-col items-center justify-center p-8 rounded-2xl border-[1.5px] border-dashed border-slate-300 bg-slate-50/50 hover:border-[#0d6efd] hover:bg-[#eff6ff] transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center p-8 rounded-2xl border-[1.5px] border-dashed border-slate-300 bg-slate-50/50 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
                 >
-                  <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-[#0d6efd] mb-4">
-                     <CloudUpload className="w-6 h-6 text-slate-400 group-hover:text-[#0d6efd] transition-colors" />
+                  <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-primary mb-4">
+                     <CloudUpload className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
                   </div>
                   <span className="text-[14px] font-bold text-slate-800 mb-1">
                     {form.document ? form.document.name : "Upload validation doc"}
                   </span>
                   <span className="text-[12px] text-slate-500 font-medium mb-4">PDF or image, max 5MB</span>
                   
-                  <div className="bg-[#0d6efd] hover:bg-blue-700 text-white text-[12px] font-bold px-5 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer">
+                  <div className="bg-primary hover:bg-primary/90 text-white text-[12px] font-bold px-5 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer">
                     Browse Files
                   </div>
                 </Label>
@@ -228,7 +228,7 @@ const OtherRegistration = () => {
                   </div>
                   {/* Toggle 2 */}
                   <div className="flex items-start gap-3">
-                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-[#0d6efd]" />
+                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
                     <div className="flex flex-col gap-1 text-left">
                        <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Instant alert</Label>
                        <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Notify entity on successful approval</span>
@@ -241,7 +241,7 @@ const OtherRegistration = () => {
              <div className="flex flex-col gap-3 min-w-[200px]">
                <Button 
                 disabled={loading}
-                className="w-full h-11 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
                 type="submit"
                >
                 {loading ? "Registering..." : "Register Entity"}

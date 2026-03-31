@@ -135,7 +135,7 @@ const RegisterDriver = () => {
              <Button type="button" variant="outline" className="h-10 px-6 rounded-xl text-slate-600 border-slate-200 font-semibold hover:bg-slate-50">
                 Cancel
              </Button>
-             <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-[#0d6efd] hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 font-semibold border-0">
+             <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 font-semibold border-0">
                 Register Driver
              </Button>
           </div>
@@ -149,9 +149,9 @@ const RegisterDriver = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Name</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                 <Input
-                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
                   placeholder="Enter driver's full name"
                   name="name"
                   value={form.name}
@@ -166,12 +166,12 @@ const RegisterDriver = () => {
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Phone Number</Label>
               <div className="relative group flex items-center">
                 <div className="absolute left-4 flex items-center gap-2 text-slate-500">
-                  <PhoneCall className="w-3.5 h-3.5 group-focus-within:text-[#0d6efd] transition-colors" />
+                  <PhoneCall className="w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
                   <span className="text-[13px] font-medium ml-1">🇪🇹 +251</span>
                   <div className="w-px h-4 bg-slate-300 mx-1"></div>
                 </div>
                 <Input
-                  className="h-12 pl-[100px] rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  className="h-12 pl-[100px] rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
                   placeholder="Enter phone number"
                   name="phone"
                   value={form.phone}
@@ -186,7 +186,7 @@ const RegisterDriver = () => {
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Passcode</Label>
               <div className="relative group">
                 <Input
-                  className="h-12 pl-4 pr-32 rounded-xl border-slate-200 bg-slate-50/50 font-black text-xl tracking-[0.3em] text-slate-600 focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all"
+                  className="h-12 pl-4 pr-32 rounded-xl border-slate-200 bg-slate-50/50 font-black text-xl tracking-[0.3em] text-slate-600 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
                   placeholder="••••••••"
                   type="password"
                   name="password"
@@ -197,7 +197,7 @@ const RegisterDriver = () => {
                 <button 
                   type="button" 
                   onClick={handleGeneratePassword}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-[#eff6ff] text-[#0d6efd] hover:bg-blue-100 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors"
                 >
                   <KeyRound className="w-3.5 h-3.5" /> Generate
                 </button>
@@ -207,7 +207,7 @@ const RegisterDriver = () => {
             {/* Asset Class */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
-                <BusFront className="w-4 h-4 text-[#0d6efd]" /> 
+                <BusFront className="w-4 h-4 text-primary" /> 
                 Asset Class
               </Label>
               <Select value={form.carType} onValueChange={handleSelectChange} required>
@@ -225,13 +225,13 @@ const RegisterDriver = () => {
             {/* License Plate */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
-                <IdCard className="w-4 h-4 text-[#0d6efd]" /> 
+                <IdCard className="w-4 h-4 text-primary" /> 
                 License Plate
               </Label>
               <div className="relative group">
-                <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#0d6efd] transition-colors" />
+                <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                 <Input
-                  className="h-12 pl-11 pr-24 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-[#0d6efd] focus-visible:border-[#0d6efd] transition-all uppercase"
+                  className="h-12 pl-11 pr-24 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all uppercase"
                   placeholder="Enter plate number"
                   name="carPlate"
                   value={form.carPlate}
@@ -256,11 +256,11 @@ const RegisterDriver = () => {
                 />
                 <Label 
                   htmlFor="document" 
-                  className="flex items-center justify-between p-4 rounded-xl border-[1.5px] border-dashed border-slate-300 bg-white hover:border-[#0d6efd] hover:bg-[#eff6ff] transition-all cursor-pointer group"
+                  className="flex items-center justify-between p-4 rounded-xl border-[1.5px] border-dashed border-slate-300 bg-white hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-[#0d6efd]">
-                       <CloudUpload className="w-5 h-5 text-slate-400 group-hover:text-[#0d6efd] transition-colors" />
+                     <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-primary">
+                       <CloudUpload className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
                      </div>
                      <div className="flex flex-col">
                        <span className="text-[13px] font-bold text-slate-800 mb-0.5 truncate max-w-[150px]">
@@ -269,7 +269,7 @@ const RegisterDriver = () => {
                        <span className="text-[11px] text-slate-500 font-medium">PDF or image, max 5MB</span>
                      </div>
                   </div>
-                  <div className="bg-[#0d6efd] hover:bg-blue-700 text-white text-[12px] font-bold px-4 py-2 rounded-lg shadow-sm transition-colors cursor-pointer">
+                  <div className="bg-primary hover:bg-primary/90 text-white text-[12px] font-bold px-4 py-2 rounded-lg shadow-sm transition-colors cursor-pointer">
                     Upload File
                   </div>
                 </Label>
@@ -296,7 +296,7 @@ const RegisterDriver = () => {
                   </div>
                   {/* Toggle 2 */}
                   <div className="flex items-start gap-3">
-                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-[#0d6efd]" />
+                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
                     <div className="flex flex-col gap-1 text-left">
                        <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Credentials alert</Label>
                        <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Email/SMS invite driver to download credentials</span>
@@ -309,7 +309,7 @@ const RegisterDriver = () => {
              <div className="flex flex-col gap-3 min-w-[200px]">
                <Button 
                 disabled={loading}
-                className="w-full h-11 bg-[#0d6efd] hover:bg-blue-700 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
                 type="submit"
                >
                 {loading ? "Registering..." : "Register Driver"}

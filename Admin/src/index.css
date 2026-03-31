@@ -3,7 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-sen);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -52,7 +52,7 @@
 
 
 :root {
-    --font-inter: "Inter", system-ui, sans-serif;
+    --font-sen: "Sen", system-ui, sans-serif;
     --radius: 0.75rem;
     
     /* Main body background: extremely light gray-blue (#f3f4f6 or #f8fafc) */
@@ -63,8 +63,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
     
-    /* Primary blue color typical of standard Bootstrap/Tailwind blue-600 */
-    --primary: 221 83% 53%; /* #2563eb */
+    /* Primary dark blue color */
+    --primary: 224 71% 36%; 
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -76,19 +76,19 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%; /* blue-600 */
+    --ring: 224 71% 36%; 
     
-    /* Sidebar colors - Deep dark blue (#0f172a) */
-    --sidebar-background: 222 47% 11%; 
-    --sidebar-foreground: 210 40% 98%;
+    /* Sidebar colors - Light and clean in Light Mode */
+    --sidebar-background: 0 0% 100%; 
+    --sidebar-foreground: 222.2 47.4% 11.2%;
     /* Bright blue for active active links */
-    --sidebar-primary: 221 83% 53%; 
+    --sidebar-primary: 224 71% 36%; 
     --sidebar-primary-foreground: 0 0% 100%;
     /* Accent hover effects */
-    --sidebar-accent: 221 83% 53%; /* blue-600 background on active */
-    --sidebar-accent-foreground: 0 0% 100%; /* white text on active */
-    --sidebar-border: 222 47% 15%; /* slightly lighter line */
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-accent: 210 40% 96.1%; 
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 224 71% 36%;
     --header-height: 4rem;
     --footer-height: 4rem;
   }
@@ -100,7 +100,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 47% 12%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221 83% 53%;
+    --primary: 224 71% 45%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -112,15 +112,15 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 221 83% 53%;
+    --ring: 224 71% 45%;
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary: 224 71% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 47% 15%;
+    --sidebar-accent: 224 71% 20%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 222 47% 15%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-ring: 224 71% 45%;
   }
 
 @layer base {
@@ -130,7 +130,7 @@
   
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: var(--font-inter);
+    font-family: var(--font-sen);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;

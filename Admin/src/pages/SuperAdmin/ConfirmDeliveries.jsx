@@ -179,7 +179,7 @@ const ConfirmDeliveries = () => {
                   <div className="w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-border/50">
                     <Button 
                       onClick={() => setConfirmingDelivery(delivery)}
-                      className="w-full h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center justify-center gap-3 rounded-xl font-bold"
+                      className="w-full h-14 px-8 bg-primary hover:bg-primary/90 text-white shadow-sm flex items-center justify-center gap-3 rounded-xl font-bold"
                     >
                       <ShieldCheck className="w-5 h-5 transition-transform" />
                       Authorize Delivery
@@ -196,8 +196,8 @@ const ConfirmDeliveries = () => {
       <AlertDialog open={!!confirmingDelivery} onOpenChange={(open) => !open && setConfirmingDelivery(null)}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Truck className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Truck className="w-8 h-8 text-primary" />
             </div>
             <AlertDialogTitle className="text-center text-2xl">Confirm Logistics Action?</AlertDialogTitle>
             <AlertDialogDescription className="text-center">
@@ -214,7 +214,7 @@ const ConfirmDeliveries = () => {
               <Button 
                 onClick={handleConfirm}
                 disabled={isProcessing}
-                className="h-11 bg-blue-600 hover:bg-blue-700 font-bold"
+                className="h-11 bg-primary hover:bg-primary/90 font-bold"
               >
                 {isProcessing ? <Loader2 className="animate-spin h-4 w-4" /> : "Authorize Now"}
               </Button>

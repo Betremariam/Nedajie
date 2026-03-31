@@ -14,6 +14,7 @@ import {
   Server,
   Bell,
   Fingerprint,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -33,7 +34,7 @@ const SuperAdminDashboard = () => {
   ];
 
   const iconBg = {
-    blue: "bg-blue-500/10 text-blue-500",
+    blue: "bg-primary/10 text-primary",
     emerald: "bg-emerald-500/10 text-emerald-500",
     amber: "bg-amber-500/10 text-amber-500",
     purple: "bg-purple-500/10 text-purple-500",
@@ -53,10 +54,10 @@ const SuperAdminDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <Terminal className="w-5 h-5 text-primary" />
+            <Terminal className="w-6 h-6 text-foreground" />
             <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Control Layer Active</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
              Global Control Center
           </h1>
           <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Centralized intelligence nexus and multi-regional system orchestration.</p>
@@ -68,8 +69,7 @@ const SuperAdminDashboard = () => {
             <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full flex items-center justify-center bg-destructive text-destructive-foreground text-[10px] font-bold border-2 border-card">3</span>
           </button>
           <button className="h-10 px-5 flex items-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-md shadow-primary/20">
-            <Activity className="w-4 h-4 opacity-80" />
-            Live Diagnostics
+            <Activity className="w-8 h-8 text-foreground" />
           </button>
         </div>
       </div>
@@ -78,28 +78,17 @@ const SuperAdminDashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <div key={i} className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-border transition-all duration-300">
-            <div className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-              <h3 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
-                {stat.label}
-              </h3>
-              <div className={cn("p-2 rounded-xl transition-colors", iconBg[stat.color])}>
-                <stat.icon className="h-4 w-4" />
+            <div className="flex flex-col gap-4 relative z-10">
+              <div className="p-0 rounded-xl transition-colors">
+                <stat.icon className="h-10 w-10 text-foreground" />
               </div>
-            </div>
-            <div className="relative z-10">
-              <div className="text-3xl font-black tracking-tight text-foreground mb-1">
-                {stat.value}
-              </div>
-              <div className="flex flex-wrap items-center justify-between mt-2 gap-2">
-                <p className="text-[11px] font-medium text-muted-foreground">
-                  {stat.desc}
-                </p>
-                <span className={cn(
-                  "text-[10px] font-bold px-2 py-0.5 rounded-md border",
-                  stat.trend.startsWith('+') ? "text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:text-emerald-400" : "text-muted-foreground bg-muted border-border"
-                )}>
-                  {stat.trend}
-                </span>
+              <div className="space-y-1">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                  {stat.label}
+                </h3>
+                <div className="text-3xl font-bold tracking-tight text-foreground">
+                  {stat.value}
+                </div>
               </div>
             </div>
           </div>
@@ -113,7 +102,7 @@ const SuperAdminDashboard = () => {
         <div className="col-span-4 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden relative">
           <div className="p-6 md:p-8 border-b border-border flex flex-row items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-xl font-extrabold tracking-tight text-foreground">Network Volume Monitor</h2>
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">Network Volume Monitor</h2>
               <p className="text-muted-foreground text-[13px] font-medium">Real-time throughput analysis across all regional clusters.</p>
             </div>
             <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-xl border border-border">
@@ -160,22 +149,19 @@ const SuperAdminDashboard = () => {
         {/* System Activity Log */}
         <div className="col-span-3 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden">
           <div className="p-6 md:p-8 border-b border-border">
-            <h2 className="text-xl font-extrabold tracking-tight text-foreground">System Audit Log</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">System Audit Log</h2>
             <p className="text-muted-foreground text-[13px] font-medium mt-1">Live stream of infrastructure events.</p>
           </div>
           <div className="p-4 md:p-6 space-y-3 flex-1 overflow-y-auto">
             {recentActivity.map((item) => (
               <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-muted/50 transition-all group cursor-pointer border border-transparent hover:border-border">
-                <div className={cn(
-                  "h-12 w-12 rounded-[14px] flex items-center justify-center",
-                  statusStyle[item.status]
-                )}>
-                  <item.icon className="h-5 w-5" />
+                <div className="h-12 w-12 flex items-center justify-center">
+                  <item.icon className="h-10 w-10 text-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-bold text-foreground leading-tight truncate group-hover:text-primary transition-colors">{item.user}</p>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">{item.type}</p>
+                    <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">{item.type}</p>
                     <span className="w-1 h-1 rounded-full bg-border" />
                     <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground/60">
                       <Clock className="h-3.5 w-3.5" />
@@ -188,7 +174,7 @@ const SuperAdminDashboard = () => {
             ))}
           </div>
           <div className="p-4 border-t border-border bg-muted/20">
-            <button className="w-full h-11 text-[12px] font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-colors">
+            <button className="w-full h-11 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-colors">
               View Full Audit Ledger
             </button>
           </div>
@@ -201,11 +187,11 @@ const SuperAdminDashboard = () => {
          <div className="col-span-2 bg-card rounded-[24px] shadow-sm border border-border overflow-hidden">
             <div className="p-6 md:p-8 flex flex-row items-center justify-between border-b border-border">
                 <div className="space-y-1">
-                  <h2 className="text-xl font-extrabold tracking-tight text-foreground">Hardware Interface</h2>
+                  <h2 className="text-xl font-semibold tracking-tight text-foreground">Hardware Interface</h2>
                   <p className="text-muted-foreground text-[13px] font-medium">Direct execution commands for root orchestration.</p>
                 </div>
-                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
-                  <Zap className="h-6 w-6" />
+                <div className="flex items-center justify-center">
+                  <Zap className="h-12 w-12 text-foreground" />
                 </div>
             </div>
             <div className="p-6 md:p-8">
@@ -242,7 +228,7 @@ const SuperAdminDashboard = () => {
                     </div>
                  </div>
                  <div className="space-y-2.5">
-                    <div className="flex justify-between text-[11px] font-bold uppercase tracking-wider text-sidebar-foreground/40 px-1">
+                    <div className="flex justify-between text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40 px-1">
                       <span>Protocol Integrity</span>
                       <span className="text-emerald-400">Validated</span>
                     </div>

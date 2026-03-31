@@ -29,7 +29,7 @@ const RegisterAdminDashboard = () => {
   ];
 
   const iconBg = {
-    blue: "bg-blue-500/10 text-blue-500",
+    blue: "bg-primary/10 text-primary",
     emerald: "bg-emerald-500/10 text-emerald-500",
     amber: "bg-amber-500/10 text-amber-500",
     purple: "bg-purple-500/10 text-purple-500",
@@ -42,10 +42,10 @@ const RegisterAdminDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <Fingerprint className="w-5 h-5 text-primary" />
+            <Fingerprint className="w-6 h-6 text-foreground" />
             <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Biometric Identity Hub</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
             Registry Overview
           </h1>
           <p className="text-muted-foreground text-[14px] font-medium">Manage and monitor total ecosystem enrollments</p>
@@ -60,11 +60,11 @@ const RegisterAdminDashboard = () => {
               ))}
            </div>
            <div className="pr-4 border-r border-border h-10 flex flex-col justify-center">
-             <span className="text-[10px] font-bold uppercase tracking-tight text-muted-foreground leading-none mb-1 whitespace-nowrap">Active Operatives</span>
-             <span className="text-[13px] font-black text-foreground leading-none">12 ONLINE</span>
+             <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none mb-1 whitespace-nowrap">Active Operatives</span>
+             <span className="text-[13px] font-bold text-foreground leading-none">12 ONLINE</span>
            </div>
-           <div className="bg-emerald-500/10 text-emerald-500 p-2.5 rounded-xl">
-              <Activity className="w-4 h-4" />
+           <div className="text-foreground p-2.5">
+              <Activity className="w-6 h-6" />
            </div>
         </div>
       </div>
@@ -73,25 +73,17 @@ const RegisterAdminDashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {registrationTypes.map((type, i) => (
           <div key={i} className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-border transition-all duration-300">
-            <div className="flex flex-row items-center justify-between pb-4 relative z-10">
-              <h3 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
-                {type.label}
-              </h3>
-              <div className={cn("p-2 rounded-xl transition-colors", iconBg[type.color])}>
-                <type.icon className="h-4 w-4" />
+            <div className="flex flex-col gap-4 relative z-10">
+              <div className="p-0 rounded-xl transition-colors">
+                <type.icon className="h-10 w-10 text-foreground" />
               </div>
-            </div>
-            <div className="relative z-10">
-              <div className="text-3xl font-black tracking-tight text-foreground mb-1">
-                {type.count}
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-[11px] font-medium text-muted-foreground">
-                  {type.desc}
-                </p>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 dark:text-emerald-400">
-                  {type.trend}
-                </span>
+              <div className="space-y-1">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                  {type.label}
+                </h3>
+                <div className="text-3xl font-semibold tracking-tight leading-none text-foreground">
+                  {type.count}
+                </div>
               </div>
             </div>
           </div>
@@ -109,9 +101,9 @@ const RegisterAdminDashboard = () => {
           </div>
           <div className="relative z-10">
              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-sidebar-foreground/10 backdrop-blur-md rounded-[12px] flex items-center justify-center border border-sidebar-foreground/20">
-                   <Zap className="h-5 w-5 text-primary" />
-                </div>
+                 <div className="flex items-center justify-center">
+                    <Zap className="h-8 w-8 text-white" />
+                 </div>
                 <span className="bg-primary/20 text-primary border-none font-bold uppercase px-3 py-1 rounded-[8px] text-[10px] tracking-widest">
                    Rapid Onboarding
                 </span>
@@ -141,7 +133,7 @@ const RegisterAdminDashboard = () => {
 
           <div className="flex items-center gap-2 mb-2">
              <Activity className="w-4 h-4 text-primary" />
-             <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">System Integrity</h3>
+             <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">System Integrity</h3>
           </div>
           <p className="text-foreground text-lg font-bold tracking-tight mb-8">Real-time authentication bounds</p>
 
@@ -192,15 +184,15 @@ const RegisterAdminDashboard = () => {
          <div className="absolute inset-0 bg-muted/10 pointer-events-none" />
 
          <div className="relative z-10 flex flex-col items-center max-w-2xl">
-            <div className="w-16 h-16 bg-card rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border transition-transform">
-               <ShieldCheck className="h-8 w-8 text-primary" />
+            <div className="flex items-center justify-center mb-6 transition-transform">
+               <ShieldCheck className="h-12 w-12 text-foreground" />
             </div>
-            <h3 className="text-2xl font-extrabold tracking-tight text-foreground mb-3">Military-Grade Data Sovereignty</h3>
+            <h3 className="text-2xl font-semibold tracking-tight text-foreground mb-3">Military-Grade Data Sovereignty</h3>
             <p className="text-muted-foreground font-medium text-[14px] leading-relaxed mb-8">
                Every asset enrollment is shielded by end-to-end cryptographic layers. Identity telemetry is securely stored with zero-trust compliance protocols.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-6">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-6">
                <span className="flex items-center gap-2"><Lock className="w-3.5 h-3.5 text-muted-foreground/40" /> AES-256 E2EE</span>
                <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-border" />
                <span className="flex items-center gap-2"><Fingerprint className="w-3.5 h-3.5 text-muted-foreground/40" /> Biometric Token</span>

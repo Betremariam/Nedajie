@@ -30,7 +30,7 @@ const FederalDashboard = () => {
   ];
 
   const iconBg = {
-    blue:    "bg-blue-500/10 text-blue-500",
+    blue:    "bg-primary/10 text-primary",
     emerald: "bg-emerald-500/10 text-emerald-500",
     amber:   "bg-amber-500/10 text-amber-500",
     purple:  "bg-purple-500/10 text-purple-500",
@@ -38,7 +38,7 @@ const FederalDashboard = () => {
 
   const statusStyle = {
     OWNER_ACCEPTED:      { icon: "bg-emerald-500/10 text-emerald-500", badge: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/20" },
-    SUPERADMIN_ACCEPTED: { icon: "bg-blue-500/10 text-blue-500",       badge: "text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-500/10 dark:border-blue-500/20" },
+    SUPERADMIN_ACCEPTED: { icon: "bg-primary/10 text-primary",       badge: "text-primary bg-primary/5 border-primary/20 dark:text-primary dark:bg-primary/10 dark:border-primary/20" },
     PENDING:             { icon: "bg-amber-500/10 text-amber-500",     badge: "text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-500/10 dark:border-amber-500/20" },
   };
 
@@ -48,7 +48,7 @@ const FederalDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
             National Command Center
           </h1>
           <p className="text-muted-foreground text-[14px] font-medium max-w-xl">
@@ -70,25 +70,17 @@ const FederalDashboard = () => {
             key={i}
             className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-border transition-all duration-300"
           >
-
-            <div className="flex flex-row items-center justify-between pb-4 relative z-10">
-              <h3 className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
-                {stat.label}
-              </h3>
-              <div className={cn("p-2 rounded-xl transition-colors", iconBg[stat.color])}>
-                <stat.icon className="h-4 w-4" />
+            <div className="flex flex-col gap-4 relative z-10">
+              <div className="p-0 rounded-xl transition-colors">
+                <stat.icon className="h-10 w-10 text-foreground" />
               </div>
-            </div>
-
-            <div className="relative z-10">
-              <div className="text-3xl font-black tracking-tight text-foreground mb-1">
-                {stat.value}
-              </div>
-              <div className="flex flex-wrap items-center justify-between mt-2 gap-2">
-                <p className="text-[11px] font-medium text-muted-foreground">{stat.desc}</p>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md border text-blue-600 bg-blue-500/10 border-blue-500/20 dark:text-blue-400">
-                  {stat.trend}
-                </span>
+              <div className="space-y-1">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                  {stat.label}
+                </h3>
+                <div className="text-3xl font-bold tracking-tight text-foreground">
+                  {stat.value}
+                </div>
               </div>
             </div>
           </div>
@@ -101,22 +93,22 @@ const FederalDashboard = () => {
         <div className="col-span-4 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden relative">
           <div className="p-6 md:p-8 border-b border-border flex flex-row items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-xl font-extrabold tracking-tight text-foreground">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">
                 Regional Distribution Matrix
               </h2>
               <p className="text-muted-foreground text-[13px] font-medium">
                 Strategic fuel quota allocation across domestic administrative zones.
               </p>
             </div>
-            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
-              <Map className="w-6 h-6" />
+            <div className="flex items-center justify-center">
+              <Map className="w-10 h-10 text-foreground" />
             </div>
           </div>
 
           <div className="h-[340px] flex items-center justify-center relative bg-muted/30 m-6 mb-8 rounded-[24px] border border-dashed border-border overflow-hidden">
             <div className="text-center space-y-4 relative z-10 transition-transform duration-300">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20">
-                <Globe className="h-10 w-10 text-primary/50" />
+              <div className="flex items-center justify-center mx-auto">
+                <Globe className="h-12 w-12 text-foreground/50" />
               </div>
               <div className="space-y-1">
                 <p className="text-lg font-bold text-foreground">Interactive Mapping Layer</p>
@@ -143,7 +135,7 @@ const FederalDashboard = () => {
         {/* Deliveries list */}
         <div className="col-span-3 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden">
           <div className="p-6 md:p-8 border-b border-border">
-            <h2 className="text-xl font-extrabold tracking-tight text-foreground">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
               Disbursement Stream
             </h2>
             <p className="text-muted-foreground text-[13px] font-medium mt-1">
@@ -160,11 +152,11 @@ const FederalDashboard = () => {
                   className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl hover:bg-muted/50 transition-all group cursor-pointer border border-transparent hover:border-border"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={cn("h-12 w-12 rounded-[14px] flex items-center justify-center transition-all", style.icon)}>
-                      <item.icon className="h-6 w-6" />
+                    <div className="h-12 w-12 flex items-center justify-center transition-all">
+                      <item.icon className="h-10 w-10 text-foreground" />
                     </div>
                     <div>
-                      <p className="text-[14px] font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                      <p className="text-[14px] font-medium text-foreground leading-tight group-hover:text-primary transition-colors">
                         {item.destination}
                       </p>
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -180,7 +172,7 @@ const FederalDashboard = () => {
                   </div>
 
                   <div className="sm:text-right ml-16 md:ml-0 flex items-center sm:block gap-2 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border">
-                    <p className="text-[14px] font-black text-foreground tabular-nums">{item.volume}</p>
+                    <p className="text-[14px] font-bold text-foreground tabular-nums">{item.volume}</p>
                     <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 ml-auto sm:mt-1 group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
                 </div>
@@ -189,7 +181,7 @@ const FederalDashboard = () => {
           </div>
 
           <div className="p-4 border-t border-border bg-muted/30">
-            <button className="w-full h-11 text-[12px] font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-colors">
+            <button className="w-full h-11 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-colors">
               View National Logistics Ledger
             </button>
           </div>

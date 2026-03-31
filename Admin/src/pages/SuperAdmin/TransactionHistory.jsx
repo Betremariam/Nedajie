@@ -101,8 +101,8 @@ const Transactions = () => {
                     <TableRow key={tx.id} className="group transition-colors hover:bg-muted/30">
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-md flex items-center justify-center border border-blue-200 dark:border-blue-800">
-                            <span className="text-blue-700 dark:text-blue-300 font-bold text-xs">
+                          <div className="w-8 h-8 bg-primary/10 dark:bg-primary/30 rounded-md flex items-center justify-center border border-primary/20 dark:border-primary/80">
+                            <span className="text-primary dark:text-primary font-bold text-xs">
                               {(tx.driver?.name || tx.farmer?.fullName)?.charAt(0) || 'C'}
                             </span>
                           </div>
@@ -116,7 +116,7 @@ const Transactions = () => {
                           variant="outline" 
                           className={`capitalize text-[10px] h-5 gap-1 ${
                             tx.gasType === 'benzene' 
-                              ? 'border-blue-500 text-blue-600' 
+                              ? 'border-primary text-primary' 
                               : 'border-emerald-500 text-emerald-600'
                           }`}
                         >
