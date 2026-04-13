@@ -97,17 +97,17 @@ const OtherRegistration = () => {
         </Alert>
       )}
 
-      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 md:p-10">
+      <div className="bg-card rounded-[24px] shadow-sm border border-border p-8 md:p-10 transition-colors">
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-100">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border">
           <div className="flex items-center gap-5">
-             <div className="w-14 h-14 rounded-[16px] bg-[#0f172a] flex items-center justify-center text-white shadow-md">
+             <div className="w-14 h-14 rounded-[16px] bg-primary flex items-center justify-center text-primary-foreground shadow-md">
                 <Users className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Entity Registry</h1>
-                <p className="text-slate-500 text-[13px] font-medium">Capture identity data for auxiliary consumers</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">Entity Registry</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">Capture identity data for auxiliary consumers</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -167,12 +167,12 @@ const OtherRegistration = () => {
                 Resource Priority [Fuel Type]
               </Label>
               <Select value={form.fuelType} onValueChange={handleSelectChange} required>
-                <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus:ring-1 focus:ring-primary focus:border-primary transition-all">
+                <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus:ring-1 focus:ring-primary focus:border-primary transition-all text-foreground">
                   <SelectValue placeholder="Select required resource" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border border-slate-200 bg-white shadow-lg">
-                  <SelectItem value="benzene" className="font-medium text-slate-700 focus:bg-slate-50 py-2.5">Benzene</SelectItem>
-                  <SelectItem value="diesel" className="font-medium text-slate-700 focus:bg-slate-50 py-2.5">Diesel</SelectItem>
+                <SelectContent className="rounded-xl border border-border bg-card shadow-lg">
+                  <SelectItem value="benzene" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Benzene</SelectItem>
+                  <SelectItem value="diesel" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Diesel</SelectItem>
                 </SelectContent>
               </Select>
             </div>

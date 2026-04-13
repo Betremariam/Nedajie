@@ -89,17 +89,17 @@ const RegisterFarmer = () => {
         </Alert>
       )}
 
-      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 md:p-10">
+      <div className="bg-card rounded-[24px] shadow-sm border border-border p-8 md:p-10 transition-colors">
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-100">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border">
           <div className="flex items-center gap-5">
-             <div className="w-14 h-14 rounded-[16px] bg-[#0f172a] flex items-center justify-center text-white shadow-md">
+             <div className="w-14 h-14 rounded-[16px] bg-primary flex items-center justify-center text-primary-foreground shadow-md">
                 <TreePine className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Farmer Registry</h1>
-                <p className="text-slate-500 text-[13px] font-medium">Verify agricultural identities for regional fuel access</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">Farmer Registry</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">Verify agricultural identities for regional fuel access</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -118,11 +118,11 @@ const RegisterFarmer = () => {
             
             {/* Full Name */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Name</Label>
+              <Label className="text-[13px] font-bold text-foreground/80 ml-0.5">Full Name</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
-                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  className="h-12 pl-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
                   placeholder="Enter farmer's full name"
                   name="fullName"
                   value={form.fullName}
@@ -202,15 +202,15 @@ const RegisterFarmer = () => {
                 />
                 <Label 
                   htmlFor="document" 
-                  className="flex flex-col items-center justify-center p-8 rounded-2xl border-[1.5px] border-dashed border-slate-300 bg-slate-50/50 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center p-8 rounded-2xl border-[1.5px] border-dashed border-border bg-muted/10 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
                 >
-                  <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-primary mb-4">
-                     <CloudUpload className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
+                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card group-hover:border-primary mb-4">
+                     <CloudUpload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <span className="text-[14px] font-bold text-slate-800 mb-1">
+                  <span className="text-[14px] font-bold text-foreground mb-1">
                     {form.document ? form.document.name : "Upload permit or identity doc"}
                   </span>
-                  <span className="text-[12px] text-slate-500 font-medium mb-4">PDF or image, max 5MB</span>
+                  <span className="text-[12px] text-muted-foreground font-medium mb-4">PDF or image, max 5MB</span>
                   
                   <div className="bg-primary hover:bg-primary/90 text-white text-[12px] font-bold px-5 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer">
                     Browse Files

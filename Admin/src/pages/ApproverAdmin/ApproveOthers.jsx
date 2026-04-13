@@ -154,7 +154,7 @@ const ApproveOthers = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleApprove(user.id)}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                    className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -163,7 +163,7 @@ const ApproveOthers = () => {
                   </button>
                   <button
                     onClick={() => handleReject(user.id)}
-                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                    className="bg-slate-100 text-slate-600 px-6 py-3 rounded-lg hover:bg-slate-200 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -177,38 +177,38 @@ const Reports = () => {
             </CardContent>
          </Card>
 
-         <Card className="lg:col-span-2 border-border shadow-md rounded-[32px] overflow-hidden bg-foreground text-background relative group">
+         <Card className="lg:col-span-2 border-border shadow-md rounded-[32px] overflow-hidden bg-primary text-primary-foreground relative group transition-colors">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent opacity-50" />
             <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 rotate-12 transition-transform duration-1000">
                <TrendingUp className="w-64 h-64" />
             </div>
             <CardHeader className="relative z-10 pb-2 p-8">
-               <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-primary">Throughput Aggregate</CardTitle>
-               <CardDescription className="text-background/60 font-medium">Aggregate volume metrics across authorized nodes.</CardDescription>
+               <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-primary-foreground/90">Throughput Aggregate</CardTitle>
+               <CardDescription className="text-primary-foreground/60 font-medium">Aggregate volume metrics across authorized nodes.</CardDescription>
             </CardHeader>
             <CardContent className="relative z-10 py-10 flex flex-col items-center justify-center text-center px-8">
                <div className="space-y-1">
-                  <div className="text-7xl md:text-8xl font-bold tracking-tighter tabular-nums text-white group-hover:text-primary transition-colors flex items-end justify-center">
+                  <div className="text-7xl md:text-8xl font-bold tracking-tighter tabular-nums text-white group-hover:scale-105 transition-transform flex items-end justify-center">
                      {totalLiters.toLocaleString()}
-                     <span className="text-xl font-semibold text-background/40 uppercase tracking-widest ml-3 mb-4">Liters</span>
+                     <span className="text-xl font-semibold text-primary-foreground/40 uppercase tracking-widest ml-3 mb-4">Liters</span>
                   </div>
-                  <p className="text-[11px] font-bold text-background/30 uppercase tracking-[0.3em]">Net Throughput Authorized</p>
+                  <p className="text-[11px] font-bold text-primary-foreground/30 uppercase tracking-[0.3em]">Net Throughput Authorized</p>
                </div>
                
-               <div className="mt-12 w-full max-w-md bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-xl flex items-center justify-around gap-8">
+               <div className="mt-12 w-full max-w-md bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl flex items-center justify-around gap-8">
                   <div className="text-center">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-background/40 mb-1">TX Volume</p>
-                     <p className="text-2xl font-bold tabular-nums">{transactions.length}</p>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">TX Volume</p>
+                     <p className="text-2xl font-bold tabular-nums text-white">{transactions.length}</p>
                   </div>
                   <div className="w-px h-10 bg-white/10" />
                   <div className="text-center">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-background/40 mb-1">Activity</p>
-                     <p className="text-2xl font-bold tabular-nums text-primary">{transactions.length > 0 ? "100%" : "0%"}</p>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">Activity</p>
+                     <p className="text-2xl font-bold tabular-nums text-white">{transactions.length > 0 ? "100%" : "0%"}</p>
                   </div>
                   <div className="w-px h-10 bg-white/10" />
                   <div className="text-center">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-background/40 mb-1">Cycle</p>
-                     <p className="text-xl font-bold text-primary">{reportType.toUpperCase()}</p>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">Cycle</p>
+                     <p className="text-xl font-bold text-white">{reportType.toUpperCase()}</p>
                   </div>
                </div>
             </CardContent>
