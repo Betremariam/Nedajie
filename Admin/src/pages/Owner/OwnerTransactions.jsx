@@ -74,63 +74,69 @@ const OwnerTransactions = () => {
   }, []);
 
   if (loading && transactions.length === 0) return (
-    <div className="h-[80vh] flex flex-col items-center justify-center gap-6">
+    <div className="h-[80vh] flex flex-col items-center justify-center gap-6 font-sans">
       <div className="relative">
         <Loader2 className="h-16 w-16 animate-spin text-primary opacity-20" />
         <Receipt className="h-8 w-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
       </div>
       <div className="text-center space-y-2">
-        <p className="text-xl font-black tracking-tight italic text-foreground">Syncing Transaction Ledger</p>
-        <p className="text-muted-foreground uppercase tracking-widest text-[10px]">Decrypting financial stream...</p>
+        <p className="text-xl font-semibold tracking-tight text-foreground">Syncing Transaction Ledger</p>
+        <p className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold">Establishing secure ledger link...</p>
       </div>
     </div>
   );
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
+    <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto font-sans">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+        <div className="space-y-1.5">
           <div className="flex items-center gap-2 mb-1 text-primary">
             <Receipt className="w-5 h-5" />
-            <span className="text-[10px] font-mono font-black tracking-[0.2em] uppercase text-primary/60">Financial Audit Active</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Financial Audit Interface</span>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-foreground italic">Station Transactions</h1>
-          <p className="text-muted-foreground text-lg mt-1 italic">Immutable ledger of real-time fuel sales and station throughput.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Station Transactions</h1>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Immutable ledger of real-time fuel sales and station throughput.</p>
         </div>
         <div className="flex items-center gap-4">
            <div className="bg-muted/40 p-1.5 rounded-xl border border-border/50 flex items-center gap-1">
-              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg bg-background shadow-sm font-black uppercase text-[10px] tracking-widest">All Cycles</Button>
-              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg font-black uppercase text-[10px] tracking-widest text-muted-foreground/60">Export CSV</Button>
+              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg bg-background shadow-sm font-bold uppercase text-[10px] tracking-widest">All Cycles</Button>
+              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg font-bold uppercase text-[10px] tracking-widest text-muted-foreground/60 transition-colors">Export CSV</Button>
            </div>
         </div>
       </div>
 
       {error && (
-        <Alert variant="destructive" className="border-red-500/50 bg-red-500/5">
+        <Alert variant="destructive" className="border-destructive/50 bg-destructive/5 rounded-2xl">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-black text-[10px] uppercase tracking-widest">Protocol Failure</AlertTitle>
-          <AlertDescription className="font-bold">{error}</AlertDescription>
+          <AlertTitle className="font-bold text-[11px] uppercase tracking-widest">Protocol Failure</AlertTitle>
+          <AlertDescription className="font-medium text-[13px]">{error}</AlertDescription>
         </Alert>
       )}
 
       {transactions.length === 0 && !loading ? (
-        <Card className="border-dashed border-2 border-border/50 bg-muted/10 h-[50vh] flex flex-col items-center justify-center text-center p-12">
+        <Card className="border-dashed border-2 border-border/50 bg-muted/10 h-[50vh] flex flex-col items-center justify-center text-center p-12 rounded-[24px]">
           <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-6">
             <CreditCard className="w-10 h-10 text-muted-foreground/30" />
           </div>
-          <h2 className="text-2xl font-black tracking-tight italic text-muted-foreground">Transaction Void</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">Transaction Void</h2>
           <p className="text-muted-foreground mt-2 max-w-sm font-medium">No sales transactions have been authorized in this administrative cycle.</p>
         </Card>
       ) : (
-        <Card className="border border-border shadow-sm overflow-hidden">
+        <Card className="border border-border shadow-sm overflow-hidden rounded-[24px]">
           <CardHeader className="bg-muted/30 border-b border-border/20 py-6 px-8 flex flex-row items-center justify-between">
             <div className="flex items-center gap-4">
                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                   <History className="w-6 h-6" />
                </div>
                <div>
-                  <CardTitle className="text-xl font-black italic">Asset Liquidation Log</CardTitle>
-                  <CardDescription className="italic font-medium">Real-time throughput metrics across nodes.</CardDescription>
+                  <CardTitle className="text-xl font-semibold">Asset Liquidation Log</CardTitle>
+                  <CardDescription className="text-[13px] font-medium">Real-time throughput metrics across nodes.</CardDescription>
+               </div>
+            </div>
+            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold">
+                  <ShieldCheck className="w-3 h-3" />
+                  Secured
                </div>
             </div>
           </CardHeader>
@@ -139,12 +145,12 @@ const OwnerTransactions = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50 border-none h-14">
-                    <TableHead className="pl-8 text-[10px] font-black uppercase tracking-widest">Authorized Customer</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">Fuel Type</TableHead>
-                    <TableHead className="text-right text-[10px] font-black uppercase tracking-widest">Volume (L)</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">Lead Attendant</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">Operational Node</TableHead>
-                    <TableHead className="pr-8 text-right text-[10px] font-black uppercase tracking-widest">Cycle Timestamp</TableHead>
+                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Authorized Customer</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Type</TableHead>
+                    <TableHead className="text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Volume</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Lead Attendant</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Operational Node</TableHead>
+                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Cycle Timestamp</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -152,59 +158,56 @@ const OwnerTransactions = () => {
                     <TableRow key={tx.id} className="group hover:bg-primary/5 transition-all border-b border-border/30 h-20">
                       <TableCell className="pl-8">
                         <div className="flex items-center gap-3">
-                           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground transition-all duration-300">
-                              <User className="w-4 h-4" />
+                           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground/60 transition-all duration-300">
+                              <User className="w-5 h-5" />
                            </div>
                            <div>
-                              <p className="text-sm font-black group-hover:text-primary transition-colors">{tx.driver?.name || tx.farmer?.fullName || "UNKNOWN_NODE"}</p>
-                              <Badge variant="outline" className="text-[8px] h-4 font-black uppercase tracking-[0.1em] border-border/40 py-0">
-                                 {tx.driver ? "LOGISTICS_OPERATOR" : tx.farmer ? "AGRI_ENTITY" : "EXTERNAL"}
+                              <p className="text-[14px] font-bold group-hover:text-primary transition-colors">{tx.driver?.name || tx.farmer?.fullName || "UNKNOWN_NODE"}</p>
+                              <Badge variant="outline" className="text-[9px] h-4 font-bold uppercase tracking-widest border-border/40 py-0">
+                                 {tx.driver ? "Logistics Vendor" : tx.farmer ? "Agri Entity" : "External Node"}
                               </Badge>
                            </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="h-7 px-3 rounded-full font-black text-[9px] uppercase tracking-widest bg-muted/20 border-border/50 group-hover:border-primary/30 transition-colors">
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="h-7 px-3 rounded-full font-bold text-[10px] uppercase tracking-widest bg-muted/20 border-border/50 group-hover:border-primary/30 transition-colors">
                            <Droplets className="w-2.5 h-2.5 mr-1.5 text-primary" />
                            {tx.gasType}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
-                           <span className="text-lg font-black tracking-tighter tabular-nums text-foreground group-hover:text-primary transition-colors">
-                              {tx.liters.toLocaleString()} <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest ml-0.5">L</span>
+                           <span className="text-base font-bold tracking-tight tabular-nums text-foreground group-hover:text-primary transition-colors">
+                              {tx.liters.toLocaleString()} <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest ml-0.5">Liters</span>
                            </span>
-                           <div className="flex items-center gap-1 text-[8px] font-bold text-emerald-600 uppercase tracking-tighter">
-                              <TrendingDown className="w-2 h-2" /> Discharged
+                           <div className="flex items-center gap-1 text-[9px] font-bold text-emerald-600 uppercase tracking-tight">
+                              <TrendingDown className="w-2.5 h-2.5" /> Discharged
                            </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 group-hover:text-primary transition-colors">
-                           <UserCheck className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary/40" />
-                           <span className="text-xs font-bold">{tx.attendantName || "SYSTEM_AUTO"}</span>
-                        </div>
+                         <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                            <span className="text-[13px] font-semibold text-foreground/80">{tx.attendantName || "SYS_AUTO"}</span>
+                         </div>
                       </TableCell>
                       <TableCell>
-                        <div>
-                           <p className="text-[10px] font-black uppercase flex items-center gap-1.5">
-                              <Building2 className="w-3 h-3 text-muted-foreground/60" />
-                              {tx.stationName}
-                           </p>
-                           <p className="text-[9px] font-bold text-muted-foreground tracking-tight flex items-center gap-1 uppercase ml-4.5">
-                              {tx.city}
-                           </p>
-                        </div>
+                         <div className="flex flex-col">
+                            <span className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">{tx.stationName}</span>
+                            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight flex items-center gap-1">
+                               <MapPin className="w-3 h-3" /> {tx.city}
+                            </span>
+                         </div>
                       </TableCell>
                       <TableCell className="pr-8 text-right">
                         <div className="flex flex-col items-end">
-                           <span className="text-xs font-black text-foreground/80 flex items-center gap-2">
-                              {new Date(tx.createdAt).toLocaleDateString()}
-                              <Calendar className="w-3.5 h-3.5 text-muted-foreground/40" />
-                           </span>
-                           <span className="text-[10px] font-bold text-muted-foreground/60 uppercase mt-0.5 font-mono">
-                              {new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                           </span>
+                          <span className="text-[13px] font-bold text-foreground/80 flex items-center gap-2">
+                             {new Date(tx.createdAt).toLocaleDateString()}
+                             <Calendar className="w-3.5 h-3.5 text-muted-foreground/40" />
+                          </span>
+                          <span className="text-[11px] font-semibold text-muted-foreground/60 uppercase mt-0.5">
+                             {new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -214,14 +217,14 @@ const OwnerTransactions = () => {
             </div>
           </CardContent>
           <CardFooter className="bg-muted/5 border-t border-border/10 p-4 px-8 flex items-center justify-between">
-             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <Receipt className="w-3 h-3 text-primary" />
-                Live transaction link active. Integrity verified.
+             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <AlertCircle className="w-3.5 h-3.5 text-primary/60" />
+                Ledger synchronized with station nodes.
              </p>
-             <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-tighter text-muted-foreground/40">
-                <span>Ref: TRANS-AUDIT-{new Date().getFullYear()}</span>
+             <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                <span>ISO-27001</span>
                 <span className="w-1 h-1 rounded-full bg-border" />
-                <span>Node: {stationIds.length} Stations Active</span>
+                <span>Operational Aggregate Identified</span>
              </div>
           </CardFooter>
         </Card>

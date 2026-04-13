@@ -60,11 +60,11 @@ export const ownerFuelReceived = async (req, res) => {
 
     const records = await prisma.fuelReceived.findMany({
       where: {
-        fuelStockId: { in: stationIds },
+        stationId: { in: stationIds },
       },
       orderBy: { createdAt: 'desc' },
       include: {
-        fuelStock: {
+        station: {
           select: {
             stationName: true,
             city: true,
@@ -80,8 +80,8 @@ export const ownerFuelReceived = async (req, res) => {
 
     const formatted = records.map((r) => ({
       id: r.id,
-      stationName: r.fuelStock?.stationName || "",
-      city: r.fuelStock?.city || "",
+      stationName: r.station?.stationName || "",
+      city: r.station?.city || "",
       gasType: r.gasType,
       liters: r.liters,
       date: r.date,
