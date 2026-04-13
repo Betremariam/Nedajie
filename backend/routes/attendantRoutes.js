@@ -1,7 +1,5 @@
 import { Router } from "express";
-import { registerAttendant, loginAttendant  ,getDriverByQR,
-  dispenseFuel,
-  getAttendantTransactions } from "../controllers/attendantController.js";
+import { registerAttendant, loginAttendant, getDriverByQR, dispenseFuel, getAttendantTransactions } from "../controllers/admins/attendantController.js";
 import { upload } from '../middleWare/multerConfig.js';
 
 const router = Router();

@@ -1,7 +1,7 @@
 import express from "express";
-import authMiddleware from "../middleware/authMiddleware.js";
-import attachAdmin from "../middleware/attachAdmin.js";
-import authorizeRoles from "../middleware/authorizeRoles.js";
+import authMiddleware from "../middleWare/authMiddleware.js";
+import attachAdmin from "../middleWare/attachAdmin.js";
+import authorizeRoles from "../middleWare/authorizeRoles.js";
 import multer from "multer";
 import {
   getOwnerFuelStock,

@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
 import prisma from "../lib/prisma.js";
-import { getAttendantTransactions } from '../controllers/attendantController.js';
+import { getAttendantTransactions } from '../controllers/admins/attendantController.js';
 import { addFuelStock, getFuelStocks, getFuelLeftForDriver } from '../controllers/fuelController.js';
 
 router.post("/add", addFuelStock);
