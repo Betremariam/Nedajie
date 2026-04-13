@@ -28,6 +28,11 @@ export async function getAllFuelTransactions(req, res) {
             fullName: true,
           },
         },
+        millHouseOwner: {
+          select: {
+            fullName: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -434,6 +439,30 @@ export async function getAllOthers(req, res) {
     res.status(200).json(others);
   } catch (error) {
     console.error("Error fetching others:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function getAllMillHouseOwners(req, res) {
+  try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
+
+    const owners = await prisma.millHouseOwner.findMany({
+      where,
+      include: {
+        approvedBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(owners);
+  } catch (error) {
+    console.error("Error fetching mill house owners:", error);
     res.status(500).json({ message: "Server error" });
   }
 }

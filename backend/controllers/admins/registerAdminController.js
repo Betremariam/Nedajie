@@ -126,7 +126,7 @@ export async function registerFarmer(req, res) {
 
 export const registerOtherUser = async (req, res) => {
   try {
-    const { fullName, phoneNumber, fuelType } = req.body;
+    const { fullName, phoneNumber, fuelType, maxUses } = req.body;
 
     if (!fullName || !phoneNumber || !fuelType) {
       return res.status(400).json({ msg: "All fields are required" });
@@ -143,6 +143,7 @@ export const registerOtherUser = async (req, res) => {
         fuelType: fuelType.toLowerCase(),
         documentPath,
         region: admin.region,
+        maxUses: parseInt(maxUses) || -1,
       },
     });
 
@@ -155,4 +156,46 @@ export const registerOtherUser = async (req, res) => {
     res.status(500).json({ msg: "Server error while registering other user" });
   }
 };
+
+export async function registerMillHouseOwner(req, res) {
+  try {
+    const { fullName, kebele, woreda, phoneNumber, fuelType, dailyLimit } = req.body;
+
+    if (!fullName || !kebele || !woreda || !phoneNumber) {
+      return res.status(400).json({ msg: "All fields are required." });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ msg: "Document is required." });
+    }
+
+    const existing = await prisma.millHouseOwner.findUnique({
+      where: { phoneNumber },
+    });
+    if (existing) {
+      return res.status(400).json({ msg: "Mill House Owner with this phone number already exists." });
+    }
+
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+
+    const newOwner = await prisma.millHouseOwner.create({
+      data: {
+        fullName,
+        kebele,
+        woreda,
+        phoneNumber,
+        fuelType: fuelType || "diesel",
+        dailyLimit: parseFloat(dailyLimit) || 0,
+        documentPath: req.file.path,
+        region: admin.region,
+        isApproved: false,
+      },
+    });
+
+    res.status(201).json({ msg: "Mill House Owner registered. Awaiting approval.", ownerId: newOwner.id });
+  } catch (err) {
+    console.error("Mill House Owner Registration Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
 

@@ -88,6 +88,7 @@ const OthersLists = () => {
                   <TableHead className="pl-6 h-12 uppercase text-[10px] font-bold tracking-wider">User Identity</TableHead>
                   <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Contact Path</TableHead>
                   <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Allocation Type</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Usage Status</TableHead>
                   <TableHead className="pr-6 h-12 uppercase text-[10px] font-bold tracking-wider">Verification Source</TableHead>
                 </TableRow>
               </TableHeader>
@@ -126,17 +127,26 @@ const OthersLists = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge 
-                          variant="secondary" 
-                          className={`capitalize font-medium flex items-center gap-1.5 w-fit ${
-                            other.fuelType === 'benzene' 
-                              ? 'bg-blue-500/10 text-blue-700 border-blue-200/50' 
-                              : 'bg-muted text-muted-foreground border-border/50'
-                          }`}
-                        >
-                          <Droplet className="w-3 h-3" />
+                        <Badge variant="secondary" className="capitalize">
                           {other.fuelType}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                         <div className="flex flex-col gap-1">
+                            <span className="text-xs font-bold text-foreground">
+                               {other.maxUses === -1 ? 'Unlimited' : `${other.useCount} / ${other.maxUses} Uses`}
+                            </span>
+                            {other.maxUses !== -1 && (
+                               <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden border border-border/50">
+                                  <div 
+                                    className={`h-full transition-all ${
+                                        other.useCount >= other.maxUses ? 'bg-red-500' : 'bg-primary'
+                                    }`}
+                                    style={{ width: `${Math.min((other.useCount / other.maxUses) * 100, 100)}%` }}
+                                  />
+                               </div>
+                            )}
+                         </div>
                       </TableCell>
                       <TableCell className="pr-6">
                         {other.approvedBy ? (

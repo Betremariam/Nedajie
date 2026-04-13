@@ -3,14 +3,21 @@ import API from "../../services/api.js";
 import { 
   User, 
   PhoneCall, 
-  Droplets, 
+  MapPin, 
+  Landmark, 
+  Home, 
+  CloudUpload, 
   ShieldCheck, 
-  CloudUpload,
   ArrowRight,
   CheckCircle2,
   AlertCircle,
-  Users
+  Droplets
 } from "lucide-react";
+import { Input } from "../../components/ui/Input";
+import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
+import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { Switch } from "../../components/ui/Switch";
 import { 
   Select, 
   SelectContent, 
@@ -18,18 +25,15 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "../../components/ui/Select";
-import { Input } from "../../components/ui/Input";
-import { Button } from "../../components/ui/Button";
-import { Label } from "../../components/ui/Label";
-import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
-import { Switch } from "../../components/ui/Switch";
 
-const OtherRegistration = () => {
+const RegisterMillHouseOwner = () => {
   const [form, setForm] = useState({
     fullName: "",
     phoneNumber: "",
-    fuelType: "",
-    maxUses: "-1",
+    kebele: "",
+    woreda: "",
+    fuelType: "diesel",
+    dailyLimit: "",
     document: null,
   });
 
@@ -61,17 +65,19 @@ const OtherRegistration = () => {
     const formData = new FormData();
     formData.append("fullName", form.fullName);
     formData.append("phoneNumber", form.phoneNumber);
+    formData.append("kebele", form.kebele);
+    formData.append("woreda", form.woreda);
     formData.append("fuelType", form.fuelType);
-    formData.append("maxUses", form.maxUses);
+    formData.append("dailyLimit", form.dailyLimit);
     if(form.document) formData.append("document", form.document);
 
     try {
-      const res = await API.post("/admins/register-other-user", formData, {
+      const res = await API.post("/admins/register-mill-house-owner", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setSuccess("Entity registered successfully.");
-      setForm({ fullName: "", phoneNumber: "", fuelType: "", maxUses: "-1", document: null });
+      setSuccess("Mill House Owner registered successfully.");
+      setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", fuelType: "diesel", dailyLimit: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -105,11 +111,11 @@ const OtherRegistration = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border">
           <div className="flex items-center gap-5">
              <div className="w-14 h-14 rounded-[16px] bg-primary flex items-center justify-center text-primary-foreground shadow-md">
-                <Users className="w-7 h-7" />
+                <Home className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Entity Registry</h1>
-                <p className="text-muted-foreground text-[13px] font-medium">Capture identity data for auxiliary consumers</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">Mill House Registry</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">Capture operational data for mill house fuel allocation</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -117,7 +123,7 @@ const OtherRegistration = () => {
                 Cancel
              </Button>
              <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 font-semibold border-0">
-                Register Entity
+                Register Mill Owner
              </Button>
           </div>
         </div>
@@ -128,12 +134,12 @@ const OtherRegistration = () => {
             
             {/* Full Name */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Full Entity Name</Label>
+              <Label className="text-[13px] font-bold text-foreground/80 ml-0.5">Owner Full Name</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
-                  className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                  placeholder="Enter entity's full name"
+                  className="h-12 pl-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
+                  placeholder="Enter owner's full name"
                   name="fullName"
                   value={form.fullName}
                   onChange={handleChange}
@@ -162,45 +168,77 @@ const OtherRegistration = () => {
               </div>
             </div>
 
-            {/* Fuel Type */}
+            {/* Fuel Type & Limit */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
                 <Droplets className="w-4 h-4 text-primary" /> 
-                Resource Priority [Fuel Type]
+                Fuel Type
               </Label>
-              <Select value={form.fuelType} onValueChange={(val) => setForm({...form, fuelType: val})} required>
+              <Select value={form.fuelType} onValueChange={handleSelectChange} required>
                 <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus:ring-1 focus:ring-primary focus:border-primary transition-all text-foreground">
-                  <SelectValue placeholder="Select resource" />
+                  <SelectValue placeholder="Select fuel type" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border border-border bg-card shadow-lg">
-                  <SelectItem value="benzene" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Benzene</SelectItem>
                   <SelectItem value="diesel" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Diesel</SelectItem>
+                  <SelectItem value="benzene" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Benzene</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Usage Limit */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Daily Limit [Liters]</Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="Enter daily liter limit"
+                  name="dailyLimit"
+                  value={form.dailyLimit}
+                  type="number"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Woreda */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-primary" /> 
-                Usage Limit [QR Expiration]
+                <Landmark className="w-4 h-4 text-primary" /> 
+                Woreda
               </Label>
-              <Select value={form.maxUses} onValueChange={(val) => setForm({...form, maxUses: val})} required>
-                <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus:ring-1 focus:ring-primary focus:border-primary transition-all text-foreground">
-                  <SelectValue placeholder="Select usage limit" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border border-border bg-card shadow-lg">
-                  <SelectItem value="1" className="font-medium text-foreground/80 focus:bg-muted py-2.5">One-time Dispense</SelectItem>
-                  <SelectItem value="2" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Two-time Dispense</SelectItem>
-                  <SelectItem value="5" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Five-time Dispense</SelectItem>
-                  <SelectItem value="-1" className="font-medium text-foreground/80 focus:bg-muted py-2.5">Unlimited (Recurring)</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="Enter woreda"
+                  name="woreda"
+                  value={form.woreda}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Kebele */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" /> 
+                Kebele
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="Enter kebele"
+                  name="kebele"
+                  value={form.kebele}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
 
             {/* Document Upload */}
             <div className="space-y-3 md:col-span-2">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Validation Credentials</Label>
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Operational Credentials</Label>
               <div className="relative group">
                 <input
                   className="hidden"
@@ -212,15 +250,15 @@ const OtherRegistration = () => {
                 />
                 <Label 
                   htmlFor="document" 
-                  className="flex flex-col items-center justify-center p-8 rounded-2xl border-[1.5px] border-dashed border-slate-300 bg-slate-50/50 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center p-8 rounded-2xl border-[1.5px] border-dashed border-border bg-muted/10 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
                 >
-                  <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center bg-white group-hover:border-primary mb-4">
-                     <CloudUpload className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
+                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card group-hover:border-primary mb-4">
+                     <CloudUpload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <span className="text-[14px] font-bold text-slate-800 mb-1">
-                    {form.document ? form.document.name : "Upload validation doc"}
+                  <span className="text-[14px] font-bold text-foreground mb-1">
+                    {form.document ? form.document.name : "Upload mill house permit or ID"}
                   </span>
-                  <span className="text-[12px] text-slate-500 font-medium mb-4">PDF or image, max 5MB</span>
+                  <span className="text-[12px] text-muted-foreground font-medium mb-4">PDF or image, max 5MB</span>
                   
                   <div className="bg-primary hover:bg-primary/90 text-white text-[12px] font-bold px-5 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer">
                     Browse Files
@@ -231,7 +269,7 @@ const OtherRegistration = () => {
             
           </div>
 
-          {/* Bottom Verification Section */}
+          {/* Bottom Status Section */}
           <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
              <div className="flex flex-col gap-6 w-full max-w-lg">
                 <div className="flex items-center gap-2">
@@ -241,18 +279,18 @@ const OtherRegistration = () => {
                 <div className="flex flex-col sm:flex-row gap-8 pl-1">
                   {/* Toggle 1 */}
                   <div className="flex items-start gap-3">
-                    <Switch id="active-entity" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
+                    <Switch id="active-mill" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
                     <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="active-entity" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Active profile</Label>
-                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Entity is eligible to receive allocation</span>
+                       <Label htmlFor="active-mill" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Active profile</Label>
+                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Owner is eligible for allocation</span>
                     </div>
                   </div>
                   {/* Toggle 2 */}
                   <div className="flex items-start gap-3">
                     <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
                     <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Instant alert</Label>
-                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Notify entity on successful approval</span>
+                       <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Verification alert</Label>
+                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Notify regional center of valid proof</span>
                     </div>
                   </div>
                 </div>
@@ -265,14 +303,14 @@ const OtherRegistration = () => {
                 className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
                 type="submit"
                >
-                {loading ? "Registering..." : "Register Entity"}
+                {loading ? "Registering..." : "Register Mill Owner"}
                 <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
                </Button>
                <Button 
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({fullName:"", phoneNumber:"", fuelType:"", maxUses: "-1", document:null})}
+                onClick={() => setForm({fullName:"", phoneNumber:"", kebele:"", woreda:"", fuelType: "diesel", dailyLimit: "", document:null})}
                >
                 Clear
                </Button>
@@ -285,4 +323,4 @@ const OtherRegistration = () => {
   );
 };
 
-export default OtherRegistration;
+export default RegisterMillHouseOwner;

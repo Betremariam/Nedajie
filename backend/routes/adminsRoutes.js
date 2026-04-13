@@ -21,6 +21,7 @@ import {
   getAllOthers,
   getAllVehicles,
   getAllFarmers,
+  getAllMillHouseOwners,
   getFuelDeliveries,
   uploadFuelDeliveries,
   approveFuelDelivery
@@ -36,9 +37,12 @@ import {
   approveOthers,
   getUnapprovedOthers,
   rejectOther,
+  approveMillHouseOwner,
+  getUnapprovedMillHouseOwners,
+  rejectMillHouseOwner,
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
-import { registerVehicle, registerFarmer,registerOtherUser } from "../controllers/admins/registerAdminController.js";
+import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner } from "../controllers/admins/registerAdminController.js";
 
 
 const router = express.Router();
@@ -79,6 +83,7 @@ router.get("/farmer/:id", protectSuper, getFarmerDetails);    // Farmer eligibil
 router.get("/vehicle/:id", protectSuper, getVehicleDetails); 
 router.post("/owners", protectSuper, createStationOwner);
 router.get("/others", protectSuper, getAllOthers);
+router.get("/mill-house-owners", protectSuper, getAllMillHouseOwners);
 router.post('/upload-deliveries', upload.single('xlsx'),protectSuper, uploadFuelDeliveries);
 router.get('/deliveries',protectSuper, getFuelDeliveries);
 router.patch('/approve/:id',protectSuper, approveFuelDelivery);
@@ -102,6 +107,11 @@ router.delete('/reject-farmer/:farmerId', approverOnly, rejectFarmer);
 router.put("/approve-other-user/:otherId", approverOnly, approveOthers);
 router.get("/unapproved-other-user", approverOnly, getUnapprovedOthers);
 router.delete('/reject-other-user/:otherId', approverOnly, rejectOther);
+
+// 🏘️ Mill House Owner approval
+router.get("/unapproved-mill-house-owners", approverOnly, getUnapprovedMillHouseOwners);
+router.put("/approve-mill-house-owner/:ownerId", approverOnly, approveMillHouseOwner);
+router.delete('/reject-mill-house-owner/:ownerId', approverOnly, rejectMillHouseOwner);
 
 // Register a new vehicle
 router.post(
@@ -132,6 +142,14 @@ router.post(
   registerAdmin,
   upload.single("document"),
   registerOtherUser
+);
+
+// Register a new mill house owner
+router.post(
+  "/register-mill-house-owner",
+  registerAdmin,
+  upload.single("document"),
+  registerMillHouseOwner
 );
 
 

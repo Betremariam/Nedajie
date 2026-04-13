@@ -229,3 +229,65 @@ export const getUnapprovedOthers = async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+
+export async function approveMillHouseOwner(req, res) {
+  try {
+    const { ownerId } = req.params;
+    const approverId = req.admin.id;
+
+    const owner = await prisma.millHouseOwner.update({
+      where: { id: ownerId },
+      data: {
+        isApproved: true,
+        approvedById: approverId,
+      },
+      include: {
+        approvedBy: {
+          select: { name: true, email: true },
+        },
+      },
+    });
+
+    if (!owner) return res.status(404).json({ msg: "Mill House Owner not found" });
+
+    res.status(200).json({ msg: "Mill House Owner approved", owner });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getUnapprovedMillHouseOwners(req, res) {
+  try {
+    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const where = { isApproved: false };
+    if (admin.region) where.region = admin.region;
+
+    const owners = await prisma.millHouseOwner.findMany({
+      where: where,
+      orderBy: { createdAt: "desc" },
+    });
+
+    const baseUrl = 'http://192.168.43.237:5000';
+
+    const updatedOwners = owners.map(owner => ({
+      ...owner,
+      documentUrl: owner.documentPath ? `${baseUrl}/${owner.documentPath.replace(/\\/g, '/')}` : null
+    }));
+
+    res.status(200).json(updatedOwners);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function rejectMillHouseOwner(req, res) {
+  try {
+    const { ownerId } = req.params;
+    await prisma.millHouseOwner.delete({
+      where: { id: ownerId },
+    });
+    res.status(200).json({ msg: "Mill House Owner rejected and deleted" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}

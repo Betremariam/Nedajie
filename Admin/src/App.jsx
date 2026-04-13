@@ -7,6 +7,7 @@ import FuelStockManager from "./pages/SuperAdmin/FuelStockManager";
 import TransactionHistory from "./pages/SuperAdmin/TransactionHistory";
 import VehicleLists from "./pages/SuperAdmin/VehicleLists";
 import FarmerLists from "./pages/SuperAdmin/FarmerLists";
+import MillHouseOwnerLists from "./pages/SuperAdmin/MillHouseOwnerLists";
 import OtherLists from "./pages/SuperAdmin/OtherLists";
 import FuelDelivery from "./pages/SuperAdmin/FuelDelivery";
 import ConfirmDeliveries from "./pages/SuperAdmin/ConfirmDeliveries";
@@ -26,11 +27,13 @@ import RegisterAdminDashboard from "./pages/RegisterAdmin/RegisterAdminDashboard
 import RegisterAttendant from "./pages/RegisterAdmin/RegisterAttendant";
 import RegisterVehicle from "./pages/RegisterAdmin/RegisterVehicle";
 import RegisterFarmer from "./pages/RegisterAdmin/RegisterFarmer";
+import RegisterMillHouseOwner from "./pages/RegisterAdmin/RegisterMillHouseOwner";
 import OtherRegistration from "./pages/RegisterAdmin/OtherRegistration";
 
 // Approver Admin Pages
 import ApproveVehicles from "./pages/ApproverAdmin/ApproveVehicles";
 import ApproveFarmers from "./pages/ApproverAdmin/ApproveFarmers";
+import ApproveMillHouseOwners from "./pages/ApproverAdmin/ApproveMillHouseOwners";
 import ApproveAttendants from "./pages/ApproverAdmin/ApproveAttendants";
 import ApproveOthers from "./pages/ApproverAdmin/ApproveOthers";
 import ApproveDashboard from "./pages/ApproverAdmin/ApproverDashboard";
@@ -67,6 +70,7 @@ function App() {
             <Route path="transactions" element={<TransactionHistory />}/>
             <Route path="vehicles-list" element={<VehicleLists />} />
             <Route path="farmers-list" element={<FarmerLists />} />
+            <Route path="mill-house-owners-list" element={<MillHouseOwnerLists />} />
             <Route path="others-list" element={<OtherLists />} />
             <Route path="fuel-delivery" element={<FuelDelivery />} />
             <Route path="confirm-deliveries" element={<ConfirmDeliveries />} />
@@ -77,6 +81,7 @@ function App() {
             <Route path="register-dashboard" element={<RegisterAdminDashboard />} />
             <Route path="vehicle-registration" element={<RegisterVehicle />} />
             <Route path="farmer-registration" element={<RegisterFarmer />} />
+            <Route path="mill-house-owner-registration" element={<RegisterMillHouseOwner />} />
             <Route path="other-registration" element={<OtherRegistration />} />
           </Route>
             
@@ -85,6 +90,7 @@ function App() {
             <Route path="dashboard" element={<ApproveDashboard/>} />
             <Route path="vehicles" element={<ApproveVehicles/>} />
             <Route path="farmers" element={<ApproveFarmers/>} />
+            <Route path="mill-house-owners" element={<ApproveMillHouseOwners/>} />
             <Route path="attendants" element={<ApproveAttendants/>} />
             <Route path="others" element={<ApproveOthers/>} />
           </Route>

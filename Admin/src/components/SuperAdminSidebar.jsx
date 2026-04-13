@@ -13,6 +13,7 @@ const navItems = [
     items: [
       { title: "Vehicles", url: "/super-admin/vehicles-list" },
       { title: "Farmers", url: "/super-admin/farmers-list" },
+      { title: "Mill Owners", url: "/super-admin/mill-house-owners-list" },
       { title: "Others", url: "/super-admin/others-list" },
     ],
   },

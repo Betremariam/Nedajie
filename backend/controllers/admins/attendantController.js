@@ -349,7 +349,118 @@ export const dispenseFuel = async (req, res) => {
       ]);
 
       return res.status(200).json({ message: "Fuel dispensed successfully to farmer" });
-    } else {
+    }
+    // -----------------------------------
+    // MILL HOUSE OWNER LOGIC
+    // -----------------------------------
+    else if (userType === "mill_house_owner") {
+      const owner = await prisma.millHouseOwner.findUnique({
+        where: { id: userId },
+      });
+      if (!owner || !owner.isApproved) {
+        return res.status(404).json({ message: "Mill House Owner not found or not approved" });
+      }
+
+      // Mill house owner logic: just check stock and dispense (dailyLimit can be enforced if needed)
+      // For now, let's assume they have a daily limit
+      const limit = owner.dailyLimit || 0;
+      if (limit > 0 && liters > limit) {
+         return res.status(400).json({ message: `Liters exceeded owner's daily limit of ${limit}L` });
+      }
+
+      const stock = await prisma.fuelStock.findFirst({
+        where: {
+          stationName: fuelAttendant.stationName,
+          city: fuelAttendant.city,
+          gasType,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (!stock || stock.litersReceived - stock.litersDispensed < liters) {
+        return res.status(400).json({ message: "Not enough fuel in stock" });
+      }
+
+      await prisma.$transaction([
+        prisma.fuelStock.update({
+          where: { id: stock.id },
+          data: {
+            litersDispensed: { increment: liters },
+          },
+        }),
+        prisma.fuelTransaction.create({
+          data: {
+            millHouseOwnerId: owner.id,
+            gasType,
+            liters,
+            stationName: fuelAttendant.stationName,
+            attendantName: fuelAttendant.name,
+            city: fuelAttendant.city,
+            region: fuelAttendant.region,
+          },
+        }),
+      ]);
+
+      return res.status(200).json({ message: "Fuel dispensed successfully to mill house owner" });
+    }
+    // -----------------------------------
+    // OTHER USER LOGIC (With Usage Limit)
+    // -----------------------------------
+    else if (userType === "other") {
+      const other = await prisma.otherUser.findUnique({
+        where: { id: userId },
+      });
+      if (!other || !other.isApproved) {
+        return res.status(404).json({ message: "Other user not found or not approved" });
+      }
+
+      // Check usage count
+      if (other.maxUses !== -1 && other.useCount >= other.maxUses) {
+        return res.status(403).json({ message: "QR code expired. Usage limit reached." });
+      }
+
+      const stock = await prisma.fuelStock.findFirst({
+        where: {
+          stationName: fuelAttendant.stationName,
+          city: fuelAttendant.city,
+          gasType,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (!stock || stock.litersReceived - stock.litersDispensed < liters) {
+        return res.status(400).json({ message: "Not enough fuel in stock" });
+      }
+
+      await prisma.$transaction([
+        prisma.otherUser.update({
+          where: { id: userId },
+          data: {
+            useCount: { increment: 1 },
+          },
+        }),
+        prisma.fuelStock.update({
+          where: { id: stock.id },
+          data: {
+            litersDispensed: { increment: liters },
+          },
+        }),
+        prisma.fuelTransaction.create({
+          data: {
+            otherUserId: other.id,
+            gasType,
+            liters,
+            stationName: fuelAttendant.stationName,
+            attendantName: fuelAttendant.name,
+            city: fuelAttendant.city,
+            region: fuelAttendant.region,
+          },
+        }),
+      ]);
+
+      return res.status(200).json({ message: "Fuel dispensed successfully" });
+    }
+    else {
       return res.status(400).json({ message: "Invalid user type" });
     }
   } catch (error) {
@@ -377,6 +488,16 @@ export async function getAttendantTransactions(req, res) {
           select: {
             fullName: true,
             Kebele: true, // Assuming Kebele instead of landSize as per schema
+          },
+        },
+        millHouseOwner: {
+          select: {
+            fullName: true,
+          },
+        },
+        otherUser: {
+          select: {
+            fullName: true,
           },
         },
       },
