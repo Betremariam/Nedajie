@@ -75,7 +75,6 @@ function App() {
           {/* Register Admin Routes */}
           <Route path="/register" element={<DashboardLayout Sidebar={RegisterAdminSidebar} />}>
             <Route path="register-dashboard" element={<RegisterAdminDashboard />} />
-            <Route path="attendant-registration" element={<RegisterAttendant />} />
             <Route path="driver-registration" element={<RegisterDriver />} />
             <Route path="farmer-registration" element={<RegisterFarmer />} />
             <Route path="other-registration" element={<OtherRegistration />} />

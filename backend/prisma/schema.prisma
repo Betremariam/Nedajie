@@ -29,6 +29,7 @@ model Admin {
   drivers         Driver[]
   farmers         Farmer[]
   otherUsers      OtherUser[]
+  attendants      FuelAttendant[]
 }
 
 enum AdminRole {
@@ -93,7 +94,10 @@ model FuelAttendant {
   city         String
   region       String?
   isApproved   Boolean  @default(false)
+  isEnabled    Boolean  @default(true)
   documentPath String
+  owner        Admin?   @relation(fields: [ownerId], references: [id])
+  ownerId      String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

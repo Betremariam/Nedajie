@@ -226,9 +226,9 @@ export const ownerReports = async (req, res) => {
 
 export async function registerAttendant(req, res) {
   try {
-    const { name, phone, password, stationName, city } = req.body;
+    const { name, phone, stationName, city, region } = req.body;
 
-    if (!name || !phone || !password || !stationName || !city) {
+    if (!name || !phone || !stationName || !city || !region) {
       return res.status(400).json({ msg: "All fields are required." });
     }
 
@@ -243,7 +243,8 @@ export async function registerAttendant(req, res) {
       return res.status(400).json({ msg: "Phone already registered." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const generatedPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
     await prisma.fuelAttendant.create({
       data: {
@@ -252,13 +253,53 @@ export async function registerAttendant(req, res) {
         password: hashedPassword,
         stationName,
         city,
+        region,
         documentPath: req.file.path,
+        ownerId: req.admin.id,
+        isEnabled: true,
       },
     });
 
-    res.status(201).json({ msg: "Registered successfully. Await admin approval." });
+    res.status(201).json({ 
+      msg: "Registered successfully. Await admin approval.", 
+      generatedPassword 
+    });
   } catch (err) {
     console.error("Register Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function getMyAttendants(req, res) {
+  try {
+    const attendants = await prisma.fuelAttendant.findMany({
+      where: { ownerId: req.admin.id },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(attendants);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function toggleAttendantStatus(req, res) {
+  try {
+    const { id } = req.params;
+    const attendant = await prisma.fuelAttendant.findFirst({
+      where: { id, ownerId: req.admin.id }
+    });
+
+    if (!attendant) {
+      return res.status(404).json({ msg: "Attendant not found or not owned by you." });
+    }
+
+    const updated = await prisma.fuelAttendant.update({
+      where: { id },
+      data: { isEnabled: !attendant.isEnabled }
+    });
+
+    res.json({ msg: `Attendant ${updated.isEnabled ? "enabled" : "disabled"}`, isEnabled: updated.isEnabled });
+  } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }

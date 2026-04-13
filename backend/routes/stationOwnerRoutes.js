@@ -10,6 +10,8 @@ import {
   ownerReports,
   ownerStations,
   registerAttendant,
+  getMyAttendants,
+  toggleAttendantStatus,
 } from "../controllers/stationOwnerController.js";
 
 const router = express.Router();
@@ -71,6 +73,22 @@ router.post(
   authorizeRoles("stationOwner"),
   upload.single("document"),
   registerAttendant
+);
+
+router.get(
+  "/my-attendants",
+  authMiddleware,
+  attachAdmin,
+  authorizeRoles("stationOwner"),
+  getMyAttendants
+);
+
+router.patch(
+  "/attendant/:id/toggle",
+  authMiddleware,
+  attachAdmin,
+  authorizeRoles("stationOwner"),
+  toggleAttendantStatus
 );
 
 export default router;

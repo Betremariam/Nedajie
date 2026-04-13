@@ -4,7 +4,8 @@ import { upload } from '../middleWare/multerConfig.js';
 
 const router = Router();
 
-router.post("/register", upload.single("document"), registerAttendant);
+// Removed public registration - only station owners can register attendants
+// router.post("/register", upload.single("document"), registerAttendant);
 router.post("/login", loginAttendant);
 router.get('/driver/:id', getDriverByQR);
 router.post('/dispense', dispenseFuel);

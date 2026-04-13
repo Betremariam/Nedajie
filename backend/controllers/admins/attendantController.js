@@ -66,6 +66,10 @@ export async function loginAttendant(req, res) {
       return res.status(403).json({ msg: "Wait for admin approval." });
     }
 
+    if (!attendant.isEnabled) {
+      return res.status(403).json({ msg: "Your account has been disabled by the station owner." });
+    }
+
     const token = jwt.sign(
       { id: attendant.id, role: "attendant" },
       process.env.JWT_SECRET,

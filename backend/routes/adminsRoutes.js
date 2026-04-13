@@ -113,13 +113,13 @@ router.post(
   registerDriver
 );
 
-// Register a new fuel attendant
-router.post(
-  "/register-attendant",
-  registerAdmin,
-  upload.single("document"),
-  registerAttendant
-);
+// Removed register-attendant - only station owners can register attendants
+// router.post(
+//   "/register-attendant",
+//   registerAdmin,
+//   upload.single("document"),
+//   registerAttendant
+// );
 
 // Register a new farmer
 router.post(

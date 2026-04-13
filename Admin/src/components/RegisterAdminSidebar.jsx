@@ -3,7 +3,6 @@ import BaseSidebar from "./BaseSidebar";
 
 const navItems = [
   { title: "Dashboard", url: "/register/register-dashboard", icon: LayoutGrid },
-  { title: "Attendants", url: "/register/attendant-registration", icon: Fuel },
   { title: "Drivers", url: "/register/driver-registration", icon: Car },
   { title: "Farmers", url: "/register/farmer-registration", icon: Wheat },
   { title: "Others", url: "/register/other-registration", icon: Users2 },
