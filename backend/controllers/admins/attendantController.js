@@ -127,40 +127,44 @@ function getLimit(carType) {
   return 0;
 }
 
-function getGasType(carType) {
-  const type = carType.toLowerCase();
+function getGasType(vehicleType) {
+  const type = vehicleType.toLowerCase();
   switch (type) {
     case "bajaj":
+    case "motorcycle":
+    case "car":
       return "benzene";
     case "taxi":
     case "heavy":
+    case "truck":
+    case "bus":
       return "Diesel";
     default:
-      return null;
+      return "benzene"; // Fallback
   }
 }
 
-export async function getDriverByQR(req, res) {
+export async function getVehicleByQR(req, res) {
   try {
     const { id } = req.params;
-    const driver = await prisma.driver.findUnique({
+    const vehicle = await prisma.vehicle.findUnique({
       where: { id },
     });
-    if (!driver || !driver.isApproved) {
-      return res.status(404).json({ msg: "Driver not found or not approved." });
+    if (!vehicle || !vehicle.isApproved) {
+      return res.status(404).json({ msg: "Vehicle not found or not approved." });
     }
 
-    const fuelLimit = getLimit(driver.carType);
+    const fuelLimit = vehicle.fullCapacity;
 
     const today = new Date().toDateString();
-    const lastFuelDate = driver.lastFuelDate
-      ? new Date(driver.lastFuelDate).toDateString()
+    const lastFuelDate = vehicle.lastFuelDate
+      ? new Date(vehicle.lastFuelDate).toDateString()
       : null;
 
-    let updatedLimitUsed = driver.dailyLimitUsed || 0;
+    let updatedLimitUsed = vehicle.dailyLimitUsed || 0;
     if (lastFuelDate !== today) {
       updatedLimitUsed = 0;
-      await prisma.driver.update({
+      await prisma.vehicle.update({
         where: { id },
         data: {
           dailyLimitUsed: 0,
@@ -172,11 +176,11 @@ export async function getDriverByQR(req, res) {
     const fuelLeft = Math.max(fuelLimit - updatedLimitUsed, 0);
 
     res.status(200).json({
-      id: driver.id,
-      name: driver.name,
-      carType: driver.carType,
+      id: vehicle.id,
+      name: vehicle.ownerName,
+      vehicleType: vehicle.vehicleType,
       fuelLeft,
-      gasType: getGasType(driver.carType),
+      gasType: getGasType(vehicle.vehicleType),
     });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
@@ -202,38 +206,32 @@ export const dispenseFuel = async (req, res) => {
     const today = new Date().toDateString();
 
     // -----------------------------------
-    // DRIVER LOGIC
+    // VEHICLE LOGIC
     // -----------------------------------
-    if (userType === "driver") {
-      const driver = await prisma.driver.findUnique({
+    if (userType === "vehicle" || userType === "driver") {
+      const vehicle = await prisma.vehicle.findUnique({
         where: { id: userId },
       });
-      if (!driver || !driver.isApproved) {
-        return res.status(404).json({ message: "Driver not found or not approved" });
+      if (!vehicle || !vehicle.isApproved) {
+        return res.status(404).json({ message: "Vehicle not found or not approved" });
       }
 
-      const lastFuelDate = driver.lastFuelDate
-        ? new Date(driver.lastFuelDate).toDateString()
+      const lastFuelDate = vehicle.lastFuelDate
+        ? new Date(vehicle.lastFuelDate).toDateString()
         : null;
 
-      let currentDailyLimitUsed = driver.dailyLimitUsed || 0;
+      let currentDailyLimitUsed = vehicle.dailyLimitUsed || 0;
       if (lastFuelDate !== today) {
         currentDailyLimitUsed = 0;
       }
 
-      const carLimits = {
-        bajaj: 10,
-        taxi: 40,
-        heavy: 100,
-      };
-
-      const limit = carLimits[driver.carType.toLowerCase()];
-      if (!limit) {
-        return res.status(400).json({ message: "Invalid car type" });
+      const limit = vehicle.fullCapacity;
+      if (limit <= 0) {
+        return res.status(400).json({ message: "Vehicle has no fuel capacity limit defined" });
       }
 
       if (currentDailyLimitUsed + liters > limit) {
-        return res.status(400).json({ message: "Daily limit exceeded" });
+        return res.status(400).json({ message: `Daily capacity limit exceeded. Allowed left: ${limit - currentDailyLimitUsed}L` });
       }
 
       // Check stock
@@ -252,7 +250,7 @@ export const dispenseFuel = async (req, res) => {
 
       // Atomic update using transaction
       await prisma.$transaction([
-        prisma.driver.update({
+        prisma.vehicle.update({
           where: { id: userId },
           data: {
             dailyLimitUsed: currentDailyLimitUsed + liters,
@@ -267,7 +265,7 @@ export const dispenseFuel = async (req, res) => {
         }),
         prisma.fuelTransaction.create({
           data: {
-            driverId: driver.id,
+            vehicleId: vehicle.id,
             gasType,
             liters,
             stationName: fuelAttendant.stationName,
@@ -278,7 +276,7 @@ export const dispenseFuel = async (req, res) => {
         }),
       ]);
 
-      return res.status(200).json({ message: "Fuel dispensed successfully to driver" });
+      return res.status(200).json({ message: "Fuel dispensed successfully to vehicle" });
     }
 
     // -----------------------------------
@@ -369,10 +367,10 @@ export async function getAttendantTransactions(req, res) {
       orderBy: { createdAt: 'desc' },
       take: 50,
       include: {
-        driver: {
+        vehicle: {
           select: {
-            name: true,
-            carType: true,
+            ownerName: true,
+            vehicleType: true,
           },
         },
         farmer: {

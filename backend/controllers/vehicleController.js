@@ -3,42 +3,36 @@ import moment from "moment";
 
 export async function requestFuel(req, res) {
   try {
-    const { driverId, liters, gasType } = req.body;
+    const { vehicleId, liters, gasType } = req.body;
 
-    const driver = await prisma.driver.findUnique({
-      where: { id: driverId },
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id: vehicleId },
     });
-    if (!driver) return res.status(404).json({ message: "Driver not found" });
+    if (!vehicle) return res.status(404).json({ message: "Vehicle not found" });
 
-    const limits = {
-      bajaj: 10,
-      taxi: 40,
-      heavy: 100,
-    };
-
-    const maxLimit = limits[driver.carType.toLowerCase()];
-    if (!maxLimit) return res.status(400).json({ message: "Unknown car type" });
+    const maxLimit = vehicle.fullCapacity;
+    if (maxLimit <= 0) return res.status(400).json({ message: "Vehicle capacity not defined" });
 
     const today = moment().startOf("day").toDate();
 
     const existing = await prisma.fuelTransaction.findFirst({
       where: {
-        driverId: driverId,
+        vehicleId: vehicleId,
         createdAt: { gte: today },
       },
     });
 
     if (existing) {
-      return res.status(403).json({ message: "You already received fuel today" });
+      return res.status(403).json({ message: "This vehicle already received fuel today" });
     }
 
     if (liters > maxLimit) {
-      return res.status(400).json({ message: `Limit exceeded: Max ${maxLimit}L allowed` });
+      return res.status(400).json({ message: `Limit exceeded: Max ${maxLimit}L allowed based on capacity` });
     }
 
     const newTransaction = await prisma.fuelTransaction.create({
       data: {
-        driverId: driverId,
+        vehicleId: vehicleId,
         liters,
         gasType,
       },
@@ -50,15 +44,16 @@ export async function requestFuel(req, res) {
   }
 }
 
-export async function getDriverTransactions(req, res) {
+export async function getVehicleTransactions(req, res) {
   try {
     const transactions = await prisma.fuelTransaction.findMany({
       include: {
-        driver: {
+        vehicle: {
           select: {
-            name: true,
+            ownerName: true,
             phone: true,
-            carType: true,
+            vehicleType: true,
+            carPlate: true
           },
         },
       },
@@ -71,21 +66,21 @@ export async function getDriverTransactions(req, res) {
   }
 }
 
-export async function getDriverDetails(req, res) {
+export async function getVehicleDetails(req, res) {
   const { id } = req.params;
 
   try {
-    const driver = await prisma.driver.findUnique({
+    const vehicle = await prisma.vehicle.findUnique({
       where: { id },
     });
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
     }
 
     const today = moment().startOf("day").toDate();
     const transaction = await prisma.fuelTransaction.findFirst({
       where: {
-        driverId: id,
+        vehicleId: id,
         createdAt: { gte: today },
       },
     });
@@ -93,16 +88,17 @@ export async function getDriverDetails(req, res) {
     const alreadyReceivedFuelToday = !!transaction;
 
     res.status(200).json({
-      driver: {
-        id: driver.id,
-        name: driver.name,
-        vehicleType: driver.carType,
-        // fuelLimit: driver.fuelLimit, // fuelLimit not in current schema
+      vehicle: {
+        id: vehicle.id,
+        ownerName: vehicle.ownerName,
+        vehicleType: vehicle.vehicleType,
+        carPlate: vehicle.carPlate,
+        fullCapacity: vehicle.fullCapacity
       },
       alreadyReceivedFuelToday,
     });
   } catch (error) {
-    console.error("Error getting driver details:", error);
+    console.error("Error getting vehicle details:", error);
     res.status(500).json({ message: "Server error" });
   }
 }

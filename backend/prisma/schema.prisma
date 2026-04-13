@@ -26,7 +26,7 @@ model Admin {
   stationIds          String[]
   createdAt           DateTime  @default(now())
 
-  drivers         Driver[]
+  vehicles        Vehicle[]
   farmers         Farmer[]
   otherUsers      OtherUser[]
   attendants      FuelAttendant[]
@@ -40,16 +40,17 @@ enum AdminRole {
   stationOwner
 }
 
-model Driver {
+model Vehicle {
   id              String   @id @default(cuid())
-  name            String
+  ownerName       String
   phone           String   @unique
-  carType         CarType
+  vehicleType     VehicleType
   carPlate        String
   qrCode          String?
   password        String
   dailyLimitUsed  Float    @default(0)
   lastFuelDate    DateTime?
+  fullCapacity    Float    @default(0)
   isApproved      Boolean  @default(false)
   documentPath    String?
   region          String?
@@ -57,14 +58,22 @@ model Driver {
   approvedById    String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
   transactions    FuelTransaction[]
 }
 
-enum CarType {
+enum VehicleType {
   bajaj
   taxi
   heavy
+  car
+  truck
+  bus
+  motorcycle
+  boat
+  ship
+  machinery
+  ambulance
+  other
 }
 
 model Farmer {
@@ -162,8 +171,8 @@ model FuelStock {
 
 model FuelTransaction {
   id            String    @id @default(cuid())
-  driver        Driver?   @relation(fields: [driverId], references: [id])
-  driverId      String?
+  vehicle       Vehicle?   @relation(fields: [vehicleId], references: [id])
+  vehicleId     String?
   farmer        Farmer?   @relation(fields: [farmerId], references: [id])
   farmerId      String?
   otherUser     OtherUser? @relation(fields: [otherUserId], references: [id])

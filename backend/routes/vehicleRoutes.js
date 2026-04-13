@@ -1,33 +1,34 @@
 import express from "express";
 import {
   requestFuel,
-  getDriverTransactions,
-  getDriverDetails,
-} from "../controllers/driverController.js";
+  getVehicleTransactions,
+  getVehicleDetails,
+} from "../controllers/vehicleController.js";
 import prisma from "../lib/prisma.js";
 
 const router = express.Router();
 router.post("/request-fuel", requestFuel);
-router.get("/transactions", getDriverTransactions);
-router.get("/:id/details", getDriverDetails);
+router.get("/transactions", getVehicleTransactions);
+router.get("/:id/details", getVehicleDetails);
 router.get("/:id", async (req, res) => {
   try {
-    const driver = await prisma.driver.findUnique({
+    const vehicle = await prisma.vehicle.findUnique({
       where: { id: req.params.id },
       select: {
         id: true,
-        name: true,
+        ownerName: true,
         phone: true,
-        carType: true,
+        vehicleType: true,
         carPlate: true,
+        fullCapacity: true,
         isApproved: true,
         createdAt: true,
       },
     });
-    if (!driver) {
-      return res.status(404).json({ msg: "Driver not found" });
+    if (!vehicle) {
+      return res.status(404).json({ msg: "Vehicle not found" });
     }
-    res.status(200).json(driver);
+    res.status(200).json(vehicle);
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }

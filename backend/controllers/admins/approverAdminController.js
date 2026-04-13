@@ -1,12 +1,12 @@
 import prisma from "../../lib/prisma.js";
 
-export async function approveDriver(req, res) {
+export async function approveVehicle(req, res) {
   try {
-    const { driverId } = req.params;
+    const { vehicleId } = req.params;
     const approverId = req.admin.id;
 
-    const driver = await prisma.driver.update({
-      where: { id: driverId },
+    const vehicle = await prisma.vehicle.update({
+      where: { id: vehicleId },
       data: {
         isApproved: true,
         approvedById: approverId,
@@ -21,44 +21,44 @@ export async function approveDriver(req, res) {
       },
     });
 
-    if (!driver) return res.status(404).json({ msg: "Driver not found" });
+    if (!vehicle) return res.status(404).json({ msg: "Vehicle not found" });
 
-    res.status(200).json({ msg: "Driver approved", driver });
+    res.status(200).json({ msg: "Vehicle approved", vehicle });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
 
-export async function getUnapprovedDrivers(req, res) {
+export async function getUnapprovedVehicles(req, res) {
   try {
     const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
     const where = { isApproved: false };
     if (admin.region) where.region = admin.region;
 
-    const drivers = await prisma.driver.findMany({
+    const vehicles = await prisma.vehicle.findMany({
       where: where,
     });
 
     const baseUrl = 'http://192.168.43.237:5000';
 
-    const updatedDrivers = drivers.map(driver => ({
-      ...driver,
-      documentUrl: driver.documentPath ? `${baseUrl}/${driver.documentPath.replace(/\\/g, '/')}` : null
+    const updatedVehicles = vehicles.map(vehicle => ({
+      ...vehicle,
+      documentUrl: vehicle.documentPath ? `${baseUrl}/${vehicle.documentPath.replace(/\\/g, '/')}` : null
     }));
 
-    res.status(200).json(updatedDrivers);
+    res.status(200).json(updatedVehicles);
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
 
-export async function rejectDriver(req, res) {
+export async function rejectVehicle(req, res) {
   try {
-    const { driverId } = req.params;
-    await prisma.driver.delete({
-      where: { id: driverId },
+    const { vehicleId } = req.params;
+    await prisma.vehicle.delete({
+      where: { id: vehicleId },
     });
-    res.status(200).json({ msg: "Driver rejected and deleted successfully" });
+    res.status(200).json({ msg: "Vehicle rejected and deleted successfully" });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }

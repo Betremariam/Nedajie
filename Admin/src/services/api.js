@@ -48,7 +48,7 @@ export const getAllAdmins = () => API.get("/admins/admins");
 export const blockAdmin = (id) => API.patch(`/admins/admins/${id}/block`);
 export const getAllFuelTransactions = () => API.get("/admins/transactions");
 export const getAllFuelStocks = () => API.get("/admins/fuel-stocks");
-export const getDrivers = () => API.get("/admins/drivers");
+export const getVehicles = () => API.get("/admins/vehicles");
 export const getFarmers = () => API.get("/admins/farmers");
 export const getOthers = () => API.get("/admins/others");
 

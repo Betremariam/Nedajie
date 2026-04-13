@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-enum UserType { driver, farmer }
+enum UserType { vehicle, farmer }
 
 class FuelDispenseScreen extends StatefulWidget {
   const FuelDispenseScreen({super.key});
@@ -17,8 +17,8 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
   bool scanned = false;
   String? scannedUserId;
   String? userName;
-  double? fuelLeft;
-  String? carType;
+  double? fuelLimit;
+  String? vehicleType;
   String? gasType;
   String? attendantId;
   bool loading = false;
@@ -60,19 +60,19 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     final token = prefs.getString('token');
 
     try {
-      final driverRes = await http.get(
-        Uri.parse('http://192.168.43.237:5000/api/attendants/driver/$id'),
+      final vehicleRes = await http.get(
+        Uri.parse('http://192.168.43.237:5000/api/attendants/vehicle/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      if (driverRes.statusCode == 200) {
-        final data = jsonDecode(driverRes.body);
+      if (vehicleRes.statusCode == 200) {
+        final data = jsonDecode(vehicleRes.body);
         setState(() {
-          userType = UserType.driver;
+          userType = UserType.vehicle;
           userName = data['name'];
-          fuelLeft = data['fuelLeft']?.toDouble();
-          carType = data['carType'];
-          gasType = _determineGasType(data['carType']);
+          fuelLimit = data['fuelLimit']?.toDouble();
+          vehicleType = data['vehicleType'];
+          gasType = data['gasType']; // Now uses backend-determined gas type
         });
         return;
       }
@@ -97,6 +97,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
           userType = UserType.farmer;
           userName = data['farmer']['name'];
           gasType = 'benzene';
+          fuelLimit = 50.0;
         });
       } else {
         throw Exception('Unknown QR or not eligible');
@@ -110,11 +111,6 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     } finally {
       setState(() => loading = false);
     }
-  }
-
-  String _determineGasType(String? carType) {
-    if (carType == null) return 'Unknown';
-    return carType.toLowerCase() == 'bajaj' ? 'benzene' : 'diesel';
   }
 
   Future<void> _dispenseFuel() async {
@@ -135,7 +131,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     }
 
     try {
-      if (userType == UserType.driver) {
+      if (userType == UserType.vehicle) {
         if (fuelAmountController.text.isEmpty) {
           setState(() {
             error = 'Please enter fuel amount';
@@ -161,7 +157,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
           },
           body: jsonEncode({
             'userId': scannedUserId,
-            'userType': 'driver',
+            'userType': 'vehicle',
             'liters': liters,
             'fuelAttendantId': attendantId,
             'gasType': gasType,
@@ -171,14 +167,11 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
         final data = jsonDecode(response.body);
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Fuel dispensed to driver')),
+            const SnackBar(content: Text('Fuel dispensed to vehicle')),
           );
-          setState(() {
-            fuelLeft = (fuelLeft ?? 0) - liters;
-            fuelAmountController.clear();
-          });
+          _resetScan(); // Reset after success
         } else {
-          throw Exception(data['message'] ?? 'Failed to dispense to driver');
+          throw Exception(data['message'] ?? 'Failed to dispense to vehicle');
         }
       } else if (userType == UserType.farmer) {
         final liters = 50.0;
@@ -204,6 +197,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('50L dispensed to farmer')),
           );
+          _resetScan();
         } else {
           throw Exception(data['message'] ?? 'Failed to dispense to farmer');
         }
@@ -223,8 +217,8 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
       scanned = false;
       scannedUserId = null;
       userName = null;
-      fuelLeft = null;
-      carType = null;
+      fuelLimit = null;
+      vehicleType = null;
       gasType = null;
       userType = null;
       error = null;
@@ -282,8 +276,8 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
                   for (final barcode in barcodes) {
                     final String? code = barcode.rawValue;
                     if (code != null) {
-                      onScan(code); // Call your function here
-                      break; // Stop after first valid scan
+                      onScan(code);
+                      break;
                     }
                   }
                 },
@@ -299,31 +293,43 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     return ListView(
       children: [
         Text(
-          '${userType == UserType.farmer ? 'Farmer' : 'Driver'}: $userName',
-          style: const TextStyle(fontSize: 18, color: Colors.white),
+          '${userType == UserType.farmer ? 'Farmer' : 'Vehicle'}: $userName',
+          style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        if (userType == UserType.driver) ...[
-          const SizedBox(height: 10),
+        const SizedBox(height: 10),
+        if (userType == UserType.vehicle) ...[
           Text(
-            'Fuel Left: ${fuelLeft?.toStringAsFixed(2) ?? "0"} liters',
-            style: const TextStyle(fontSize: 16, color: Colors.white70),
+            'Vehicle Type: $vehicleType',
+            style: const TextStyle(color: Colors.white70, fontSize: 16),
           ),
-          Text(
-            'Car Type: $carType',
-            style: const TextStyle(color: Colors.white70),
-          ),
+          const SizedBox(height: 4),
         ],
         Text(
           'Gas Type: $gasType',
-          style: const TextStyle(color: Colors.white70),
+          style: const TextStyle(color: Colors.white70, fontSize: 16),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.deepPurple.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.deepPurple.withOpacity(0.5)),
+          ),
+          child: Text(
+            'Daily Limit Remaining: ${fuelLimit?.toStringAsFixed(2) ?? "0"} Liters',
+            style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
         const SizedBox(height: 20),
-        if (userType == UserType.driver)
+        if (userType == UserType.vehicle)
           TextField(
             controller: fuelAmountController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: 'Enter amount to dispense',
+              labelText: 'Dispense Amount (Liters)',
+              labelStyle: const TextStyle(color: Colors.white70),
+              hintText: 'Enter amount',
               hintStyle: const TextStyle(color: Colors.white54),
               filled: true,
               fillColor: const Color(0xFF1E1E1E),
@@ -338,7 +344,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
             padding: const EdgeInsets.only(top: 12.0),
             child: Text(
               error!,
-              style: const TextStyle(color: Colors.redAccent),
+              style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
             ),
           ),
         const SizedBox(height: 20),
@@ -351,16 +357,21 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
                   onPressed: _dispenseFuel,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text('Dispense Fuel'),
+                  child: const Text('DISPENSE FUEL', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 10),
                 OutlinedButton(
                   onPressed: _resetScan,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.deepPurple,
+                    side: const BorderSide(color: Colors.deepPurple),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text('Scan Again'),
+                  child: const Text('SCAN ANOTHER'),
                 ),
               ],
             ),

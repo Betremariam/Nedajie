@@ -15,12 +15,12 @@ export async function getAllFuelTransactions(req, res) {
     const transactions = await prisma.fuelTransaction.findMany({
       where,
       include: {
-        driver: {
+        vehicle: {
           select: {
-            name: true,
+            ownerName: true,
             phone: true,
             carPlate: true,
-            carType: true,
+            vehicleType: true,
           },
         },
         farmer: {
@@ -200,48 +200,48 @@ export async function getAllFarmers(req, res) {
   }
 }
 
-export async function getDriverDetails(req, res) {
+export async function getVehicleDetails(req, res) {
   const { id } = req.params;
 
   try {
-    const driver = await prisma.driver.findUnique({
+    const vehicle = await prisma.vehicle.findUnique({
       where: { id },
     });
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
     }
 
     const today = moment().startOf("day").toDate();
     const transaction = await prisma.fuelTransaction.findFirst({
       where: {
-        driverId: id,
-        date: { gte: today },
+        vehicleId: id,
+        createdAt: { gte: today },
       },
     });
 
     const alreadyReceivedFuelToday = !!transaction;
 
     res.status(200).json({
-      driver: {
-        id: driver.id,
-        name: driver.name,
-        vehicleType: driver.carType,
-        // fuelLimit: driver.fuelLimit, // Note: fuelLimit wasn't in original schema but referenced in controller.
+      vehicle: {
+        id: vehicle.id,
+        ownerName: vehicle.ownerName,
+        vehicleType: vehicle.vehicleType,
+        fullCapacity: vehicle.fullCapacity
       },
       alreadyReceivedFuelToday,
     });
   } catch (error) {
-    console.error("Error getting driver details:", error);
+    console.error("Error getting vehicle details:", error);
     res.status(500).json({ message: "Server error" });
   }
 }
 
-export async function getAllDrivers(req, res) {
+export async function getAllVehicles(req, res) {
   try {
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
     const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
 
-    const drivers = await prisma.driver.findMany({
+    const vehicles = await prisma.vehicle.findMany({
       where,
       include: {
         approvedBy: {
@@ -253,9 +253,9 @@ export async function getAllDrivers(req, res) {
       },
     });
 
-    res.status(200).json(drivers);
+    res.status(200).json(vehicles);
   } catch (error) {
-    console.error("Error fetching drivers:", error);
+    console.error("Error fetching vehicles:", error);
     res.status(500).json({ message: "Server error" });
   }
 }

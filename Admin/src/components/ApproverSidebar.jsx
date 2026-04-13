@@ -4,7 +4,7 @@ import BaseSidebar from "./BaseSidebar";
 const navItems = [
   { title: "Dashboard", url: "/approver/dashboard", icon: LayoutGrid },
   { title: "Attendants", url: "/approver/attendants", icon: Fuel },
-  { title: "Drivers", url: "/approver/drivers", icon: Car },
+  { title: "Vehicles", url: "/approver/vehicles", icon: Car },
   { title: "Farmers", url: "/approver/farmers", icon: Wheat },
   { title: "Others", url: "/approver/others", icon: Users2 },
 ];

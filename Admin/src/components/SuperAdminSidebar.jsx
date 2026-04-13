@@ -11,7 +11,7 @@ const navItems = [
     title: "Users",
     icon: Users2,
     items: [
-      { title: "Drivers", url: "/super-admin/drivers-list" },
+      { title: "Vehicles", url: "/super-admin/vehicles-list" },
       { title: "Farmers", url: "/super-admin/farmers-list" },
       { title: "Others", url: "/super-admin/others-list" },
     ],

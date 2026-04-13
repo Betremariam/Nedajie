@@ -2,29 +2,30 @@ import prisma from "../../lib/prisma.js";
 import bcrypt from "bcryptjs";
 import { hash } from "bcryptjs";
 
-export async function registerDriver(req, res) {
+export async function registerVehicle(req, res) {
   try {
-    const { name, phone, carType, carPlate, password } = req.body;
+    const { ownerName, phone, vehicleType, carPlate, password, fullCapacity } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ msg: "Document is required" });
     }
 
-    const existing = await prisma.driver.findUnique({
+    const existing = await prisma.vehicle.findUnique({
       where: { phone },
     });
-    if (existing) return res.status(400).json({ msg: "Driver already registered" });
+    if (existing) return res.status(400).json({ msg: "Vehicle phone already registered" });
 
     const hashed = await hash(password, 10);
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
 
-    const driver = await prisma.driver.create({
+    const vehicle = await prisma.vehicle.create({
       data: {
-        name,
+        ownerName,
         phone,
-        carType: carType.toLowerCase(),
+        vehicleType: vehicleType.toLowerCase(),
         carPlate,
         password: hashed,
+        fullCapacity: parseFloat(fullCapacity) || 0,
         isApproved: false,
         documentPath: req.file.path,
         region: admin.region,
@@ -32,8 +33,8 @@ export async function registerDriver(req, res) {
     });
 
     res.status(201).json({
-      msg: "Driver registered. Awaiting admin approval.",
-      driverId: driver.id,
+      msg: "Vehicle registered. Awaiting admin approval.",
+      vehicleId: vehicle.id,
     });
 
   } catch (err) {

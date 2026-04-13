@@ -15,10 +15,11 @@ import {
   updateFuelDispensed,
   refillFuelStock,
   getFarmerDetails,
-  getDriverDetails,
+  getFarmerDetails,
+  getVehicleDetails,
   createStationOwner,
   getAllOthers,
-  getAllDrivers,
+  getAllVehicles,
   getAllFarmers,
   getFuelDeliveries,
   uploadFuelDeliveries,
@@ -26,12 +27,9 @@ import {
 } from "../controllers/admins/superAdminController.js";
 
 import {
-  approveDriver,
-  getUnapprovedDrivers,
-  rejectDriver,
-  approveAttendant,
-  getUnapprovedAttendants,
-  rejectAttendant,
+  approveVehicle,
+  getUnapprovedVehicles,
+  rejectVehicle,
   approveFarmer,
   getUnapprovedFarmers,
   rejectFarmer,
@@ -40,7 +38,7 @@ import {
   rejectOther,
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
-import { registerDriver, registerAttendant, registerFarmer,registerOtherUser } from "../controllers/admins/registerAdminController.js";
+import { registerVehicle, registerFarmer,registerOtherUser } from "../controllers/admins/registerAdminController.js";
 
 
 const router = express.Router();
@@ -74,11 +72,11 @@ router.get("/fuel-stocks", protectSuper, getAllFuelStocks);         // View all 
 router.post("/fuel-stocks", protectSuper, addFuelStock);            // Add fuel stock
 router.put("/fuel-stocks/:stockId/dispensed", protectSuper, updateFuelDispensed);  // Update dispensed
 router.put("/fuel-stocks/:stockId/refill", protectSuper, refillFuelStock); 
-router.get("/drivers",protectSuper, getAllDrivers);  
+router.get("/vehicles",protectSuper, getAllVehicles);  
 router.get("/farmers",protectSuper,getAllFarmers);
 // User details
 router.get("/farmer/:id", protectSuper, getFarmerDetails);    // Farmer eligibility & details
-router.get("/driver/:id", protectSuper, getDriverDetails); 
+router.get("/vehicle/:id", protectSuper, getVehicleDetails); 
 router.post("/owners", protectSuper, createStationOwner);
 router.get("/others", protectSuper, getAllOthers);
 router.post('/upload-deliveries', upload.single('xlsx'),protectSuper, uploadFuelDeliveries);
@@ -86,14 +84,14 @@ router.get('/deliveries',protectSuper, getFuelDeliveries);
 router.patch('/approve/:id',protectSuper, approveFuelDelivery);
 
 
-router.get("/unapproved-drivers", approverOnly, getUnapprovedDrivers);
-router.put("/approve-driver/:driverId", approverOnly, approveDriver);
-router.delete('/reject-driver/:driverId',approverOnly, rejectDriver); 
+router.get("/unapproved-vehicles", approverOnly, getUnapprovedVehicles);
+router.put("/approve-vehicle/:vehicleId", approverOnly, approveVehicle);
+router.delete('/reject-vehicle/:vehicleId',approverOnly, rejectVehicle); 
 
-// 🧑‍🔧 Attendant approval
+// 🧑‍🔧 Vehicle approval (formerly attendant)
 router.get("/unapproved-attendants", approverOnly, getUnapprovedAttendants);
 router.put("/approve-attendant/:attendantId", approverOnly, approveAttendant);
-router.delete('/reject-attendant/:attendantId',approverOnly, rejectAttendant);
+router.delete('/reject-attendant/:attendantId', approverOnly, rejectAttendant);
 
 // 🌾 Farmer approval
 router.get("/unapproved-farmers", approverOnly, getUnapprovedFarmers);
@@ -105,12 +103,12 @@ router.put("/approve-other-user/:otherId", approverOnly, approveOthers);
 router.get("/unapproved-other-user", approverOnly, getUnapprovedOthers);
 router.delete('/reject-other-user/:otherId', approverOnly, rejectOther);
 
-// Register a new driver
+// Register a new vehicle
 router.post(
-  "/register-driver",
+  "/register-vehicle",
   registerAdmin,
   upload.single("document"),
-  registerDriver
+  registerVehicle
 );
 
 // Removed register-attendant - only station owners can register attendants

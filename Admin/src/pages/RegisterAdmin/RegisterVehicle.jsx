@@ -12,7 +12,11 @@ import {
   BusFront,
   IdCard,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Fuel,
+  Ship,
+  Truck,
+  Bike
 } from "lucide-react";
 import { 
   Select, 
@@ -26,15 +30,15 @@ import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Switch } from "../../components/ui/Switch";
-import { cn } from "../../lib/utils";
 
-const RegisterDriver = () => {
+const RegisterVehicle = () => {
   const [form, setForm] = useState({
-    name: "",
+    ownerName: "",
     phone: "",
     password: "",
-    carType: "",
+    vehicleType: "",
     carPlate: "",
+    fullCapacity: "",
     document: null,
   });
 
@@ -54,7 +58,7 @@ const RegisterDriver = () => {
   };
 
   const handleSelectChange = (value) => {
-    setForm({ ...form, carType: value });
+    setForm({ ...form, vehicleType: value });
   };
 
   const handleGeneratePassword = () => {
@@ -68,27 +72,29 @@ const RegisterDriver = () => {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append("name", form.name);
+    formData.append("ownerName", form.ownerName);
     formData.append("phone", form.phone);
     formData.append("password", form.password);
-    formData.append("carType", form.carType);
+    formData.append("vehicleType", form.vehicleType);
     formData.append("carPlate", form.carPlate);
+    formData.append("fullCapacity", form.fullCapacity);
     if(form.document) formData.append("document", form.document);
 
     try {
-      const res = await API.post("/admins/register-driver", formData, {
+      const res = await API.post("/admins/register-vehicle", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      setSuccess(res.data.msg || "Driver registered successfully.");
+      setSuccess(res.data.msg || "Vehicle registered successfully.");
       setForm({
-        name: "",
+        ownerName: "",
         phone: "",
         password: "",
-        carType: "",
+        vehicleType: "",
         carPlate: "",
+        fullCapacity: "",
         document: null,
       });
     } catch (err) {
@@ -127,8 +133,8 @@ const RegisterDriver = () => {
                 <Car className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Driver Registry</h1>
-                <p className="text-muted-foreground text-[13px] font-medium">Map driver identities to assigned assets</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">Vehicle Registry</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">Map vehicle identities to capacity-based quotas</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -136,7 +142,7 @@ const RegisterDriver = () => {
                 Cancel
              </Button>
              <Button type="button" onClick={handleSubmit} className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 font-semibold border-0">
-                Register Driver
+                Register Vehicle
              </Button>
           </div>
         </div>
@@ -145,16 +151,16 @@ const RegisterDriver = () => {
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
             
-            {/* Full Name */}
+            {/* Owner Name */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground/80 ml-0.5">Full Name</Label>
+              <Label className="text-[13px] font-bold text-foreground/80 ml-0.5">Owner / Organization Name</Label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                   className="h-12 pl-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                  placeholder="Enter driver's full name"
-                  name="name"
-                  value={form.name}
+                  placeholder="Enter owner's full name"
+                  name="ownerName"
+                  value={form.ownerName}
                   onChange={handleChange}
                   required
                 />
@@ -163,7 +169,7 @@ const RegisterDriver = () => {
 
             {/* Phone Number */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground/80 ml-0.5">Phone Number</Label>
+              <Label className="text-[13px] font-bold text-foreground/80 ml-0.5">Contact Phone</Label>
               <div className="relative group flex items-center">
                 <div className="absolute left-4 flex items-center gap-2 text-muted-foreground">
                   <PhoneCall className="w-3.5 h-3.5 group-focus-within:text-primary transition-colors" />
@@ -183,7 +189,7 @@ const RegisterDriver = () => {
 
             {/* Passcode */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Passcode</Label>
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">QR Login Passcode</Label>
               <div className="relative group">
                 <Input
                   className="h-12 pl-4 pr-32 rounded-xl border-slate-200 bg-slate-50/50 font-black text-xl tracking-[0.3em] text-slate-600 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
@@ -204,20 +210,28 @@ const RegisterDriver = () => {
               </div>
             </div>
 
-            {/* Asset Class */}
+            {/* Vehicle Type */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground/80 ml-0.5 flex items-center gap-2">
                 <BusFront className="w-4 h-4 text-primary" /> 
-                Asset Class
+                Vehicle Type
               </Label>
-              <Select value={form.carType} onValueChange={handleSelectChange} required>
+              <Select value={form.vehicleType} onValueChange={handleSelectChange} required>
                 <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] transition-all text-foreground">
-                  <SelectValue placeholder="Select asset class" />
+                  <SelectValue placeholder="Select vehicle type" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-border shadow-xl bg-card">
                   <SelectItem value="bajaj" className="font-medium py-2.5">Light Transport (Bajaj)</SelectItem>
                   <SelectItem value="taxi" className="font-medium py-2.5">Public Transit (Taxi)</SelectItem>
-                  <SelectItem value="heavy" className="font-medium py-2.5">Heavy Freight</SelectItem>
+                  <SelectItem value="car" className="font-medium py-2.5">Private Car</SelectItem>
+                  <SelectItem value="motorcycle" className="font-medium py-2.5">Motorcycle</SelectItem>
+                  <SelectItem value="bus" className="font-medium py-2.5">Bus</SelectItem>
+                  <SelectItem value="truck" className="font-medium py-2.5">Truck / Freight</SelectItem>
+                  <SelectItem value="heavy" className="font-medium py-2.5">Heavy Machinery</SelectItem>
+                  <SelectItem value="boat" className="font-medium py-2.5">Boat / Marine</SelectItem>
+                  <SelectItem value="ship" className="font-medium py-2.5">Ship / Large Vessel</SelectItem>
+                  <SelectItem value="ambulance" className="font-medium py-2.5">Ambulance / Emergency</SelectItem>
+                  <SelectItem value="other" className="font-medium py-2.5">Other Vehicle</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -226,7 +240,7 @@ const RegisterDriver = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
                 <IdCard className="w-4 h-4 text-primary" /> 
-                License Plate
+                License Plate / ID
               </Label>
               <div className="relative group">
                 <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
@@ -238,13 +252,34 @@ const RegisterDriver = () => {
                   onChange={handleChange}
                   required
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-medium text-slate-400 pointer-events-none">e.g., AA-12345</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-medium text-slate-400 pointer-events-none uppercase">Plate No.</span>
               </div>
             </div>
 
-            {/* Driver License Upload */}
+            {/* Fuel Capacity */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Driver License</Label>
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <Fuel className="w-4 h-4 text-primary" /> 
+                Full Fuel Capacity (Liters)
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 pr-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="e.g., 50"
+                  type="number"
+                  name="fullCapacity"
+                  value={form.fullCapacity}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-bold text-primary pointer-events-none">LITERS</span>
+              </div>
+            </div>
+
+            {/* Document Upload */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Vehicle Registration Document</Label>
               <div className="relative group">
                 <input
                   className="hidden"
@@ -264,7 +299,7 @@ const RegisterDriver = () => {
                      </div>
                      <div className="flex flex-col">
                        <span className="text-[13px] font-bold text-foreground mb-0.5 truncate max-w-[150px]">
-                         {form.document ? form.document.name : "Upload license"}
+                         {form.document ? form.document.name : "Upload registration"}
                        </span>
                        <span className="text-[11px] text-muted-foreground font-medium">PDF or image, max 5MB</span>
                      </div>
@@ -278,28 +313,28 @@ const RegisterDriver = () => {
             
           </div>
 
-          {/* Bottom Driver Status Section */}
+          {/* Bottom Vehicle Status Section */}
           <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
              <div className="flex flex-col gap-6 w-full max-w-lg">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-muted-foreground" />
-                  <h3 className="text-[14px] font-bold text-foreground">Driver Status</h3>
+                  <h3 className="text-[14px] font-bold text-foreground">Registration Options</h3>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-8 pl-1">
                   {/* Toggle 1 */}
                   <div className="flex items-start gap-3">
-                    <Switch id="active-driver" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
+                    <Switch id="active-vehicle" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
                     <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="active-driver" className="text-[13px] font-semibold text-foreground cursor-pointer">Active driver</Label>
-                       <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[160px]">Driver can be assigned to assets</span>
+                       <Label htmlFor="active-vehicle" className="text-[13px] font-semibold text-foreground cursor-pointer">Immediate Active</Label>
+                       <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[160px]">Ready for fuel after approval</span>
                     </div>
                   </div>
                   {/* Toggle 2 */}
                   <div className="flex items-start gap-3">
-                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
+                    <Switch id="send-noti" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
                     <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-foreground cursor-pointer">Credentials alert</Label>
-                       <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[160px]">Email/SMS invite driver to download credentials</span>
+                       <Label htmlFor="send-noti" className="text-[13px] font-semibold text-foreground cursor-pointer">SMS Confirmation</Label>
+                       <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[160px]">Send credentials to owner via SMS</span>
                     </div>
                   </div>
                 </div>
@@ -312,16 +347,16 @@ const RegisterDriver = () => {
                 className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
                 type="submit"
                >
-                {loading ? "Registering..." : "Register Driver"}
+                {loading ? "Registering..." : "Register Vehicle"}
                 <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
                </Button>
                <Button 
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({name:"", phone:"", password:"", carType:"", carPlate:"", document:null})}
+                onClick={() => setForm({ownerName:"", phone:"", password:"", vehicleType:"", carPlate:"", fullCapacity:"", document:null})}
                >
-                Clear
+                Clear Form
                </Button>
              </div>
           </div>
@@ -332,4 +367,4 @@ const RegisterDriver = () => {
   );
 };
 
-export default RegisterDriver;
+export default RegisterVehicle;

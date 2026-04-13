@@ -5,7 +5,7 @@ import SuperAdminDashboard from "./pages/SuperAdmin/SuperAdminDashboard";
 import ManageAdmins from "./pages/SuperAdmin/ManageAdmins";
 import FuelStockManager from "./pages/SuperAdmin/FuelStockManager";
 import TransactionHistory from "./pages/SuperAdmin/TransactionHistory";
-import DriverLists from "./pages/SuperAdmin/DriverLists";
+import VehicleLists from "./pages/SuperAdmin/VehicleLists";
 import FarmerLists from "./pages/SuperAdmin/FarmerLists";
 import OtherLists from "./pages/SuperAdmin/OtherLists";
 import FuelDelivery from "./pages/SuperAdmin/FuelDelivery";
@@ -24,12 +24,12 @@ import OwnerSidebar from "./components/OwnerSidebar";
 // Register Admin Pages
 import RegisterAdminDashboard from "./pages/RegisterAdmin/RegisterAdminDashboard";
 import RegisterAttendant from "./pages/RegisterAdmin/RegisterAttendant";
-import RegisterDriver from "./pages/RegisterAdmin/RegisterDriver";
+import RegisterVehicle from "./pages/RegisterAdmin/RegisterVehicle";
 import RegisterFarmer from "./pages/RegisterAdmin/RegisterFarmer";
 import OtherRegistration from "./pages/RegisterAdmin/OtherRegistration";
 
 // Approver Admin Pages
-import ApproveDrivers from "./pages/ApproverAdmin/ApproveDrivers";
+import ApproveVehicles from "./pages/ApproverAdmin/ApproveVehicles";
 import ApproveFarmers from "./pages/ApproverAdmin/ApproveFarmers";
 import ApproveAttendants from "./pages/ApproverAdmin/ApproveAttendants";
 import ApproveOthers from "./pages/ApproverAdmin/ApproveOthers";
@@ -65,7 +65,7 @@ function App() {
             <Route path="manage-admins" element={<ManageAdmins />} />
             <Route path="fuel-stock" element={<FuelStockManager />} />
             <Route path="transactions" element={<TransactionHistory />}/>
-            <Route path="drivers-list" element={<DriverLists />} />
+            <Route path="vehicles-list" element={<VehicleLists />} />
             <Route path="farmers-list" element={<FarmerLists />} />
             <Route path="others-list" element={<OtherLists />} />
             <Route path="fuel-delivery" element={<FuelDelivery />} />
@@ -75,7 +75,7 @@ function App() {
           {/* Register Admin Routes */}
           <Route path="/register" element={<DashboardLayout Sidebar={RegisterAdminSidebar} />}>
             <Route path="register-dashboard" element={<RegisterAdminDashboard />} />
-            <Route path="driver-registration" element={<RegisterDriver />} />
+            <Route path="vehicle-registration" element={<RegisterVehicle />} />
             <Route path="farmer-registration" element={<RegisterFarmer />} />
             <Route path="other-registration" element={<OtherRegistration />} />
           </Route>
@@ -83,7 +83,7 @@ function App() {
           {/* Approver Admin Routes */}
           <Route path="/approver" element={<DashboardLayout Sidebar={ApproverSidebar} />}>
             <Route path="dashboard" element={<ApproveDashboard/>} />
-            <Route path="drivers" element={<ApproveDrivers/>} />
+            <Route path="vehicles" element={<ApproveVehicles/>} />
             <Route path="farmers" element={<ApproveFarmers/>} />
             <Route path="attendants" element={<ApproveAttendants/>} />
             <Route path="others" element={<ApproveOthers/>} />
