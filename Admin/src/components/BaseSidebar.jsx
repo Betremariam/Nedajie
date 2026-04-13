@@ -20,9 +20,9 @@ const BaseSidebar = ({ navItems, label, roleTitle }) => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-3 px-4 py-6 border-b border-sidebar-border/50">
+        <div className="flex items-center gap-3 px-4 py-6 group-data-[collapsible=icon]:p-2 border-b border-sidebar-border/50">
           {/* Logo mark */}
-          <div className="flex aspect-square size-12 items-center justify-center shrink-0">
+          <div className="flex aspect-square size-12 group-data-[collapsible=icon]:size-8 items-center justify-center shrink-0 transition-all duration-200">
             <img src={nedajieLogo} alt="Nedajie Logo" className="w-full h-full object-contain" />
           </div>
           {/* Brand text */}
