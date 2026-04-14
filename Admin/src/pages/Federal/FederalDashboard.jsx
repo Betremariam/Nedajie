@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Users,
   Truck,
@@ -14,19 +14,33 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { getFederalDashboardStats } from "../../services/api";
 
 const FederalDashboard = () => {
-  const stats = [
-    { label: "Regional Super Admins", value: "12",      icon: Globe,         color: "blue",    desc: "Provincial oversight" },
-    { label: "Verified Station Owners", value: "84",    icon: Building2,     color: "emerald", desc: "Entity level auth" },
-    { label: "National Fuel Dispatch",  value: "312",   icon: Truck,         color: "amber",   desc: "Weekly logistics flow" },
-    { label: "Regulatory Compliance",   value: "Optimal", icon: ShieldCheck, color: "purple",  desc: "Standard alignment" },
-  ];
+  const [statsData, setStatsData] = useState({
+    superAdmins: 0,
+    verifiedOwners: 0,
+    totalDeliveries: 0,
+    recentDeliveries: []
+  });
 
-  const recentDeliveries = [
-    { id: 1, destination: "Addis North Terminal",   volume: "20,000L", status: "PENDING",            time: "10 mins ago",  icon: Navigation },
-    { id: 2, destination: "Nazreth Logistics Hub",  volume: "15,000L", status: "SUPERADMIN_ACCEPTED", time: "1 hour ago",   icon: Activity },
-    { id: 3, destination: "Bahir Dar Depot",        volume: "10,000L", status: "OWNER_ACCEPTED",      time: "3 hours ago",  icon: FileCheck },
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await getFederalDashboardStats();
+        setStatsData(res.data);
+      } catch (err) {
+        console.error("Failed to fetch federal stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const stats = [
+    { label: "Regional Super Admins", value: statsData.superAdmins.toString(),      icon: Globe,         color: "blue",    desc: "Provincial oversight" },
+    { label: "Verified Station Owners", value: statsData.verifiedOwners.toString(),    icon: Building2,     color: "emerald", desc: "Entity level auth" },
+    { label: "National Fuel Dispatch",  value: statsData.totalDeliveries.toString(),   icon: Truck,         color: "amber",   desc: "Weekly logistics flow" },
+    { label: "Regulatory Compliance",   value: "Optimal", icon: ShieldCheck, color: "purple",  desc: "Standard alignment" },
   ];
 
   const iconBg = {
@@ -40,6 +54,12 @@ const FederalDashboard = () => {
     OWNER_ACCEPTED:      { icon: "bg-emerald-500/10 text-emerald-500", badge: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/20" },
     SUPERADMIN_ACCEPTED: { icon: "bg-primary/10 text-primary",       badge: "text-primary bg-primary/5 border-primary/20 dark:text-primary dark:bg-primary/10 dark:border-primary/20" },
     PENDING:             { icon: "bg-amber-500/10 text-amber-500",     badge: "text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-500/10 dark:border-amber-500/20" },
+  };
+
+  const getDeliveryIcon = (dest) => {
+    if (dest?.toLowerCase().includes("terminal")) return Navigation;
+    if (dest?.toLowerCase().includes("hub")) return Activity;
+    return FileCheck;
   };
 
   return (
@@ -144,16 +164,19 @@ const FederalDashboard = () => {
           </div>
 
           <div className="p-4 md:p-6 space-y-3 flex-1 overflow-y-auto">
-            {recentDeliveries.map((item) => {
+            {statsData.recentDeliveries.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">No recent deliveries found</div>
+            ) : statsData.recentDeliveries.map((item) => {
               const style = statusStyle[item.status] || statusStyle.PENDING;
+              const IconComp = getDeliveryIcon(item.destination);
               return (
                 <div
                   key={item.id}
                   className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl hover:bg-muted/50 transition-all group cursor-pointer border border-transparent hover:border-border"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 flex items-center justify-center transition-all">
-                      <item.icon className="h-10 w-10 text-foreground" />
+                    <div className={cn("h-12 w-12 flex items-center justify-center rounded-[14px] transition-all", style.icon)}>
+                      <IconComp className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="text-[14px] font-medium text-foreground leading-tight group-hover:text-primary transition-colors">
@@ -165,14 +188,14 @@ const FederalDashboard = () => {
                         </span>
                         <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {item.time}
+                          {new Date(item.createdAt).toLocaleString()}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="sm:text-right ml-16 md:ml-0 flex items-center sm:block gap-2 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border">
-                    <p className="text-[14px] font-bold text-foreground tabular-nums">{item.volume}</p>
+                    <p className="text-[14px] font-bold text-foreground tabular-nums">{item.volume}L</p>
                     <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 ml-auto sm:mt-1 group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
                 </div>

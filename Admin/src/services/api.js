@@ -32,9 +32,10 @@ export const loginAdmin = (credentials) => API.post("/admin-auth/login", credent
 export const changePassword = (data) => API.post("/admin-auth/change-password", data);
 
 // Federal APIs
-export const createRegionalSuperAdmin = (data) => API.post("/federal/create-super-admin", data);
-export const createOwner = (data) => API.post("/federal/create-owner", data);
+export const createRegionalSuperAdmin = (data) => API.post("/federal/create-super-admin", data, { headers: { "Content-Type": "multipart/form-data" } });
+export const createOwner = (data) => API.post("/federal/create-owner", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const addFuelDelivery = (data) => API.post("/federal/add-fuel", data);
+export const getFederalDashboardStats = () => API.get("/federal/dashboard-stats");
 export const getAllFederalFuelDeliveries = () => API.get("/federal/fuel-deliveries");
 
 // Fuel Workflow APIs

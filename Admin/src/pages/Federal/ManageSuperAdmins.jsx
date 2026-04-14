@@ -24,7 +24,7 @@ import { Switch } from "../../components/ui/Switch";
 
 const ManageSuperAdmins = () => {
   const [admins, setAdmins] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "", region: "" });
+  const [form, setForm] = useState({ name: "", email: "", region: "", document: null });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -48,17 +48,29 @@ const ManageSuperAdmins = () => {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleFileChange = (e) => setForm({ ...form, document: e.target.files[0] });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
     setError("");
     setNewCreds(null);
     setLoading(true);
+
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("email", form.email);
+    formData.append("region", form.region);
+    if (form.document) formData.append("document", form.document);
+
     try {
-      const res = await createRegionalSuperAdmin(form);
+      const res = await createRegionalSuperAdmin(formData);
       setSuccess("Regional Super Admin created successfully.");
       setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
-      setForm({ name: "", email: "", region: "" });
+      setForm({ name: "", email: "", region: "", document: null });
+      // Reset file input visually
+      const fileInput = document.getElementById("documentUpload");
+      if (fileInput) fileInput.value = "";
       fetchAdmins();
     } catch (err) {
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -195,6 +207,23 @@ const ManageSuperAdmins = () => {
               </div>
             </div>
 
+            {/* Document Upload */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                Document Upload (PDF/Image)
+              </Label>
+              <div className="relative group">
+                <Input
+                  type="file"
+                  id="documentUpload"
+                  className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                  onChange={handleFileChange}
+                  accept=".pdf,image/*"
+                  required
+                />
+              </div>
+            </div>
+
           </div>
 
           {/* Bottom Status + Submit */}
@@ -204,7 +233,11 @@ const ManageSuperAdmins = () => {
                 {loading ? "Creating..." : "Create Super Admin"}
                 {!loading && <ArrowRight className="w-4 h-4 ml-1 opacity-90" />}
               </Button>
-              <Button type="button" variant="outline" className="w-full h-11 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => setForm({ name: "", email: "", region: "" })}>
+              <Button type="button" variant="outline" className="w-full h-11 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => {
+                setForm({ name: "", email: "", region: "", document: null });
+                const fileInput = document.getElementById("documentUpload");
+                if (fileInput) fileInput.value = "";
+              }}>
                 Clear
               </Button>
             </div>

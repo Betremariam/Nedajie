@@ -24,6 +24,7 @@ model Admin {
   region              String?
   companyName         String?
   stationIds          String[]
+  documentPath        String?
   createdAt           DateTime  @default(now())
 
   vehicles        Vehicle[]

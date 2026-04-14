@@ -17,6 +17,7 @@ function generateTempPassword(length = 10) {
 export async function createRegionalSuperAdmin(req, res) {
   try {
     const { name, email, region } = req.body;
+    const documentPath = req.file ? req.file.path : null;
 
     if (!name || !email || !region) {
       return res.status(400).json({ msg: "Name, email, and region are required." });
@@ -37,6 +38,7 @@ export async function createRegionalSuperAdmin(req, res) {
         password: hashedPassword, 
         role: "super", 
         region,
+        documentPath,
         mustChangePassword: true 
       },
     });
@@ -58,9 +60,23 @@ export async function createRegionalSuperAdmin(req, res) {
 export async function createOwner(req, res) {
   try {
     const { name, email, companyName, region, stationIds } = req.body;
+    const documentPath = req.file ? req.file.path : null;
 
     if (!name || !email || !companyName || !region) {
       return res.status(400).json({ msg: "Name, email, companyName, and region are required." });
+    }
+
+    let parsedStationIds = [];
+    if (stationIds) {
+      if (typeof stationIds === 'string') {
+        try {
+          parsedStationIds = JSON.parse(stationIds);
+        } catch (e) {
+          parsedStationIds = stationIds.split(',').map(s => s.trim());
+        }
+      } else if (Array.isArray(stationIds)) {
+        parsedStationIds = stationIds;
+      }
     }
 
     const existing = await prisma.admin.findUnique({ where: { email } });
@@ -79,7 +95,8 @@ export async function createOwner(req, res) {
         role: "stationOwner",
         companyName,
         region,
-        stationIds: stationIds || [],
+        stationIds: parsedStationIds,
+        documentPath,
         mustChangePassword: true,
         isApproved: true // Federal approved them directly
       }
@@ -169,5 +186,32 @@ export async function getFederalAdmins(req, res) {
   } catch (err) {
     console.error("Get Federal Admins Error:", err);
     res.status(500).json({ msg: "Failed to fetch administrative records", error: err.message });
+  }
+}
+
+/**
+ * Federal - Get Dashboard Stats
+ */
+export async function getFederalDashboardStats(req, res) {
+  try {
+    const superAdminsCount = await prisma.admin.count({ where: { role: "super" } });
+    const stationOwnersCount = await prisma.admin.count({ where: { role: "stationOwner", isApproved: true } });
+    
+    const totalDeliveries = await prisma.fuelDelivery.count();
+
+    const recentDeliveries = await prisma.fuelDelivery.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" }
+    });
+
+    res.status(200).json({
+      superAdmins: superAdminsCount,
+      verifiedOwners: stationOwnersCount,
+      totalDeliveries,
+      recentDeliveries
+    });
+  } catch (err) {
+    console.error("Get Dashboard Stats Error:", err);
+    res.status(500).json({ msg: "Failed to fetch dashboard stats", error: err.message });
   }
 }

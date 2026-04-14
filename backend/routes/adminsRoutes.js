@@ -50,7 +50,7 @@ import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwn
 const router = express.Router();
 
 // All routes below are for super admin only
-const protectSuper = [verifyToken, authorizeRoles("super")];
+const protectSuper = [verifyToken, authorizeRoles("super", "federal")];
 const approverOnly = [verifyToken, authorizeRoles("approver"),attachAdmin];
 const registerAdmin = [verifyToken, authorizeRoles("register")];
 
