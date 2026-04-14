@@ -39,10 +39,10 @@ export const getFederalDashboardStats = () => API.get("/federal/dashboard-stats"
 export const getAllFederalFuelDeliveries = () => API.get("/federal/fuel-deliveries");
 
 // Fuel Workflow APIs
-export const getPendingDeliveriesForSuperAdmin = () => API.get("/fuel-workflow/superadmin/pending");
-export const confirmDeliveryBySuperAdmin = (deliveryId) => API.post(`/fuel-workflow/superadmin/confirm/${deliveryId}`);
+export const getPendingDeliveriesForSuperAdmin = () => API.get("/fuel-workflow/super/pending");
+export const confirmDeliveryBySuperAdmin = (deliveryId) => API.put(`/fuel-workflow/super/confirm/${deliveryId}`);
 export const getPendingDeliveriesForOwner = () => API.get("/fuel-workflow/owner/pending");
-export const acceptDeliveryByOwner = (deliveryId) => API.post(`/fuel-workflow/owner/accept/${deliveryId}`);
+export const acceptDeliveryByOwner = (deliveryId) => API.put(`/fuel-workflow/owner/accept/${deliveryId}`);
 
 // Super Admin APIs (Original but now regionally filtered in backend)
 export const getAllAdmins = () => API.get("/admins/admins");
@@ -52,5 +52,6 @@ export const getAllFuelStocks = () => API.get("/admins/fuel-stocks");
 export const getVehicles = () => API.get("/admins/vehicles");
 export const getFarmers = () => API.get("/admins/farmers");
 export const getOthers = () => API.get("/admins/others");
+export const getSuperAdminDashboardStats = () => API.get("/admins/dashboard-stats");
 
 export default API;

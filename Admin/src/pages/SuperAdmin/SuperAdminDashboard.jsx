@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import API from "../../services/api";
 import {
   Fuel,
   History,
@@ -15,23 +16,45 @@ import {
   Bell,
   Fingerprint,
   TrendingUp,
+  Package
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 const SuperAdminDashboard = () => {
+  const [statsData, setStatsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await API.get("/admins/dashboard-stats");
+        setStatsData(res.data);
+      } catch (err) {
+        console.error("Error fetching stats", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const stats = [
-    { label: "Active Nodes", value: "24", icon: MonitorDot, trend: "+2.4%", color: "emerald", desc: "Regional admin instances" },
-    { label: "Supply Points", value: "156", icon: Fuel, trend: "+4 nodes", color: "blue", desc: "Operational fuel stations" },
-    { label: "Disbursement Vol", value: "1,284", icon: Zap, trend: "+18.2%", color: "amber", desc: "Total liters today" },
+    { label: "Active Nodes", value: statsData?.activeNodes || 0, icon: MonitorDot, trend: "Live", color: "emerald", desc: "Regional admin instances" },
+    { label: "Supply Points", value: statsData?.supplyPoints || 0, icon: Fuel, trend: "Active", color: "blue", desc: "Operational fuel stations" },
+    { label: "Disbursement Vol", value: (statsData?.disbursementVolume || 0).toLocaleString(), icon: Zap, trend: "Today", color: "amber", desc: "Total liters today" },
     { label: "System Health", value: "99.9%", icon: ShieldCheck, trend: "Optimal", color: "purple", desc: "Encrypted traffic uptime" },
   ];
 
-  const recentActivity = [
-    { id: 1, type: "Registration", user: "Regional Node #04 Initialized", time: "2 mins ago", status: "success", icon: Fingerprint },
-    { id: 2, type: "Transaction", user: "Bulk Benzene Allocation Signed", time: "15 mins ago", status: "pending", icon: History },
-    { id: 3, type: "Security", user: "Global Auth Protocol Rotated", time: "1 hour ago", status: "warning", icon: ShieldCheck },
-    { id: 4, type: "System", user: "Station #42 Connectivity Loss", time: "3 hours ago", status: "error", icon: Server },
-  ];
+  const recentActivity = statsData?.recentActivity || [];
+
+  const getActivityIcon = (type) => {
+    switch (type) {
+      case "Delivery": return Package;
+      case "Registration": return Fingerprint;
+      case "Security": return ShieldCheck;
+      default: return History;
+    }
+  };
 
   const iconBg = {
     blue: "bg-primary/10 text-primary",
@@ -69,7 +92,7 @@ const SuperAdminDashboard = () => {
             <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full flex items-center justify-center bg-destructive text-destructive-foreground text-[10px] font-bold border-2 border-card">3</span>
           </button>
           <button className="h-10 px-5 flex items-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-md shadow-primary/20">
-            <Activity className="w-8 h-8 text-foreground" />
+            {loading ? <Activity className="w-8 h-8 text-foreground animate-pulse" /> : <Activity className="w-8 h-8 text-foreground" />}
           </button>
         </div>
       </div>
@@ -114,14 +137,17 @@ const SuperAdminDashboard = () => {
 
           <div className="flex-1 flex flex-col justify-between pt-6 px-4 md:px-8">
              <div className="h-[240px] flex items-end gap-3 pb-4">
-                {[45, 82, 38, 94, 61, 73, 52, 88, 69, 91, 77, 84].map((h, i) => (
+                {(statsData?.chartData || [0,0,0,0,0,0,0,0,0,0,0,0]).map((h, i) => {
+                  const maxVal = Math.max(...(statsData?.chartData || [100]));
+                  const heightPercent = maxVal === 0 ? 0 : (h / maxVal) * 100;
+                  return (
                   <div key={i} className="group/bar relative flex-1 h-full flex items-end">
-                    <div style={{ height: `${h}%` }} className="w-full bg-primary/10 rounded-t-[8px] hover:bg-primary transition-all duration-300 cursor-pointer relative" />
+                    <div style={{ height: `${heightPercent}%` }} className="w-full bg-primary/10 rounded-t-[8px] hover:bg-primary transition-all duration-300 cursor-pointer relative" />
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none bg-sidebar text-sidebar-foreground text-[11px] font-bold py-1.5 px-3 rounded-lg shadow-xl whitespace-nowrap z-20">
-                      {h}% Load
+                      {h}L Load
                     </div>
                   </div>
-                ))}
+                )})}
             </div>
           </div>
 
@@ -129,13 +155,13 @@ const SuperAdminDashboard = () => {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
                 <div>
-                  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Cumulative Sales</p>
-                  <p className="text-2xl font-black text-foreground tabular-nums">ETB 42.8M</p>
+                  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Cumulative Volume</p>
+                  <p className="text-2xl font-black text-foreground tabular-nums">{(statsData?.cumulativeSales || 0).toLocaleString()} L</p>
                 </div>
                 <div className="hidden sm:block w-px h-10 bg-border" />
                 <div>
                   <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Peak Capacity</p>
-                  <p className="text-2xl font-black text-foreground tabular-nums">94.2%</p>
+                  <p className="text-2xl font-black text-foreground tabular-nums">{statsData?.peakCapacity || 94.2}%</p>
                 </div>
               </div>
               <span className="flex items-center gap-1.5 h-10 px-4 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20 font-bold text-[12px]">
@@ -153,10 +179,14 @@ const SuperAdminDashboard = () => {
             <p className="text-muted-foreground text-[13px] font-medium mt-1">Live stream of infrastructure events.</p>
           </div>
           <div className="p-4 md:p-6 space-y-3 flex-1 overflow-y-auto">
-            {recentActivity.map((item) => (
+            {recentActivity.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center mt-4">No recent activity detected.</p>
+            ) : recentActivity.map((item) => {
+              const Icon = getActivityIcon(item.type);
+              return (
               <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-muted/50 transition-all group cursor-pointer border border-transparent hover:border-border">
                 <div className="h-12 w-12 flex items-center justify-center">
-                  <item.icon className="h-10 w-10 text-foreground" />
+                  <Icon className="h-10 w-10 text-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-bold text-foreground leading-tight truncate group-hover:text-primary transition-colors">{item.user}</p>
@@ -165,13 +195,13 @@ const SuperAdminDashboard = () => {
                     <span className="w-1 h-1 rounded-full bg-border" />
                     <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground/60">
                       <Clock className="h-3.5 w-3.5" />
-                      {item.time}
+                      {new Date(item.time).toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'})}
                     </div>
                   </div>
                 </div>
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
               </div>
-            ))}
+            )})}
           </div>
           <div className="p-4 border-t border-border bg-muted/20">
             <button className="w-full h-11 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-colors">

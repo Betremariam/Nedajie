@@ -23,7 +23,8 @@ import {
   getAllMillHouseOwners,
   getFuelDeliveries,
   uploadFuelDeliveries,
-  approveFuelDelivery
+  approveFuelDelivery,
+  getSuperAdminDashboardStats
 } from "../controllers/admins/superAdminController.js";
 
 import {
@@ -89,6 +90,7 @@ router.get("/mill-house-owners", protectSuper, getAllMillHouseOwners);
 router.post('/upload-deliveries', upload.single('xlsx'),protectSuper, uploadFuelDeliveries);
 router.get('/deliveries',protectSuper, getFuelDeliveries);
 router.patch('/approve/:id',protectSuper, approveFuelDelivery);
+router.get("/dashboard-stats", protectSuper, getSuperAdminDashboardStats);
 
 
 router.get("/unapproved-vehicles", approverOnly, getUnapprovedVehicles);

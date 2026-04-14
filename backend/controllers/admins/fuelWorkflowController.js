@@ -167,15 +167,6 @@ export async function acceptDeliveryByOwner(req, res) {
       msg: "Delivery accepted. Fuel stock updated.", 
       delivery: result 
     });
-
-    // Note: The above FuelReceived creation needs the stationId. 
-    // Prisma transactions don't easily give the ID of a created record in the same array unless structured.
-    // I'll rewrite this to ensure stationId is linked.
-
-    res.status(200).json({ 
-      msg: "Delivery accepted. Fuel stock updated.", 
-      delivery: updatedDelivery 
-    });
   } catch (err) {
     console.error("Accept Delivery Error:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
