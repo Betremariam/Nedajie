@@ -91,8 +91,8 @@ const FederalDashboard = () => {
             className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-border transition-all duration-300"
           >
             <div className="flex flex-col gap-4 relative z-10">
-              <div className="p-0 rounded-xl transition-colors">
-                <stat.icon className="h-10 w-10 text-foreground" />
+              <div className="w-12 h-12 rounded-xl bg-muted/50 border border-border flex items-center justify-center text-foreground transition-colors">
+                <stat.icon className="h-6 w-6" />
               </div>
               <div className="space-y-1">
                 <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">

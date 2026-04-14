@@ -112,7 +112,7 @@ const FuelDeliveries = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border">
           <div className="flex items-center gap-5">
-            <div className="w-14 h-14 rounded-[16px] bg-sidebar-foreground flex items-center justify-center text-sidebar-background shadow-md">
+            <div className="w-14 h-14 rounded-[16px] bg-muted/50 border border-border flex items-center justify-center text-foreground shadow-sm">
               <Truck className="w-7 h-7" />
             </div>
             <div className="space-y-1">
@@ -290,7 +290,7 @@ const FuelDeliveries = () => {
       <div className="bg-card rounded-[24px] shadow-sm border border-border overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 md:p-8 pb-4 border-b border-border">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-[12px] bg-sidebar-foreground flex items-center justify-center text-sidebar-background shadow-sm">
+            <div className="w-10 h-10 rounded-[12px] bg-muted/50 border border-border flex items-center justify-center text-foreground shadow-sm">
               <History className="w-5 h-5" />
             </div>
             <div>
