@@ -15,7 +15,6 @@ import {
   updateFuelDispensed,
   refillFuelStock,
   getFarmerDetails,
-  getFarmerDetails,
   getVehicleDetails,
   createStationOwner,
   getAllOthers,
@@ -40,6 +39,9 @@ import {
   approveMillHouseOwner,
   getUnapprovedMillHouseOwners,
   rejectMillHouseOwner,
+  getUnapprovedAttendants,
+  approveAttendant,
+  rejectAttendant,
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
 import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner } from "../controllers/admins/registerAdminController.js";
