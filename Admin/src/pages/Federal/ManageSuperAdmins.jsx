@@ -25,6 +25,7 @@ import { Switch } from "../../components/ui/Switch";
 const ManageSuperAdmins = () => {
   const [admins, setAdmins] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", region: "", document: null });
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -282,6 +283,7 @@ const ManageSuperAdmins = () => {
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Email</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Region</th>
                   <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                  <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -308,6 +310,9 @@ const ManageSuperAdmins = () => {
                         Active
                       </span>
                     </td>
+                    <td className="pr-6 md:pr-8 py-4 text-right">
+                      <Button variant="outline" size="sm" onClick={() => setSelectedAdmin(admin)} className="h-8 px-3 rounded-lg text-xs font-semibold">View</Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -315,6 +320,46 @@ const ManageSuperAdmins = () => {
           </div>
         )}
       </div>
+
+      {/* Admin Details Modal */}
+      {selectedAdmin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-lg border border-border p-6 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <h3 className="text-lg font-bold text-foreground">Admin Details</h3>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedAdmin(null)} className="h-8 w-8 rounded-full p-0">✕</Button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Full Name</p>
+                <p className="text-sm font-medium text-foreground">{selectedAdmin.name}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Email Address</p>
+                <p className="text-sm font-medium text-foreground">{selectedAdmin.email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Region / Zone</p>
+                <p className="text-sm font-medium text-foreground">{selectedAdmin.region || "—"}</p>
+              </div>
+              {selectedAdmin.documentPath && (
+                <div className="pt-2">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase mb-2">Uploaded Document</p>
+                  <a
+                    href={`http://localhost:5000/${selectedAdmin.documentPath.replace(/\\/g, '/')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center h-9 px-4 rounded-xl bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition-colors"
+                  >
+                    View Document
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

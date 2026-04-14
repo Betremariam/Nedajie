@@ -341,6 +341,7 @@ export async function getAllAdmins(req, res) {
         region: true,
         companyName: true,
         stationIds: true,
+        documentPath: true,
         isBlocked: true,
         mustChangePassword: true,
         createdAt: true,
