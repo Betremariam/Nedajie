@@ -138,7 +138,7 @@ const FuelDeliveries = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
-                Delivery Date
+                DATE
               </Label>
               <Input
                 type="date"
@@ -152,7 +152,7 @@ const FuelDeliveries = () => {
 
             {/* Customer */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5">Customer / Recipient</Label>
+              <Label className="text-[13px] font-bold text-foreground ml-0.5">CUSTOMER</Label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
@@ -170,7 +170,7 @@ const FuelDeliveries = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <Building className="w-4 h-4 text-primary" />
-                Destination (Station)
+                Destination
               </Label>
               <Input
                 className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
@@ -186,11 +186,12 @@ const FuelDeliveries = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                Sub-City
+                Citer
               </Label>
               <Input
+                type="number"
                 className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                placeholder="e.g., Bole"
+                placeholder="e.g., 20640"
                 name="citter"
                 value={form.citter}
                 onChange={handleChange}
@@ -202,7 +203,7 @@ const FuelDeliveries = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <Hash className="w-4 h-4 text-primary" />
-                FDC Number
+                FDC No
               </Label>
               <Input
                 className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-mono font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground uppercase"
@@ -218,7 +219,7 @@ const FuelDeliveries = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <Droplets className="w-4 h-4 text-primary" />
-                Volume (Liters)
+                Vol 20C
               </Label>
               <Input
                 type="number"
@@ -235,7 +236,7 @@ const FuelDeliveries = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                Region / Zone
+                Region
               </Label>
               <Input
                 className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
@@ -322,7 +323,9 @@ const FuelDeliveries = () => {
                   <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Date</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Customer</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Destination</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Volume</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Citer</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">FDC No</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Vol 20C</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Region</th>
                   <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
                 </tr>
@@ -336,16 +339,16 @@ const FuelDeliveries = () => {
                       </span>
                     </td>
                     <td className="py-4">
-                      <div className="flex flex-col">
-                        <span className="text-[14px] font-semibold text-foreground">{d.customer}</span>
-                        <span className="text-[11px] font-mono text-muted-foreground mt-0.5">#{d.fdcNo}</span>
-                      </div>
+                      <span className="text-[13px] font-semibold text-foreground">{d.customer}</span>
                     </td>
                     <td className="py-4">
-                      <div className="flex flex-col">
-                        <span className="text-[13px] font-medium text-foreground">{d.destination}</span>
-                        <span className="text-[11px] text-muted-foreground font-medium">{d.citter}</span>
-                      </div>
+                      <span className="text-[13px] font-medium text-foreground">{d.destination}</span>
+                    </td>
+                    <td className="py-4">
+                      <span className="text-[13px] font-medium text-foreground">{d.citter}</span>
+                    </td>
+                    <td className="py-4">
+                      <span className="text-[13px] font-mono font-medium text-muted-foreground">#{d.fdcNo}</span>
                     </td>
                     <td className="py-4">
                       <div className="flex items-center gap-1.5 text-[13px] font-bold text-foreground">
@@ -355,10 +358,7 @@ const FuelDeliveries = () => {
                       <span className={`text-[10px] font-semibold uppercase ${d.fuelType === "benzene" ? "text-primary" : "text-emerald-600 dark:text-emerald-400"}`}>{d.fuelType}</span>
                     </td>
                     <td className="py-4">
-                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground">
-                        <MapPin className="w-3.5 h-3.5 text-muted-foreground/50" />
-                        {d.region}
-                      </div>
+                      <span className="text-[13px] font-medium text-foreground">{d.region}</span>
                     </td>
                     <td className="pr-6 md:pr-8 py-4 text-right">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border ${statusColor(d.status)}`}>
