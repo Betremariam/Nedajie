@@ -173,8 +173,8 @@ const ApproveVehicles = () => {
       </div>
 
       {vehicles.filter(v => typeFilter === "all" || v.vehicleType === typeFilter).length === 0 ? (
-        <Card className="border-dashed border-2 py-20 bg-muted/5">
-          <CardContent className="flex flex-col items-center justify-center text-center space-y-4">
+        <div className="border border-dashed border-border py-20 bg-muted/5 rounded-[24px]">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
               <Car className="w-10 h-10 text-muted-foreground opacity-30" />
             </div>
@@ -182,8 +182,8 @@ const ApproveVehicles = () => {
               <h3 className="text-xl font-bold text-foreground">Clean Slate</h3>
               <p className="text-muted-foreground max-w-[280px]">All vehicle applications have been processed. Great job!</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <div className="grid gap-6">
           {vehicles.filter(v => typeFilter === "all" || v.vehicleType === typeFilter).map((vehicle) => (
