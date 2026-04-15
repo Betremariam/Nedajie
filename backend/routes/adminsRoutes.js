@@ -47,6 +47,7 @@ import {
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
 import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner, getRegisterDashboardStats } from "../controllers/admins/registerAdminController.js";
+import { registerAttendant } from "../controllers/admins/attendantController.js";
 
 
 const router = express.Router();
