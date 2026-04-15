@@ -53,5 +53,6 @@ export const getVehicles = () => API.get("/admins/vehicles");
 export const getFarmers = () => API.get("/admins/farmers");
 export const getOthers = () => API.get("/admins/others");
 export const getSuperAdminDashboardStats = () => API.get("/admins/dashboard-stats");
+export const getRegisterAdminDashboardStats = () => API.get("/admins/register-dashboard-stats");
 
 export default API;

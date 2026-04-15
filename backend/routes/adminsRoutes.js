@@ -45,7 +45,7 @@ import {
   rejectAttendant,
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
-import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner } from "../controllers/admins/registerAdminController.js";
+import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner, getRegisterDashboardStats } from "../controllers/admins/registerAdminController.js";
 
 
 const router = express.Router();
@@ -125,13 +125,13 @@ router.post(
   registerVehicle
 );
 
-// Removed register-attendant - only station owners can register attendants
-// router.post(
-//   "/register-attendant",
-//   registerAdmin,
-//   upload.single("document"),
-//   registerAttendant
-// );
+// Register a new attendant
+router.post(
+  "/register-attendant",
+  registerAdmin,
+  upload.single("document"),
+  registerAttendant
+);
 
 // Register a new farmer
 router.post(
@@ -155,6 +155,8 @@ router.post(
   upload.single("document"),
   registerMillHouseOwner
 );
+
+router.get("/register-dashboard-stats", registerAdmin, getRegisterDashboardStats);
 
 
 

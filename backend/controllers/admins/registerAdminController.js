@@ -199,3 +199,36 @@ export async function registerMillHouseOwner(req, res) {
   }
 }
 
+
+export async function getRegisterDashboardStats(req, res) {
+  try {
+    const adminId = req.user.id;
+    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+
+    if (!admin) {
+      return res.status(404).json({ msg: "Admin not found" });
+    }
+
+    const region = admin.region;
+    const where = region ? { region } : {};
+
+    const [vehicles, farmers, millHouseOwners, others, attendants] = await Promise.all([
+      prisma.vehicle.count({ where }),
+      prisma.farmer.count({ where }),
+      prisma.millHouseOwner.count({ where }),
+      prisma.otherUser.count({ where }),
+      prisma.fuelAttendant.count({ where }),
+    ]);
+
+    res.status(200).json({
+      vehicles,
+      farmers,
+      millHouseOwners,
+      others,
+      attendants,
+    });
+  } catch (err) {
+    console.error("Dashboard Stats Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
