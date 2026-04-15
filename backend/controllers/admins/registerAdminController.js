@@ -128,7 +128,7 @@ export async function registerFarmer(req, res) {
 
 export const registerOtherUser = async (req, res) => {
   try {
-    const { fullName, phoneNumber, fuelType, maxUses } = req.body;
+    const { fullName, phoneNumber, fuelType, maxUses, password } = req.body;
 
     if (!fullName || !phoneNumber || !fuelType) {
       return res.status(400).json({ msg: "All fields are required" });
@@ -138,11 +138,15 @@ export const registerOtherUser = async (req, res) => {
 
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
     const totalAllowedLiters = parseFloat(req.body.totalAllowedLiters) || 0;
+    
+    // Hash passcode if provided
+    const hashedPassword = password ? await hash(password, 10) : "";
 
     const newOtherUser = await prisma.otherUser.create({
       data: {
         fullName,
         phoneNumber,
+        password: hashedPassword,
         fuelType: fuelType.toLowerCase(),
         totalAllowedLiters,
         documentPath,

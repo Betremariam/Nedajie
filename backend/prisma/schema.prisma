@@ -59,7 +59,7 @@ model Vehicle {
   approvedBy      Admin?   @relation(fields: [approvedById], references: [id])
   approvedById    String?
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  updatedAt       DateTime @default(now()) @updatedAt
   transactions    FuelTransaction[]
 }
 
@@ -94,7 +94,7 @@ model Farmer {
   approvedById     String?
   isApproved       Boolean  @default(false)
   createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  updatedAt        DateTime @default(now()) @updatedAt
 
   transactions     FuelTransaction[]
 }
@@ -113,7 +113,7 @@ model FuelAttendant {
   owner        Admin?   @relation(fields: [ownerId], references: [id])
   ownerId      String?
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  updatedAt    DateTime @default(now()) @updatedAt
 }
 
 model FuelDelivery {
@@ -156,7 +156,7 @@ model FuelReceived {
   liters      Float
   date        DateTime  @default(now())
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime  @default(now()) @updatedAt
 }
 
 model FuelStock {
@@ -169,7 +169,7 @@ model FuelStock {
   litersDispensed Float    @default(0)
   date            DateTime @default(now())
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  updatedAt       DateTime @default(now()) @updatedAt
 
   fuelReceived    FuelReceived[]
 }
@@ -192,13 +192,14 @@ model FuelTransaction {
   region            String?
   date              DateTime        @default(now())
   createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  updatedAt         DateTime        @default(now()) @updatedAt
 }
 
 model OtherUser {
   id                 String   @id @default(cuid())
   fullName           String
   phoneNumber        String   @unique
+  password           String   @default("")
   fuelType           FuelType
   totalAllowedLiters Float    @default(0) // One-time bucket
   litersUsed         Float    @default(0)
@@ -211,7 +212,7 @@ model OtherUser {
   approvedBy         Admin?   @relation(fields: [approvedById], references: [id])
   approvedById       String?
   createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  updatedAt          DateTime @default(now()) @updatedAt
 
   transactions       FuelTransaction[]
 }
@@ -231,7 +232,7 @@ model MillHouseOwner {
   approvedBy     Admin?   @relation(fields: [approvedById], references: [id])
   approvedById   String?
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime @default(now()) @updatedAt
 
   transactions   FuelTransaction[]
 }
