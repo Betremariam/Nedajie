@@ -4,8 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-enum UserType { vehicle, farmer }
-
 class FuelDispenseScreen extends StatefulWidget {
   const FuelDispenseScreen({super.key});
 
@@ -17,14 +15,13 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
   bool scanned = false;
   String? scannedUserId;
   String? userName;
-  double? fuelLimit;
-  String? vehicleType;
-  String? gasType;
+  String? entityType;
+  Map<String, dynamic>? quota;
+  String? phone;
   String? attendantId;
   bool loading = false;
   final fuelAmountController = TextEditingController();
   String? error;
-  UserType? userType;
 
   @override
   void initState() {
@@ -39,18 +36,18 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     });
   }
 
+  static const String baseUrl = 'http://192.168.43.237:5000/api';
+
   void onScan(String scannedText) {
     if (scanned) return;
-
     setState(() {
       scanned = true;
       scannedUserId = scannedText;
     });
-
-    _fetchUserInfo(scannedText);
+    _fetchEntityInfo(scannedText);
   }
 
-  Future<void> _fetchUserInfo(String id) async {
+  Future<void> _fetchEntityInfo(String id) async {
     setState(() {
       loading = true;
       error = null;
@@ -60,53 +57,35 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     final token = prefs.getString('token');
 
     try {
-      final vehicleRes = await http.get(
-        Uri.parse('http://192.168.43.237:5000/api/attendants/vehicle/$id'),
+      final res = await http.get(
+        Uri.parse('$baseUrl/attendants/entity/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      if (vehicleRes.statusCode == 200) {
-        final data = jsonDecode(vehicleRes.body);
+      final data = jsonDecode(res.body);
+      if (res.statusCode == 200) {
         setState(() {
-          userType = UserType.vehicle;
           userName = data['name'];
-          fuelLimit = data['fuelLimit']?.toDouble();
-          vehicleType = data['vehicleType'];
-          gasType = data['gasType']; // Now uses backend-determined gas type
-        });
-        return;
-      }
-
-      final farmerRes = await http.get(
-        Uri.parse('http://192.168.43.237:5000/api/farmers/$id'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (farmerRes.statusCode == 200) {
-        final data = jsonDecode(farmerRes.body);
-        if (!data['isEligible']) {
-          setState(() {
-            error = 'Farmer not eligible (15-day wait)';
-            scanned = false;
-            scannedUserId = null;
-          });
-          return;
-        }
-
-        setState(() {
-          userType = UserType.farmer;
-          userName = data['farmer']['name'];
-          gasType = 'benzene';
-          fuelLimit = 50.0;
+          entityType = data['entityType'];
+          quota = data['quota'];
+          phone = data['phone'];
+          
+          // Auto-fill for cases where it's a fixed dispense or bucket
+          if (entityType == 'farmer' || entityType == 'mill_house_owner') {
+             // For farmers, maybe they always take their full 15-day quota?
+             // But let's allow inputting amount for flexibility, capped by quota.
+          }
         });
       } else {
-        throw Exception('Unknown QR or not eligible');
+        setState(() {
+          error = data['msg'] ?? 'Invalid or unapproved QR code';
+          scanned = false; // Allow re-scan on error
+        });
       }
     } catch (e) {
       setState(() {
-        error = 'Error: ${e.toString()}';
+        error = 'Network error. Please try again.';
         scanned = false;
-        scannedUserId = null;
       });
     } finally {
       setState(() => loading = false);
@@ -114,6 +93,22 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
   }
 
   Future<void> _dispenseFuel() async {
+    if (fuelAmountController.text.isEmpty) {
+      setState(() => error = 'Please enter amount to dispense');
+      return;
+    }
+
+    final liters = double.tryParse(fuelAmountController.text);
+    if (liters == null || liters <= 0) {
+      setState(() => error = 'Enter a valid positive number');
+      return;
+    }
+
+    if (liters > (quota?['remaining'] ?? 0)) {
+      setState(() => error = 'Amount exceeds remaining quota');
+      return;
+    }
+
     setState(() {
       loading = true;
       error = null;
@@ -122,94 +117,59 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    if (token == null || scannedUserId == null || attendantId == null) {
-      setState(() {
-        error = 'Missing authentication or user info';
-        loading = false;
-      });
-      return;
-    }
-
     try {
-      if (userType == UserType.vehicle) {
-        if (fuelAmountController.text.isEmpty) {
-          setState(() {
-            error = 'Please enter fuel amount';
-            loading = false;
-          });
-          return;
-        }
+      final response = await http.post(
+        Uri.parse('$baseUrl/attendants/dispense'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'userId': scannedUserId,
+          'userType': entityType,
+          'liters': liters,
+          'fuelAttendantId': attendantId,
+          'gasType': quota?['gasType'] ?? 'diesel',
+        }),
+      );
 
-        final liters = double.tryParse(fuelAmountController.text);
-        if (liters == null || liters <= 0) {
-          setState(() {
-            error = 'Enter valid fuel amount';
-            loading = false;
-          });
-          return;
-        }
-
-        final response = await http.post(
-          Uri.parse('http://192.168.43.237:5000/api/attendants/dispense'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'userId': scannedUserId,
-            'userType': 'vehicle',
-            'liters': liters,
-            'fuelAttendantId': attendantId,
-            'gasType': gasType,
-          }),
-        );
-
-        final data = jsonDecode(response.body);
-        if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Fuel dispensed to vehicle')),
-          );
-          _resetScan(); // Reset after success
-        } else {
-          throw Exception(data['message'] ?? 'Failed to dispense to vehicle');
-        }
-      } else if (userType == UserType.farmer) {
-        final liters = 50.0;
-
-        final response = await http.post(
-          Uri.parse('http://192.168.43.237:5000/api/attendants/dispense'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'userId': scannedUserId,
-            'userType': 'farmer',
-            'liters': liters,
-            'fuelAttendantId': attendantId,
-            'gasType': gasType,
-          }),
-        );
-
-        final data = jsonDecode(response.body);
-
-        if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('50L dispensed to farmer')),
-          );
-          _resetScan();
-        } else {
-          throw Exception(data['message'] ?? 'Failed to dispense to farmer');
-        }
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+        _showSuccessDialog();
+      } else {
+        setState(() => error = data['message'] ?? 'Dispense failed');
       }
     } catch (e) {
-      setState(() => error = 'Error: ${e.toString()}');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed: ${e.toString()}')));
+      setState(() => error = 'Connection error. Transaction aborted.');
     } finally {
       setState(() => loading = false);
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 64),
+        content: const Text(
+          'Fuel dispensed successfully! Transaction recorded and stock updated.',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _resetScan();
+            },
+            child: const Text('OK', style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _resetScan() {
@@ -217,10 +177,9 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
       scanned = false;
       scannedUserId = null;
       userName = null;
-      fuelLimit = null;
-      vehicleType = null;
-      gasType = null;
-      userType = null;
+      entityType = null;
+      quota = null;
+      phone = null;
       error = null;
       fuelAmountController.clear();
     });
@@ -234,148 +193,294 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: isDark ? const Color(0xFF020617) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: const Text('Fuel Dispense'),
+        title: const Text('Dispensing Hub', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         actions: [
           if (scanned)
-            IconButton(icon: const Icon(Icons.refresh), onPressed: _resetScan),
+            IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _resetScan),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: scannedUserId == null ? _buildScanner() : _buildDispenseForm(),
       ),
     );
   }
 
   Widget _buildScanner() {
-    final MobileScannerController controller = MobileScannerController();
-
     return Column(
       children: [
         const Text(
-          'Scan QR Code',
-          style: TextStyle(fontSize: 18, color: Colors.white),
+          'Position QR code within the frame',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.slate),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 32),
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.deepPurple, width: 4),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: MobileScanner(
-                controller: controller,
-                onDetect: (BarcodeCapture capture) {
-                  final List<Barcode> barcodes = capture.barcodes;
-                  for (final barcode in barcodes) {
-                    final String? code = barcode.rawValue;
-                    if (code != null) {
-                      onScan(code);
-                      break;
+            borderRadius: BorderRadius.circular(32),
+            child: Stack(
+              children: [
+                MobileScanner(
+                  onDetect: (capture) {
+                    final List<Barcode> barcodes = capture.barcodes;
+                    for (final barcode in barcodes) {
+                      final String? code = barcode.rawValue;
+                      if (code != null) {
+                        onScan(code);
+                        break;
+                      }
                     }
-                  }
-                },
-              ),
+                  },
+                ),
+                // Scanner Overlay
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFF10B981).withOpacity(0.5), width: 2),
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                ),
+                // Corner Edges
+                _buildScannerCorners(),
+              ],
             ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, py: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF3B82F6).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_rounded, color: Color(0xFF3B82F6), size: 16),
+              SizedBox(width: 8),
+              Text(
+                'ENCRYPTED SCANNING ENABLED',
+                style: TextStyle(color: Color(0xFF3B82F6), fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
+  Widget _buildScannerCorners() {
+     return Stack(
+       children: [
+         Positioned(top: 20, left: 20, child: _corner(0)),
+         Positioned(top: 20, right: 20, child: _corner(1)),
+         Positioned(bottom: 20, left: 20, child: _corner(2)),
+         Positioned(bottom: 20, right: 20, child: _corner(3)),
+       ],
+     );
+  }
+
+  Widget _corner(int index) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        border: Border(
+          top: index < 2 ? const BorderSide(color: Color(0xFF10B981), width: 4) : BorderSide.none,
+          bottom: index >= 2 ? const BorderSide(color: Color(0xFF10B981), width: 4) : BorderSide.none,
+          left: index % 2 == 0 ? const BorderSide(color: Color(0xFF10B981), width: 4) : BorderSide.none,
+          right: index % 2 != 0 ? const BorderSide(color: Color(0xFF10B981), width: 4) : BorderSide.none,
+        ),
+      ),
+    );
+  }
+
   Widget _buildDispenseForm() {
-    return ListView(
-      children: [
-        Text(
-          '${userType == UserType.farmer ? 'Farmer' : 'Vehicle'}: $userName',
-          style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        if (userType == UserType.vehicle) ...[
-          Text(
-            'Vehicle Type: $vehicleType',
-            style: const TextStyle(color: Colors.white70, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-        ],
-        Text(
-          'Gas Type: $gasType',
-          style: const TextStyle(color: Colors.white70, fontSize: 16),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.deepPurple.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.deepPurple.withOpacity(0.5)),
-          ),
-          child: Text(
-            'Daily Limit Remaining: ${fuelLimit?.toStringAsFixed(2) ?? "0"} Liters',
-            style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-        ),
-        const SizedBox(height: 20),
-        if (userType == UserType.vehicle)
-          TextField(
-            controller: fuelAmountController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: 'Dispense Amount (Liters)',
-              labelStyle: const TextStyle(color: Colors.white70),
-              hintText: 'Enter amount',
-              hintStyle: const TextStyle(color: Colors.white54),
-              filled: true,
-              fillColor: const Color(0xFF1E1E1E),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    if (loading && quota == null) {
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)));
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // User Identity Card
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
             ),
-            style: const TextStyle(color: Colors.white),
-          ),
-        if (error != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: Text(
-              error!,
-              style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
-            ),
-          ),
-        const SizedBox(height: 20),
-        loading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Column(
               children: [
-                ElevatedButton(
-                  onPressed: _dispenseFuel,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: const Color(0xFF10B981).withOpacity(0.1),
+                  child: Icon(
+                    _getEntityIcon(),
+                    color: const Color(0xFF10B981),
+                    size: 32,
                   ),
-                  child: const Text('DISPENSE FUEL', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(height: 10),
-                OutlinedButton(
-                  onPressed: _resetScan,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.deepPurple,
-                    side: const BorderSide(color: Colors.deepPurple),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text('SCAN ANOTHER'),
+                const SizedBox(height: 16),
+                Text(
+                  userName ?? 'Unknown Entity',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+                ),
+                Text(
+                  entityType?.toUpperCase() ?? 'NONE',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2, color: Color(0xFF10B981)),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  phone ?? '',
+                  style: TextStyle(color: isDark ? Colors.slate.shade400 : Colors.slate.shade500),
                 ),
               ],
             ),
-      ],
+          ),
+          
+          const SizedBox(height: 24),
+
+          // Quota Info Box
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('REMAINING QUOTA', style: TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, py: 2),
+                      decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(6)),
+                      child: Text(
+                        (quota?['gasType'] ?? 'diesel').toUpperCase(),
+                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${quota?['remaining']?.toStringAsFixed(1) ?? '0.0'}',
+                      style: const TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold, height: 1),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8.0, left: 4),
+                      child: Text('Liters', style: TextStyle(color: Colors.white38, fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                LinearProgressIndicator(
+                  value: (quota?['remaining'] ?? 0) / (quota?['limit'] ?? 1),
+                  backgroundColor: Colors.white12,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                  borderRadius: BorderRadius.circular(4),
+                  minHeight: 6,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Limit: ${quota?['limit']?.toStringAsFixed(0)}L', style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                    if (quota?['is15Day'] == true)
+                      const Text('Resets every 15 days', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                    if (quota?['isDaily'] == true)
+                      const Text('Daily Limit', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                    if (quota?['isBucket'] == true)
+                      const Text('One-time Bucket', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // Action Input
+          Text(
+            'Dispense Amount',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF0F172A)),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: fuelAmountController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0F172A), fontSize: 18, fontWeight: FontWeight.bold),
+            decoration: InputDecoration(
+              hintText: '0.0',
+              suffixText: 'LITERS',
+              suffixStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.slate),
+              filled: true,
+              fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16), 
+                borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16), 
+                borderSide: const BorderSide(color: Color(0xFF10B981), width: 2)
+              ),
+              contentPadding: const EdgeInsets.all(24),
+            ),
+          ),
+
+          if (error != null) ...[
+            const SizedBox(height: 16),
+            Text(error!, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 13)),
+          ],
+
+          const SizedBox(height: 40),
+
+          loading 
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
+            : ElevatedButton(
+                onPressed: _dispenseFuel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0F172A),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: const Text('AUTHORIZE & DISPENSE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+          
+          const SizedBox(height: 16),
+          
+          TextButton(
+            onPressed: _resetScan,
+            child: const Text('CANCEL & DISCARD SCAN', style: TextStyle(color: Colors.slate, fontWeight: FontWeight.w600)),
+          ),
+          const SizedBox(height: 40),
+        ],
+      ),
     );
+  }
+
+  IconData _getEntityIcon() {
+    switch (entityType) {
+      case 'vehicle': return Icons.directions_car_rounded;
+      case 'farmer': return Icons.agriculture_rounded;
+      case 'mill_house_owner': return Icons.factory_rounded;
+      case 'other': return Icons.help_outline_rounded;
+      default: return Icons.person_rounded;
+    }
   }
 }

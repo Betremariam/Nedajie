@@ -19,7 +19,15 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
   bool loading = false;
   String? error;
 
+  // Use a constant for base URL to make it easier to change
+  static const String baseUrl = 'http://192.168.43.237:5000/api';
+
   Future<void> login() async {
+    if (phoneController.text.isEmpty || passwordController.text.isEmpty) {
+      setState(() => error = 'Please fill in all fields');
+      return;
+    }
+
     setState(() {
       loading = true;
       error = null;
@@ -27,7 +35,7 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
 
     try {
       final res = await http.post(
-        Uri.parse('http://192.168.43.237:5000/api/attendants/login'),
+        Uri.parse('$baseUrl/attendants/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'phone': phoneController.text,
@@ -43,16 +51,17 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
         await prefs.setString('token', data['token']);
         await prefs.setString('attendantId', attendant['id']);
         await prefs.setString('stationName', attendant['stationName']);
+        await prefs.setString('attendantName', attendant['name']);
         await prefs.setString('attendant', jsonEncode(attendant));
 
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder:
-                (_) => DashboardScreen(
-                  attendantId: attendant['id'],
-                  attendantName: attendant['name'],
-                ),
+            builder: (_) => DashboardScreen(
+              attendantId: attendant['id'],
+              attendantName: attendant['name'],
+            ),
           ),
         );
       } else {
@@ -63,7 +72,7 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
       }
     } catch (e) {
       setState(() {
-        error = 'An error occurred. Please try again.';
+        error = 'Connection failed. Please check your network.';
         loading = false;
       });
     }
@@ -71,84 +80,161 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 83, 80, 80),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 79, 199, 236),
-        title: const Text(
-          'Attendant Login',
-          style: TextStyle(color: Colors.black),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark 
+              ? [const Color(0xFF0F172A), const Color(0xFF020617)]
+              : [const Color(0xFFF1F5F9), const Color(0xFFF8FAFC)],
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          reverse: true,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Welcome Back',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                CustomInputField(label: 'Phone', controller: phoneController),
-                const SizedBox(height: 15),
-                CustomInputField(
-                  label: 'Password',
-                  controller: passwordController,
-                  obscureText: true,
-                ),
-                const SizedBox(height: 20),
-                if (error != null)
-                  Text(error!, style: const TextStyle(color: Colors.redAccent)),
-                const SizedBox(height: 10),
-                loading
-                    ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.deepPurple,
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Logo & Title Header
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    )
-                    : ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          133,
-                          67,
-                          248,
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: login,
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color.fromARGB(255, 248, 247, 247),
-                        ),
+                      child: Image.asset(
+                        'assets/nedajie_logo.png',
+                        width: 80,
+                        height: 80,
                       ),
                     ),
-                const SizedBox(height: 30),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AttendantRegisterScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Don\'t have an account? Register',
-                    style: TextStyle(color: Colors.white70),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 32),
+                  Text(
+                    'Welcome back',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -1,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Login to your attendant account',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark ? Colors.slate.shade400 : Colors.slate.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+
+                  // Input Fields
+                  CustomInputField(
+                    label: 'Phone Number', 
+                    controller: phoneController,
+                    prefixIcon: Icons.phone_outlined,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomInputField(
+                    label: 'Password',
+                    controller: passwordController,
+                    obscureText: true,
+                    prefixIcon: Icons.lock_outline_rounded,
+                  ),
+
+                  // Error Message
+                  if (error != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              error!, 
+                              style: const TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.w500)
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 32),
+
+                  // Action Buttons
+                  loading
+                    ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0F172A),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: login,
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Register Link
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Don\'t have an account?',
+                        style: TextStyle(color: isDark ? Colors.slate.shade400 : Colors.slate.shade600),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const AttendantRegisterScreen()),
+                          );
+                        },
+                        child: const Text(
+                          'Register now',
+                          style: TextStyle(
+                            color: Color(0xFF10B981),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
