@@ -9,7 +9,8 @@ import {
   ArrowRight,
   CheckCircle2,
   AlertCircle,
-  Users
+  Users,
+  KeyRound
 } from "lucide-react";
 import { 
   Select, 
@@ -28,6 +29,7 @@ const OtherRegistration = () => {
   const [form, setForm] = useState({
     fullName: "",
     phoneNumber: "",
+    password: "",
     fuelType: "",
     maxUses: "-1",
     totalAllowedLiters: "",
@@ -53,6 +55,10 @@ const OtherRegistration = () => {
     setForm({ ...form, fuelType: value });
   };
 
+  const handleGeneratePassword = () => {
+    setForm({ ...form, password: Math.random().toString(36).slice(-8) });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
@@ -62,6 +68,7 @@ const OtherRegistration = () => {
     const formData = new FormData();
     formData.append("fullName", form.fullName);
     formData.append("phoneNumber", form.phoneNumber);
+    formData.append("password", form.password);
     formData.append("fuelType", form.fuelType);
     formData.append("maxUses", form.maxUses);
     formData.append("totalAllowedLiters", form.totalAllowedLiters);
@@ -73,7 +80,7 @@ const OtherRegistration = () => {
       });
 
       setSuccess("Entity registered successfully.");
-      setForm({ fullName: "", phoneNumber: "", fuelType: "", maxUses: "-1", totalAllowedLiters: "", document: null });
+      setForm({ fullName: "", phoneNumber: "", password: "", fuelType: "", maxUses: "-1", totalAllowedLiters: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -199,6 +206,30 @@ const OtherRegistration = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Passcode */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">QR Login Passcode</Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 pr-32 rounded-xl border-slate-200 bg-slate-50/50 font-black text-xl tracking-[0.3em] text-slate-600 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="••••••••"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button 
+                  type="button" 
+                  onClick={handleGeneratePassword}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors"
+                >
+                  <KeyRound className="w-3.5 h-3.5" /> Generate
+                </button>
+              </div>
+            </div>
+
             {/* Total Allowed Liters (Bucket) */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
@@ -292,7 +323,7 @@ const OtherRegistration = () => {
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({fullName:"", phoneNumber:"", fuelType:"", maxUses: "-1", totalAllowedLiters: "", document:null})}
+                onClick={() => setForm({fullName:"", phoneNumber:"", password:"", fuelType:"", maxUses: "-1", totalAllowedLiters: "", document:null})}
                >
                 Clear
                </Button>

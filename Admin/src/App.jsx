@@ -24,7 +24,6 @@ import OwnerSidebar from "./components/OwnerSidebar";
 
 // Register Admin Pages
 import RegisterAdminDashboard from "./pages/RegisterAdmin/RegisterAdminDashboard";
-import RegisterAttendant from "./pages/RegisterAdmin/RegisterAttendant";
 import RegisterVehicle from "./pages/RegisterAdmin/RegisterVehicle";
 import RegisterFarmer from "./pages/RegisterAdmin/RegisterFarmer";
 import RegisterMillHouseOwner from "./pages/RegisterAdmin/RegisterMillHouseOwner";

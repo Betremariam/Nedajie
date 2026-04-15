@@ -35,7 +35,6 @@ const RegisterVehicle = () => {
   const [form, setForm] = useState({
     ownerName: "",
     phone: "",
-    password: "",
     vehicleType: "",
     carPlate: "",
     fullCapacity: "",
@@ -61,10 +60,6 @@ const RegisterVehicle = () => {
     setForm({ ...form, vehicleType: value });
   };
 
-  const handleGeneratePassword = () => {
-    setForm({ ...form, password: Math.random().toString(36).slice(-8) });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
@@ -74,7 +69,6 @@ const RegisterVehicle = () => {
     const formData = new FormData();
     formData.append("ownerName", form.ownerName);
     formData.append("phone", form.phone);
-    formData.append("password", form.password);
     formData.append("vehicleType", form.vehicleType);
     formData.append("carPlate", form.carPlate);
     formData.append("fullCapacity", form.fullCapacity);
@@ -91,7 +85,6 @@ const RegisterVehicle = () => {
       setForm({
         ownerName: "",
         phone: "",
-        password: "",
         vehicleType: "",
         carPlate: "",
         fullCapacity: "",
@@ -184,29 +177,6 @@ const RegisterVehicle = () => {
                   onChange={handleChange}
                   required
                 />
-              </div>
-            </div>
-
-            {/* Passcode */}
-            <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">QR Login Passcode</Label>
-              <div className="relative group">
-                <Input
-                  className="h-12 pl-4 pr-32 rounded-xl border-slate-200 bg-slate-50/50 font-black text-xl tracking-[0.3em] text-slate-600 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                  placeholder="••••••••"
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                />
-                <button 
-                  type="button" 
-                  onClick={handleGeneratePassword}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg text-[12px] font-bold transition-colors"
-                >
-                  <KeyRound className="w-3.5 h-3.5" /> Generate
-                </button>
               </div>
             </div>
 
@@ -354,7 +324,7 @@ const RegisterVehicle = () => {
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({ownerName:"", phone:"", password:"", vehicleType:"", carPlate:"", fullCapacity:"", document:null})}
+                onClick={() => setForm({ownerName:"", phone:"", vehicleType:"", carPlate:"", fullCapacity:"", document:null})}
                >
                 Clear Form
                </Button>

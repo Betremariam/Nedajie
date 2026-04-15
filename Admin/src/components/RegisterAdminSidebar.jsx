@@ -6,7 +6,6 @@ const navItems = [
   { title: "Vehicles", url: "/register/vehicle-registration", icon: Car },
   { title: "Farmers", url: "/register/farmer-registration", icon: Wheat },
   { title: "Mill Houses", url: "/register/mill-house-owner-registration", icon: Home },
-  { title: "Attendants", url: "/register/register-attendant", icon: Fuel },
   { title: "Others", url: "/register/other-registration", icon: Users2 },
 ];
 
