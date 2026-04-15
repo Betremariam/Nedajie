@@ -95,8 +95,8 @@ const ApproveMillHouseOwners = () => {
         </Badge>
       </div>
 
-      {approvedOwner && (
-        <div className="bg-card border-2 border-emerald-500/20 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
+{approvedOwner && (
+        <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
           <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
@@ -111,28 +111,28 @@ const ApproveMillHouseOwners = () => {
             
             <div className="flex-1 space-y-6 text-center md:text-left">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 justify-center md:justify-start text-emerald-600">
+                <div className="flex items-center gap-2 justify-center md:justify-start text-primary">
                   <CheckCircle2 className="w-6 h-6" />
-                  <h3 className="text-2xl font-bold text-foreground">Mill Approved</h3>
+                  <h3 className="text-2xl font-bold text-foreground">Mill Site Authorized</h3>
                 </div>
-                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[11px]">Industrial fuel quota enabled</p>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">Industrial fuel quota has been activated</p>
               </div>
 
               <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Owner</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Site Owner</p>
                   <p className="font-bold text-foreground">{approvedOwner.fullName}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Allocation</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Operational Quota</p>
                   <p className="font-bold text-foreground">{approvedOwner.numberOfMills * 300}L per 15 Days</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Location</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Site Location</p>
                   <p className="font-bold text-foreground">{approvedOwner.woreda}, {approvedOwner.kebele}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">ID</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Security ID</p>
                   <p className="font-bold text-primary tabular-nums">{approvedOwner.id.slice(-8)}</p>
                 </div>
               </div>
@@ -169,8 +169,8 @@ const ApproveMillHouseOwners = () => {
               key={owner.id}
               className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all group"
             >
-              <div className="flex flex-col lg:flex-row gap-8">
-                <div className="flex-1 space-y-6">
+              <div className="flex flex-col gap-6">
+                <div className="space-y-6">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
                       <Home className="w-6 h-6" />
@@ -201,31 +201,31 @@ const ApproveMillHouseOwners = () => {
                       <p className="text-sm font-bold text-emerald-600">{owner.numberOfMills * 300}L</p>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
-                        <FileText className="w-3 h-3" /> Documentation
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5 tracking-wider">
+                        <FileText className="w-3 h-3" /> Artifacts
                       </Label>
                       {owner.documentUrl ? (
-                         <a href={owner.documentUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
-                            Verify <ArrowRight className="w-3 h-3" />
+                         <a href={owner.documentUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+                            Review <ArrowRight className="w-3 h-3" />
                          </a>
-                      ) : <p className="text-sm font-bold text-red-500">Missing</p>}
+                      ) : <p className="text-sm font-bold text-destructive">Missing</p>}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex lg:flex-col justify-end gap-3 pt-4 lg:pt-0 lg:border-l lg:pl-8 border-border">
-                  <Button 
-                    onClick={() => handleApprove(owner.id)}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold h-12 lg:h-11 shadow-md shadow-emerald-500/10"
-                  >
-                    <Check className="w-4 h-4" /> Approve
-                  </Button>
+                <div className="flex flex-row justify-end gap-3 pt-6 mt-6 border-t border-border/50">
                   <Button 
                     variant="ghost" 
                     onClick={() => handleReject(owner.id)}
-                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl gap-2 font-bold h-12 lg:h-11"
+                    className="flex-1 sm:flex-none text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl gap-2 font-bold h-11 px-6 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" /> Reject
+                    <Trash2 className="w-4 h-4" /> Reject Permit
+                  </Button>
+                  <Button 
+                    onClick={() => handleApprove(owner.id)}
+                    className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 font-bold h-11 px-8 shadow-md shadow-primary/10 transition-all active:scale-95"
+                  >
+                    <Check className="w-4 h-4" /> Approve Site
                   </Button>
                 </div>
               </div>

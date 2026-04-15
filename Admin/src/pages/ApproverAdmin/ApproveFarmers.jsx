@@ -98,13 +98,13 @@ const ApproveFarmers = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">Farmer Approvals</h1>
           <p className="text-muted-foreground font-medium">Review and authorize agricultural fuel allocations</p>
         </div>
-        <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold h-fit">
-          {farmers.length} Pending
+        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 text-[11px] font-black uppercase tracking-widest h-fit">
+          {farmers.length} Pending Approval
         </Badge>
       </div>
 
       {approvedFarmer && (
-        <div className="bg-card border-2 border-emerald-500/20 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
+        <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
           <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
@@ -119,28 +119,28 @@ const ApproveFarmers = () => {
             
             <div className="flex-1 space-y-6 text-center md:text-left">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 justify-center md:justify-start text-emerald-600">
+                <div className="flex items-center gap-2 justify-center md:justify-start text-primary">
                   <CheckCircle2 className="w-6 h-6" />
-                  <h3 className="text-2xl font-bold text-foreground">Farmer Verified</h3>
+                  <h3 className="text-2xl font-bold text-foreground">Verification Complete</h3>
                 </div>
-                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[11px]">Agricultural quota has been activated</p>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">Agricultural quota profile has been activated</p>
               </div>
 
               <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Full Name</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Full Name</p>
                   <p className="font-bold text-foreground">{approvedFarmer.fullName}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Location</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Location</p>
                   <p className="font-bold text-foreground">{approvedFarmer.woreda}, {approvedFarmer.kebele}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Phone</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Contact Phone</p>
                   <p className="font-bold text-foreground">{approvedFarmer.phoneNumber}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">ID</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Security ID</p>
                   <p className="font-bold text-primary tabular-nums">{approvedFarmer.id.slice(-8)}</p>
                 </div>
               </div>
@@ -177,10 +177,10 @@ const ApproveFarmers = () => {
               key={farmer.id}
               className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all group"
             >
-              <div className="flex flex-col lg:flex-row gap-8">
-                <div className="flex-1 space-y-6">
+              <div className="flex flex-col gap-6">
+                <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100">
+                    <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary border border-primary/10">
                       <User className="w-6 h-6" />
                     </div>
                     <div>
@@ -197,28 +197,28 @@ const ApproveFarmers = () => {
                       <p className="text-sm font-bold">{farmer.woreda}, {farmer.kebele}</p>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
-                        <Wheat className="w-3 h-3" /> Land Size
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5 tracking-wider">
+                        <Wheat className="w-3 h-3" /> Land Scale
                       </Label>
-                      <p className="text-sm font-bold text-emerald-600">{farmer.landSize} Hectares</p>
+                      <p className="text-sm font-bold text-foreground">{farmer.landSize} Hectares</p>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
-                        <FileText className="w-3 h-3" /> Credentials
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5 tracking-wider">
+                        <FileText className="w-3 h-3" /> Proofing
                       </Label>
                       {farmer.documentUrl ? (
-                         <a href={farmer.documentUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
-                            Verify <ArrowRight className="w-3 h-3" />
+                         <a href={farmer.documentUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+                            Review <ArrowRight className="w-3 h-3" />
                          </a>
-                      ) : <p className="text-sm font-bold text-red-500">Missing</p>}
+                      ) : <p className="text-sm font-bold text-destructive">Missing</p>}
                     </div>
                     <div className="space-y-1 col-span-2 sm:col-span-1">
-                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
-                        QR Expiry Date
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5 tracking-wider">
+                        Allocation Expiry
                       </Label>
                       <input 
                         type="date"
-                        className="w-full text-xs font-bold border rounded-lg p-1 px-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                        className="w-full text-xs font-bold border rounded-lg p-1.5 px-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-background"
                         value={expiryDates[farmer.id] || ""}
                         onChange={(e) => handleExpiryChange(farmer.id, e.target.value)}
                         required
@@ -227,19 +227,19 @@ const ApproveFarmers = () => {
                   </div>
                 </div>
 
-                <div className="flex lg:flex-col justify-end gap-3 pt-4 lg:pt-0 lg:border-l lg:pl-8 border-border">
-                  <Button 
-                    onClick={() => handleApprove(farmer.id)}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold h-12 lg:h-11 shadow-md shadow-emerald-500/10"
-                  >
-                    <Check className="w-4 h-4" /> Approve
-                  </Button>
+                <div className="flex flex-row justify-end gap-3 pt-6 mt-6 border-t border-border/50">
                   <Button 
                     variant="ghost" 
                     onClick={() => handleReject(farmer.id)}
-                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl gap-2 font-bold h-12 lg:h-11"
+                    className="flex-1 sm:flex-none text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl gap-2 font-bold h-11 px-6 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" /> Reject
+                    <Trash2 className="w-4 h-4" /> Reject Application
+                  </Button>
+                  <Button 
+                    onClick={() => handleApprove(farmer.id)}
+                    className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 font-bold h-11 px-8 shadow-md shadow-primary/10 transition-all active:scale-95"
+                  >
+                    <Check className="w-4 h-4" /> Approve & Activate
                   </Button>
                 </div>
               </div>
