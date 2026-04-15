@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   UserCheck,
   Car,
@@ -10,29 +10,51 @@ import {
   ArrowRight,
   ShieldAlert,
   Zap,
-  ArrowUpRight
+  ArrowUpRight,
+  Home,
+  Loader2
 } from "lucide-react";
+import { getApproverAdminDashboardStats } from "../../services/api.js";
 import { cn } from "../../lib/utils";
 
-const ApproveDashboard = () => {
+const ApproverDashboard = () => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data } = await getApproverAdminDashboardStats();
+        setStats(data);
+      } catch (err) {
+        console.error("Failed to fetch approver stats:", err);
+        setError("Could not load validation queue status.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <p className="text-muted-foreground font-medium animate-pulse">Initializing Security Hub...</p>
+    </div>
+  );
+
+  if (error) return (
+    <div className="p-8 text-center text-red-500 font-bold">{error}</div>
+  );
+
   const pendingApprovals = [
-    { label: "Drivers", count: "14", icon: Car, trend: "+3 new", priority: "high" },
-    { label: "Farmers", count: "8", icon: Wheat, trend: "Stable", priority: "medium" },
-    { label: "Attendants", count: "21", icon: Fuel, trend: "+12 new", priority: "high" },
-    { label: "Others", count: "4", icon: Users2, trend: "-2", priority: "low" },
+    { label: "Vehicles", count: stats.counts.vehicles, icon: Car, url: "/approvals/vehicles" },
+    { label: "Farmers", count: stats.counts.farmers, icon: Wheat, url: "/approvals/farmers" },
+    { label: "Mill Houses", count: stats.counts.millOwners, icon: Home, url: "/approvals/mill-house" },
+    { label: "Attendants", count: stats.counts.attendants, icon: Fuel, url: "/approvals/attendants" },
+    { label: "Others", count: stats.counts.others, icon: Users2, url: "/approvals/others" },
   ];
-
-  const recentDecisions = [
-    { name: "John Kabila", type: "Driver", status: "Approved", time: "12 mins ago" },
-    { name: "Sarah Ahmed", type: "Attendant", status: "Approved", time: "45 mins ago" },
-    { name: "Global Trans", type: "Multiple", status: "Batch Approved", time: "1 hour ago" }
-  ];
-
-  const priorityStyle = {
-    high: "text-destructive bg-destructive/10 border-destructive/20",
-    medium: "text-amber-600 bg-amber-500/10 border-amber-500/20 dark:text-amber-400",
-    low: "text-primary bg-primary/10 border-primary/20",
-  };
 
   return (
     <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto font-sans">
@@ -51,34 +73,36 @@ const ApproveDashboard = () => {
         </div>
         <div className="flex items-center gap-4">
            <div className="text-right hidden md:block">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-widest">Avg. Approval Time</p>
-              <p className="text-[15px] font-black text-foreground">4.2 Hours</p>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-widest">Global Region</p>
+              <p className="text-[15px] font-black text-foreground">Active Node</p>
            </div>
            <div className="flex items-center gap-2 py-2 px-4">
-              <Zap className="h-6 w-6 text-foreground" />
-              <span className="font-bold text-[11px] uppercase tracking-wider">High Efficiency</span>
+              <Zap className="h-6 w-6 text-primary" />
+              <span className="font-bold text-[11px] uppercase tracking-wider text-primary">High Efficiency</span>
            </div>
         </div>
       </div>
 
       {/* Metric Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-2 lg:grid-cols-5">
         {pendingApprovals.map((item, i) => (
-          <div key={i} className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-border transition-all duration-300">
+          <a href={item.url} key={i} className="bg-card rounded-[24px] shadow-sm border border-border p-6 relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
             <div className="flex flex-col gap-4 relative z-10">
               <div className="p-0 rounded-xl transition-colors">
-                <item.icon className="h-10 w-10 text-foreground" />
+                <item.icon className={cn("h-8 w-8 text-foreground group-hover:text-primary transition-colors")} />
               </div>
               <div className="space-y-1">
-                <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors truncate">
                   {item.label}
                 </h3>
-                <div className="text-3xl font-bold tracking-tight text-foreground">
+                <div className="text-2xl font-black text-foreground tabular-nums">
                   {item.count}
                 </div>
               </div>
             </div>
-          </div>
+            {/* Corner accent */}
+            <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 -mr-6 -mt-6 rounded-full group-hover:scale-150 transition-transform duration-500" />
+          </a>
         ))}
       </div>
 
@@ -101,18 +125,18 @@ const ApproveDashboard = () => {
              <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-transparent opacity-50 group-hover/batch:opacity-100 transition-opacity" />
 
              <div className="space-y-3 relative z-10">
-                <h2 className="text-6xl font-bold tracking-tight text-foreground">47 <span className="text-xl font-bold text-muted-foreground uppercase tracking-widest">Pending</span></h2>
+                <h2 className="text-7xl font-black tracking-tighter text-foreground tabular-nums">{stats.counts.total} <span className="text-xl font-bold text-muted-foreground uppercase tracking-widest">Pending</span></h2>
                 <p className="text-muted-foreground font-medium max-w-[320px] mx-auto text-[14px] leading-relaxed">
-                   A batch of driver and attendant applications is ready for final review.
+                   A batch of entity applications is ready for final review across all categories.
                 </p>
              </div>
 
              <div className="space-y-4 w-full flex flex-col items-center relative z-10">
-                  <button className="w-full max-w-[300px] h-14 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-all shadow-sm">
+                  <a href="/approvals/vehicles" className="w-full max-w-[300px] h-14 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-all shadow-sm">
                      Begin Verification Batch <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </a>
                   <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest flex items-center justify-center gap-2">
-                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Priority sorting enabled • SLA: 24h
+                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Regional Priority Active • SLA: 24h
                   </p>
              </div>
           </div>
@@ -131,27 +155,30 @@ const ApproveDashboard = () => {
           </div>
 
           <div className="p-4 md:p-6 space-y-3">
-             {recentDecisions.map((log, i) => (
+             {stats.recentDecisions.length === 0 ? (
+                 <div className="py-12 text-center">
+                     <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest opacity-50 italic">No recent decisions</p>
+                 </div>
+             ) : stats.recentDecisions.map((log, i) => (
                <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-muted/40 border border-transparent hover:border-border transition-colors group">
                   <div className="flex items-center gap-4">
-                     <div className="h-12 w-12 flex items-center justify-center font-black text-foreground text-xs shrink-0 transition-colors">
-                        <UserCheck className="h-10 w-10 text-foreground" />
+                     <div className="h-10 w-10 flex items-center justify-center font-black text-foreground text-xs shrink-0 transition-colors bg-card border border-border rounded-xl">
+                        <UserCheck className="h-5 w-5 text-emerald-500" />
                      </div>
                      <div className="min-w-0">
-                        <p className="font-semibold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">{log.name}</p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">{log.type} • {log.time}</p>
+                        <p className="font-bold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">{log.name}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">{log.type} • {new Date(log.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                      </div>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
-                      <UserCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Verified</span>
+                  <div className="flex items-center gap-1.5 shrink-0 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Verified</span>
                   </div>
                </div>
              ))}
           </div>
           <div className="p-0 mt-auto bg-muted/30 border-t border-border">
-             <button className="w-full h-14 font-semibold uppercase tracking-wider text-[11px] text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-                View Audit History <ArrowUpRight className="w-3.5 h-3.5" />
+             <button className="w-full h-14 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
+                View Policy Standards <ArrowUpRight className="w-3.5 h-3.5" />
              </button>
           </div>
         </div>
@@ -160,37 +187,37 @@ const ApproveDashboard = () => {
       {/* Policy Compliance */}
       <div className="bg-card rounded-[24px] shadow-sm border border-border overflow-hidden">
          <div className="p-6 md:p-8 border-b border-border pb-4">
-           <h2 className="text-xl font-semibold tracking-tight text-foreground">Policy Compliance</h2>
-           <p className="text-muted-foreground text-[13px] font-medium mt-1">Performance tracking and standard deviations.</p>
+           <h2 className="text-xl font-semibold tracking-tight text-foreground">Validation Compliance</h2>
+           <p className="text-muted-foreground text-[13px] font-medium mt-1">Audit integrity and verification accuracy.</p>
          </div>
          <div className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 lg:gap-12">
             <div className="flex-1 space-y-6">
-               <p className="text-[14px] font-medium text-muted-foreground leading-relaxed max-w-2xl">
-                 Your approval rate matches the standard deviation for the last quarter.
-                 <span className="text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded-md mx-1"> 90% accuracy </span> maintained across all verification steps.
-                 Ensure all document watermarks are verified before final commit.
+               <p className="text-[14px] font-medium text-muted-foreground leading-relaxed max-w-2xl px-1">
+                 All approvals are multi-factor verified.
+                 <span className="text-primary font-bold bg-primary/10 px-1.5 py-0.5 rounded-md mx-1 whitespace-nowrap"> Audit Trail Active </span> 
+                 Real-time synchronization ensures regional distribution centers receive verified credentials instantly.
                </p>
                <div className="flex items-center gap-8 bg-muted/40 w-fit p-4 rounded-2xl border border-border">
                   <div className="flex flex-col gap-1">
-                     <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Last 30 Days</span>
-                     <span className="text-xl font-black text-foreground tabular-nums">1,204 Approvals</span>
+                     <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Verification Node</span>
+                     <span className="text-xl font-black text-foreground tabular-nums">Active Security</span>
                   </div>
                   <div className="w-[1px] h-10 bg-border" />
                   <div className="flex flex-col gap-1">
-                     <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Error Margin</span>
-                     <span className="text-xl font-black text-emerald-500 tabular-nums">0.4%</span>
+                     <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Integrity Score</span>
+                     <span className="text-xl font-black text-emerald-500 tabular-nums">1.0</span>
                   </div>
                </div>
             </div>
 
             <div className="h-40 w-40 relative shrink-0 flex items-center justify-center">
                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="80" cy="80" r="70" className="stroke-muted" strokeWidth="16" fill="transparent" />
-                  <circle cx="80" cy="80" r="70" className="stroke-primary" strokeWidth="16" strokeDasharray="439.8" strokeDashoffset="43.98" fill="transparent" strokeLinecap="round" />
+                  <circle cx="80" cy="80" r="70" className="stroke-muted" strokeWidth="12" fill="transparent" />
+                  <circle cx="80" cy="80" r="70" className="stroke-primary" strokeWidth="12" strokeDasharray="439.8" strokeDashoffset="43.98" fill="transparent" strokeLinecap="round" />
                </svg>
                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="font-black text-3xl tracking-tighter text-foreground tabular-nums">90%</span>
-                  <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">Accuracy</span>
+                  <span className="font-black text-3xl tracking-tighter text-foreground tabular-nums">100%</span>
+                  <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-wider">Secure</span>
                </div>
             </div>
          </div>
@@ -200,4 +227,4 @@ const ApproveDashboard = () => {
   );
 };
 
-export default ApproveDashboard;
+export default ApproverDashboard;

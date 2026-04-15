@@ -291,3 +291,70 @@ export async function rejectMillHouseOwner(req, res) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
+
+export async function getApproverDashboardStats(req, res) {
+  try {
+    const adminId = req.admin.id;
+    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+
+    if (!admin) return res.status(404).json({ msg: "Admin not found" });
+
+    const where = { isApproved: false };
+    if (admin.region) where.region = admin.region;
+
+    const [
+      pendingVehicles,
+      pendingFarmers,
+      pendingAttendants,
+      pendingOthers,
+      pendingMillOwners,
+    ] = await Promise.all([
+      prisma.vehicle.count({ where }),
+      prisma.farmer.count({ where }),
+      prisma.fuelAttendant.count({ where }),
+      prisma.otherUser.count({ where }),
+      prisma.millHouseOwner.count({ where }),
+    ]);
+
+    // Fetch recent decisions (approvals)
+    // We'll collect the last few from each category and sort them centrally
+    const recentWhere = { isApproved: true };
+    if (admin.region) recentWhere.region = admin.region;
+
+    const [
+      recentVehicles,
+      recentFarmers,
+      recentAttendants,
+      recentOthers,
+      recentMillOwners,
+    ] = await Promise.all([
+      prisma.vehicle.findMany({ where: recentWhere, take: 5, orderBy: { updatedAt: 'desc' } }),
+      prisma.farmer.findMany({ where: recentWhere, take: 5, orderBy: { updatedAt: 'desc' } }),
+      prisma.fuelAttendant.findMany({ where: recentWhere, take: 5, orderBy: { updatedAt: 'desc' } }),
+      prisma.otherUser.findMany({ where: recentWhere, take: 5, orderBy: { updatedAt: 'desc' } }),
+      prisma.millHouseOwner.findMany({ where: recentWhere, take: 5, orderBy: { updatedAt: 'desc' } }),
+    ]);
+
+    const allRecent = [
+      ...recentVehicles.map(v => ({ name: v.ownerName, type: "Vehicle", time: v.updatedAt })),
+      ...recentFarmers.map(f => ({ name: f.fullName, type: "Farmer", time: f.updatedAt })),
+      ...recentAttendants.map(a => ({ name: a.name, type: "Attendant", time: a.updatedAt })),
+      ...recentOthers.map(o => ({ name: o.fullName, type: "Other", time: o.updatedAt })),
+      ...recentMillOwners.map(m => ({ name: m.fullName, type: "Mill Owner", time: m.updatedAt })),
+    ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 5);
+
+    res.status(200).json({
+      counts: {
+        vehicles: pendingVehicles,
+        farmers: pendingFarmers,
+        attendants: pendingAttendants,
+        others: pendingOthers,
+        millOwners: pendingMillOwners,
+        total: pendingVehicles + pendingFarmers + pendingAttendants + pendingOthers + pendingMillOwners
+      },
+      recentDecisions: allRecent
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}

@@ -43,6 +43,7 @@ import {
   getUnapprovedAttendants,
   approveAttendant,
   rejectAttendant,
+  getApproverDashboardStats
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
 import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner, getRegisterDashboardStats } from "../controllers/admins/registerAdminController.js";
@@ -116,6 +117,8 @@ router.delete('/reject-other-user/:otherId', approverOnly, rejectOther);
 router.get("/unapproved-mill-house-owners", approverOnly, getUnapprovedMillHouseOwners);
 router.put("/approve-mill-house-owner/:ownerId", approverOnly, approveMillHouseOwner);
 router.delete('/reject-mill-house-owner/:ownerId', approverOnly, rejectMillHouseOwner);
+
+router.get("/approver-dashboard-stats", approverOnly, getApproverDashboardStats);
 
 // Register a new vehicle
 router.post(

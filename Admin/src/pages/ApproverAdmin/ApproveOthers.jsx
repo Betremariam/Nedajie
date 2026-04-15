@@ -1,17 +1,35 @@
 import React, { useEffect, useState, useRef } from "react";
 import API from "../../services/api";
 import { QRCodeCanvas } from "qrcode.react";
+import { 
+  CheckCircle2, 
+  Loader2, 
+  UserPlus, 
+  PhoneCall, 
+  Droplets, 
+  ShieldCheck, 
+  FileText, 
+  Download,
+  Trash2,
+  Check,
+  Users,
+  Award,
+  ArrowRight
+} from "lucide-react";
+import { Badge } from "../../components/ui/Badge";
+import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
 
 const ApproveOthers = () => {
-  const [others, setOthers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [approvedUser, setApprovedUser] = useState(null);
   const qrRef = useRef();
 
-  const fetchOthers = async () => {
+  const fetchUsers = async () => {
     try {
       const { data } = await API.get("/admins/unapproved-other-user");
-      setOthers(data);
+      setUsers(data);
     } catch (error) {
       console.error("Error fetching other users:", error);
     } finally {
@@ -22,19 +40,20 @@ const ApproveOthers = () => {
   const handleApprove = async (id) => {
     try {
       const { data } = await API.put(`/admins/approve-other-user/${id}`);
-      setOthers((prev) => prev.filter((user) => user.id !== id));
-      setApprovedUser(data.other);
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      setApprovedUser(data.other || data.user); // Backend might return .other or .user
     } catch (error) {
-      console.error("Error approving other user:", error);
+      console.error("Error approving user:", error);
     }
   };
 
   const handleReject = async (id) => {
+    if(!window.confirm("Reject and delete this entity request?")) return;
     try {
       await API.delete(`/admins/reject-other-user/${id}`);
-      setOthers((prev) => prev.filter((user) => user.id !== id));
+      setUsers((prev) => prev.filter((u) => u.id !== id));
     } catch (error) {
-      console.error("Error rejecting other user:", error);
+      console.error("Error rejecting user:", error);
     }
   };
 
@@ -48,45 +67,39 @@ const ApproveOthers = () => {
 
     const link = document.createElement("a");
     link.href = pngUrl;
-    link.download = `other-user-qr-${approvedUser.id}.png`;
+    link.download = `entity-qr-${approvedUser.fullName}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   useEffect(() => {
-    fetchOthers();
+    fetchUsers();
   }, []);
 
   if (loading) return (
-    <div className="flex justify-center items-center p-8">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Loading users...</p>
-      </div>
+    <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <p className="text-muted-foreground font-medium">Scanning identity manifest...</p>
     </div>
   );
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Approve Other Users</h1>
-        <p className="text-muted-foreground">Review and approve pending user registrations</p>
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Entity Approvals</h1>
+          <p className="text-muted-foreground font-medium">Review and authorize auxiliary resource consumers</p>
+        </div>
+        <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold h-fit">
+          {users.length} Pending
+        </Badge>
       </div>
 
       {approvedUser && (
-        <div className="mb-8 bg-card rounded-xl shadow-lg border border-purple-200 p-8 max-w-md mx-auto">
-          <div ref={qrRef} className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-foreground">User Approved Successfully</h3>
-            </div>
-            
-            <div className="bg-muted/50 rounded-lg p-4 mb-4">
+        <div className="bg-card border-2 border-emerald-500/20 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
+          <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
                 value={approvedUser.id}
                 size={200}
@@ -97,92 +110,118 @@ const ApproveOthers = () => {
               />
             </div>
             
-            <div className="bg-purple-50 rounded-lg p-4 mb-6">
-              <p className="font-semibold text-foreground">{approvedUser.fullName}</p>
-              <p className="text-sm text-muted-foreground mt-1">User ID: {approvedUser.id}</p>
-              <p className="text-sm text-muted-foreground">Fuel Type: {approvedUser.fuelType}</p>
-              <p className="text-sm font-bold text-purple-700 mt-1">
-                 Limit: {approvedUser.maxUses === -1 ? 'Unlimited' : `${approvedUser.maxUses} Uses`}
-              </p>
+            <div className="flex-1 space-y-6 text-center md:text-left">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 justify-center md:justify-start text-emerald-600">
+                  <CheckCircle2 className="w-6 h-6" />
+                  <h3 className="text-2xl font-bold text-foreground">Entity Authorized</h3>
+                </div>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[11px]">Allocation profile has been generated</p>
+              </div>
+
+              <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Entity Name</p>
+                  <p className="font-bold text-foreground">{approvedUser.fullName}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Fuel Type</p>
+                  <Badge variant="outline" className="font-bold uppercase bg-primary/5 border-primary/20 text-primary">{approvedUser.fuelType}</Badge>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Usage Limit</p>
+                  <p className="font-bold text-foreground">{approvedUser.maxUses === -1 ? "Unlimited" : approvedUser.maxUses + " Uses"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">ID</p>
+                  <p className="font-bold text-primary tabular-nums">{approvedUser.id.slice(-8)}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={handleDownload} className="h-12 px-8 rounded-xl gap-2 font-bold shadow-lg shadow-primary/20">
+                  <Download className="w-5 h-5" /> Download Identity QR
+                </Button>
+                <Button variant="outline" onClick={() => setApprovedUser(null)} className="h-12 px-8 rounded-xl font-bold">
+                  Dismiss
+                </Button>
+              </div>
             </div>
-            
-            <button
-              onClick={handleDownload}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2 mx-auto"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download QR Code
-            </button>
           </div>
         </div>
       )}
 
-      {others.length === 0 ? (
-        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
-          <div className="text-6xl mb-4">👥</div>
-          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Pending Users</h3>
-          <p className="text-muted-foreground">All user applications have been reviewed and processed.</p>
+      {users.length === 0 ? (
+        <div className="border border-dashed border-border py-20 bg-muted/5 rounded-[24px]">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+              <Users className="w-10 h-10 text-muted-foreground opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-foreground">Clean Slate</h3>
+              <p className="text-muted-foreground max-w-[280px]">No auxiliary entity applications found in your region.</p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid gap-6">
-          {others.map((user) => (
+          {users.map((user) => (
             <div
               key={user.id}
-              className="bg-card rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-shadow duration-200"
+              className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all group"
             >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-purple-600 font-semibold text-lg">
-                        {user.fullName?.charAt(0) || 'U'}
-                      </span>
+              <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex-1 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                      <UserPlus className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground">{user.fullName}</h3>
-                      <p className="text-muted-foreground">{user.phoneNumber}</p>
+                      <h3 className="text-lg font-bold text-foreground">{user.fullName}</h3>
+                      <p className="text-sm text-muted-foreground font-medium">{user.phoneNumber}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                       </svg>
-                       <span className="text-muted-foreground"><strong>Fuel Type:</strong> {user.fuelType}</span>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <Droplets className="w-3 h-3" /> Priority
+                      </Label>
+                      <p className="text-sm font-bold uppercase">{user.fuelType}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                       <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                       </svg>
-                       <span className="text-sm font-bold text-purple-600">
-                         Usage Limit: {user.maxUses === -1 ? 'Unlimited' : `${user.maxUses} Uses`}
-                       </span>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <Award className="w-3 h-3" /> Usage
+                      </Label>
+                      <p className="text-sm font-bold uppercase">{user.maxUses === -1 ? "Unlimited" : user.maxUses + "X"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <FileText className="w-3 h-3" /> Credentials
+                      </Label>
+                      {user.documentPath ? (
+                         <a href={user.documentPath} target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
+                            Verify <ArrowRight className="w-3 h-3" />
+                         </a>
+                      ) : <p className="text-sm font-bold text-red-500">Missing</p>}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button
+                <div className="flex lg:flex-col justify-end gap-3 pt-4 lg:pt-0 lg:border-l lg:pl-8 border-border">
+                  <Button 
                     onClick={() => handleApprove(user.id)}
-                    className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold h-12 lg:h-11 shadow-md shadow-emerald-500/10"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Approve
-                  </button>
-                  <button
+                    <Check className="w-4 h-4" /> Approve
+                  </Button>
+                  <Button 
+                    variant="ghost" 
                     onClick={() => handleReject(user.id)}
-                    className="bg-slate-100 text-slate-600 px-6 py-3 rounded-lg hover:bg-slate-200 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl gap-2 font-bold h-12 lg:h-11"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Reject
-                  </button>
+                    <Trash2 className="w-4 h-4" /> Reject
+                  </Button>
                 </div>
               </div>
             </div>

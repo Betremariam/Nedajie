@@ -1,7 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
 import API from "../../services/api";
 import { QRCodeCanvas } from "qrcode.react";
-import { Home, PhoneCall, Landmark, MapPin, Droplets, ShieldCheck, CheckCircle2, X } from "lucide-react";
+import { 
+  Home, 
+  PhoneCall, 
+  MapPin, 
+  Droplets, 
+  CheckCircle2, 
+  X, 
+  Loader2, 
+  FileText, 
+  Download,
+  Trash2,
+  Check,
+  ArrowRight
+} from "lucide-react";
+import { Badge } from "../../components/ui/Badge";
+import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
 
 const ApproveMillHouseOwners = () => {
   const [owners, setOwners] = useState([]);
@@ -31,6 +47,7 @@ const ApproveMillHouseOwners = () => {
   };
 
   const handleReject = async (id) => {
+    if(!window.confirm("Reject and delete this mill house application?")) return;
     try {
       await API.delete(`/admins/reject-mill-house-owner/${id}`);
       setOwners((prev) => prev.filter((o) => o.id !== id));
@@ -49,7 +66,7 @@ const ApproveMillHouseOwners = () => {
 
     const link = document.createElement("a");
     link.href = pngUrl;
-    link.download = `mill-owner-qr-${approvedOwner.id}.png`;
+    link.download = `mill-owner-qr-${approvedOwner.fullName}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -60,41 +77,31 @@ const ApproveMillHouseOwners = () => {
   }, []);
 
   if (loading) return (
-    <div className="flex justify-center items-center p-8">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Loading mill house owners...</p>
-      </div>
+    <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <p className="text-muted-foreground font-medium">Reviewing industrial permits...</p>
     </div>
   );
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Approve Mill House Owners</h1>
-        <p className="text-muted-foreground">Review and approve pending milling operation registrations</p>
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Mill House Approvals</h1>
+          <p className="text-muted-foreground font-medium">Authorize fuel allocations for milling operations</p>
+        </div>
+        <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold h-fit">
+          {owners.length} Pending
+        </Badge>
       </div>
 
       {approvedOwner && (
-        <div className="mb-8 bg-card rounded-xl shadow-lg border border-primary/20 p-8 max-w-md mx-auto">
-          <div ref={qrRef} className="text-center relative">
-            <button 
-                onClick={() => setApprovedOwner(null)}
-                className="absolute -top-4 -right-4 p-2 bg-muted rounded-full hover:bg-muted/80 transition-colors"
-            >
-                <X className="w-4 h-4" />
-            </button>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground">Owner Approved</h3>
-            </div>
-            
-            <div className="bg-white rounded-lg p-4 mb-4 shadow-sm inline-block">
+        <div className="bg-card border-2 border-emerald-500/20 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
+          <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
                 value={approvedOwner.id}
-                size={220}
+                size={200}
                 bgColor="#ffffff"
                 fgColor="#1f2937"
                 level="H"
@@ -102,105 +109,118 @@ const ApproveMillHouseOwners = () => {
               />
             </div>
             
-            <div className="bg-primary/5 rounded-xl p-4 mb-6 border border-primary/10">
-              <p className="font-bold text-lg text-foreground">{approvedOwner.fullName}</p>
-              <div className="flex items-center justify-center gap-2 mt-2 text-sm text-muted-foreground">
-                 <Badge variant="secondary" className="font-bold">{approvedOwner.dailyLimit}L / {approvedOwner.fuelType}</Badge>
+            <div className="flex-1 space-y-6 text-center md:text-left">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 justify-center md:justify-start text-emerald-600">
+                  <CheckCircle2 className="w-6 h-6" />
+                  <h3 className="text-2xl font-bold text-foreground">Mill Approved</h3>
+                </div>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[11px]">Industrial fuel quota enabled</p>
               </div>
-              <p className="text-xs text-muted-foreground mt-2 font-mono opacity-60">ID: {approvedOwner.id}</p>
+
+              <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Owner</p>
+                  <p className="font-bold text-foreground">{approvedOwner.fullName}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Allocation</p>
+                  <p className="font-bold text-foreground">{approvedOwner.dailyLimit}L ({approvedOwner.fuelType})</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Location</p>
+                  <p className="font-bold text-foreground">{approvedOwner.woreda}, {approvedOwner.kebele}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">ID</p>
+                  <p className="font-bold text-primary tabular-nums">{approvedOwner.id.slice(-8)}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={handleDownload} className="h-12 px-8 rounded-xl gap-2 font-bold shadow-lg shadow-primary/20">
+                  <Download className="w-5 h-5" /> Download Site QR
+                </Button>
+                <Button variant="outline" onClick={() => setApprovedOwner(null)} className="h-12 px-8 rounded-xl font-bold">
+                  Dismiss
+                </Button>
+              </div>
             </div>
-            
-            <button
-              onClick={handleDownload}
-              className="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-all duration-200 font-bold shadow-md shadow-primary/20 flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download Official QR
-            </button>
           </div>
         </div>
       )}
 
       {owners.length === 0 ? (
-        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
-          <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
-             <Home className="w-10 h-10 opacity-20" />
+        <div className="border border-dashed border-border py-20 bg-muted/5 rounded-[24px]">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+              <Home className="w-10 h-10 text-muted-foreground opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-foreground">Operational Excellence</h3>
+              <p className="text-muted-foreground max-w-[280px]">All mill house permits have been reviewed.</p>
+            </div>
           </div>
-          <h3 className="text-xl font-bold text-muted-foreground mb-2">No Pending Approvals</h3>
-          <p className="text-muted-foreground">All mill house registration requests have been processed.</p>
         </div>
       ) : (
         <div className="grid gap-6">
           {owners.map((owner) => (
             <div
               key={owner.id}
-              className="bg-card rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-all duration-200 group"
+              className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all group"
             >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <span className="text-primary font-bold text-lg">
-                        {owner.fullName?.charAt(0) || 'M'}
-                      </span>
+              <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex-1 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                      <Home className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-foreground">{owner.fullName}</h3>
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                         <PhoneCall className="w-3.5 h-3.5" />
-                         {owner.phoneNumber}
-                      </div>
+                      <p className="text-sm text-muted-foreground font-medium">{owner.phoneNumber}</p>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                     <div className="space-y-1">
-                       <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Location</p>
-                       <div className="flex items-center gap-2 text-sm text-foreground/80">
-                         <MapPin className="w-3.5 h-3.5 text-primary" />
-                         {owner.woreda}, {owner.kebele}
-                       </div>
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3" /> Location
+                      </Label>
+                      <p className="text-sm font-bold truncate">{owner.woreda}</p>
                     </div>
                     <div className="space-y-1">
-                       <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Allocation</p>
-                       <div className="flex items-center gap-2 text-sm text-foreground/80">
-                         <Droplets className="w-3.5 h-3.5 text-primary" />
-                         {owner.dailyLimit}L ({owner.fuelType})
-                       </div>
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <Droplets className="w-3 h-3" /> Allocation
+                      </Label>
+                      <p className="text-sm font-bold">{owner.dailyLimit}L</p>
                     </div>
-                    {owner.documentPath && (
-                       <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Credentials</p>
-                          <a 
-                            href={owner.documentUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-xs text-primary font-bold hover:underline flex items-center gap-1.5"
-                          >
-                             View Supporting Docs
-                          </a>
-                       </div>
-                    )}
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <FileText className="w-3 h-3" /> Documentation
+                      </Label>
+                      {owner.documentUrl ? (
+                         <a href={owner.documentUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
+                            Verify <ArrowRight className="w-3 h-3" />
+                         </a>
+                      ) : <p className="text-sm font-bold text-red-500">Missing</p>}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
+                <div className="flex lg:flex-col justify-end gap-3 pt-4 lg:pt-0 lg:border-l lg:pl-8 border-border">
+                  <Button 
                     onClick={() => handleApprove(owner.id)}
-                    className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/90 transition-all duration-200 font-bold shadow-md shadow-primary/20 flex items-center justify-center gap-2"
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold h-12 lg:h-11 shadow-md shadow-emerald-500/10"
                   >
-                    <CheckCircle2 className="w-5 h-5" />
-                    Approve
-                  </button>
-                  <button
+                    <Check className="w-4 h-4" /> Approve
+                  </Button>
+                  <Button 
+                    variant="ghost" 
                     onClick={() => handleReject(owner.id)}
-                    className="bg-muted text-muted-foreground px-6 py-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200 font-bold border border-transparent hover:border-red-200 flex items-center justify-center gap-2"
+                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl gap-2 font-bold h-12 lg:h-11"
                   >
-                    <X className="w-5 h-5" />
-                    Reject
-                  </button>
+                    <Trash2 className="w-4 h-4" /> Reject
+                  </Button>
                 </div>
               </div>
             </div>

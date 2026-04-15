@@ -1,6 +1,22 @@
 import React, { useEffect, useState, useRef } from "react";
 import API from "../../services/api";
 import { QRCodeCanvas } from "qrcode.react";
+import { 
+  CheckCircle2, 
+  Loader2, 
+  User, 
+  PhoneCall, 
+  MapPin, 
+  FileText, 
+  Download,
+  Trash2,
+  Check,
+  Wheat,
+  ArrowRight
+} from "lucide-react";
+import { Badge } from "../../components/ui/Badge";
+import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
 
 const ApproveFarmers = () => {
   const [farmers, setFarmers] = useState([]);
@@ -23,13 +39,14 @@ const ApproveFarmers = () => {
     try {
       const { data } = await API.put(`/admins/approve-farmer/${id}`);
       setFarmers((prev) => prev.filter((f) => f.id !== id));
-      setApprovedFarmer(data.farmer); // Save farmer info for QR
+      setApprovedFarmer(data.farmer);
     } catch (error) {
       console.error("Error approving farmer:", error);
     }
   };
 
   const handleReject = async (id) => {
+    if(!window.confirm("Reject and delete this farmer application?")) return;
     try {
       await API.delete(`/admins/reject-farmer/${id}`);
       setFarmers((prev) => prev.filter((f) => f.id !== id));
@@ -48,7 +65,7 @@ const ApproveFarmers = () => {
 
     const link = document.createElement("a");
     link.href = pngUrl;
-    link.download = `farmer-qr-${approvedFarmer.id}.png`;
+    link.download = `farmer-qr-${approvedFarmer.fullName}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -59,34 +76,28 @@ const ApproveFarmers = () => {
   }, []);
 
   if (loading) return (
-    <div className="flex justify-center items-center p-8">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Loading farmers...</p>
-      </div>
+    <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+      <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <p className="text-muted-foreground font-medium">Loading farmer registry...</p>
     </div>
   );
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Approve Farmers</h1>
-        <p className="text-muted-foreground">Review and approve pending farmer registrations</p>
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Farmer Approvals</h1>
+          <p className="text-muted-foreground font-medium">Review and authorize agricultural fuel allocations</p>
+        </div>
+        <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold h-fit">
+          {farmers.length} Pending
+        </Badge>
       </div>
 
       {approvedFarmer && (
-        <div className="mb-8 bg-card rounded-xl shadow-lg border border-green-200 p-8 max-w-md mx-auto">
-          <div ref={qrRef} className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-foreground">Farmer Approved Successfully</h3>
-            </div>
-            
-            <div className="bg-muted/50 rounded-lg p-4 mb-4">
+        <div className="bg-card border-2 border-emerald-500/20 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
+          <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
                 value={approvedFarmer.id}
                 size={200}
@@ -97,88 +108,112 @@ const ApproveFarmers = () => {
               />
             </div>
             
-            <div className="bg-green-50 rounded-lg p-4 mb-6">
-              <p className="font-semibold text-foreground">{approvedFarmer.fullName}</p>
-              <p className="text-sm text-muted-foreground mt-1">Farmer ID: {approvedFarmer.id}</p>
-              <p className="text-sm text-muted-foreground">{approvedFarmer.woreda} • {approvedFarmer.kebele}</p>
+            <div className="flex-1 space-y-6 text-center md:text-left">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 justify-center md:justify-start text-emerald-600">
+                  <CheckCircle2 className="w-6 h-6" />
+                  <h3 className="text-2xl font-bold text-foreground">Farmer Verified</h3>
+                </div>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[11px]">Agricultural quota has been activated</p>
+              </div>
+
+              <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Full Name</p>
+                  <p className="font-bold text-foreground">{approvedFarmer.fullName}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Location</p>
+                  <p className="font-bold text-foreground">{approvedFarmer.woreda}, {approvedFarmer.kebele}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Phone</p>
+                  <p className="font-bold text-foreground">{approvedFarmer.phoneNumber}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">ID</p>
+                  <p className="font-bold text-primary tabular-nums">{approvedFarmer.id.slice(-8)}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={handleDownload} className="h-12 px-8 rounded-xl gap-2 font-bold shadow-lg shadow-primary/20">
+                  <Download className="w-5 h-5" /> Download Farmer QR
+                </Button>
+                <Button variant="outline" onClick={() => setApprovedFarmer(null)} className="h-12 px-8 rounded-xl font-bold">
+                  Dismiss
+                </Button>
+              </div>
             </div>
-            
-            <button
-              onClick={handleDownload}
-              className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2 mx-auto"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download QR Code
-            </button>
           </div>
         </div>
       )}
 
       {farmers.length === 0 ? (
-        <div className="bg-card rounded-xl shadow-sm border border-border p-12 text-center">
-          <div className="text-6xl mb-4">👨‍🌾</div>
-          <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Pending Farmers</h3>
-          <p className="text-muted-foreground">All farmer applications have been reviewed and processed.</p>
+        <div className="border border-dashed border-border py-20 bg-muted/5 rounded-[24px]">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+              <Wheat className="w-10 h-10 text-muted-foreground opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-foreground">All Caught Up</h3>
+              <p className="text-muted-foreground max-w-[280px]">No pending farmer applications in your regional queue.</p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid gap-6">
           {farmers.map((farmer) => (
             <div
               key={farmer.id}
-              className="bg-card rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-shadow duration-200"
+              className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all group"
             >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 font-semibold text-lg">
-                        {farmer.fullName?.charAt(0) || 'F'}
-                      </span>
+              <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex-1 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 border border-emerald-100">
+                      <User className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground">{farmer.fullName}</h3>
-                      <p className="text-muted-foreground">{farmer.phoneNumber}</p>
+                      <h3 className="text-lg font-bold text-foreground">{farmer.fullName}</h3>
+                      <p className="text-sm text-muted-foreground font-medium">{farmer.phoneNumber}</p>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span className="text-muted-foreground"><strong>Woreda:</strong> {farmer.woreda}</span>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div className="space-y-1 col-span-2">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3" /> Area
+                      </Label>
+                      <p className="text-sm font-bold">{farmer.woreda}, {farmer.kebele}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                      <span className="text-muted-foreground"><strong>Kebele:</strong> {farmer.kebele}</span>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <FileText className="w-3 h-3" /> Credentials
+                      </Label>
+                      {farmer.documentUrl ? (
+                         <a href={farmer.documentUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-600 hover:underline flex items-center gap-1">
+                            Verify <ArrowRight className="w-3 h-3" />
+                         </a>
+                      ) : <p className="text-sm font-bold text-red-500">Missing</p>}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button
+                <div className="flex lg:flex-col justify-end gap-3 pt-4 lg:pt-0 lg:border-l lg:pl-8 border-border">
+                  <Button 
                     onClick={() => handleApprove(farmer.id)}
-                    className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold h-12 lg:h-11 shadow-md shadow-emerald-500/10"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Approve
-                  </button>
-                  <button
+                    <Check className="w-4 h-4" /> Approve
+                  </Button>
+                  <Button 
+                    variant="ghost" 
                     onClick={() => handleReject(farmer.id)}
-                    className="bg-slate-100 text-slate-600 px-6 py-3 rounded-lg hover:bg-slate-200 transition-colors duration-200 font-semibold shadow-sm hover:shadow-md flex items-center gap-2"
+                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl gap-2 font-bold h-12 lg:h-11"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Reject
-                  </button>
+                    <Trash2 className="w-4 h-4" /> Reject
+                  </Button>
                 </div>
               </div>
             </div>
