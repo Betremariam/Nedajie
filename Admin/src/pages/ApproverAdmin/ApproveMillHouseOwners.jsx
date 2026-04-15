@@ -125,7 +125,7 @@ const ApproveMillHouseOwners = () => {
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Allocation</p>
-                  <p className="font-bold text-foreground">{approvedOwner.dailyLimit}L ({approvedOwner.fuelType})</p>
+                  <p className="font-bold text-foreground">{approvedOwner.numberOfMills * 300}L per 15 Days</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Location</p>
@@ -190,9 +190,15 @@ const ApproveMillHouseOwners = () => {
                     </div>
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
-                        <Droplets className="w-3 h-3" /> Allocation
+                        <Droplets className="w-3 h-3" /> Mills
                       </Label>
-                      <p className="text-sm font-bold">{owner.dailyLimit}L</p>
+                      <p className="text-sm font-bold">{owner.numberOfMills} Units</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        Quota
+                      </Label>
+                      <p className="text-sm font-bold text-emerald-600">{owner.numberOfMills * 300}L</p>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">

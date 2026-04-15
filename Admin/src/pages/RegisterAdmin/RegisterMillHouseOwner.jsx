@@ -33,7 +33,7 @@ const RegisterMillHouseOwner = () => {
     kebele: "",
     woreda: "",
     fuelType: "diesel",
-    dailyLimit: "",
+    numberOfMills: "",
     document: null,
   });
 
@@ -68,7 +68,7 @@ const RegisterMillHouseOwner = () => {
     formData.append("kebele", form.kebele);
     formData.append("woreda", form.woreda);
     formData.append("fuelType", form.fuelType);
-    formData.append("dailyLimit", form.dailyLimit);
+    formData.append("numberOfMills", form.numberOfMills);
     if(form.document) formData.append("document", form.document);
 
     try {
@@ -77,7 +77,7 @@ const RegisterMillHouseOwner = () => {
       });
 
       setSuccess("Mill House Owner registered successfully.");
-      setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", fuelType: "diesel", dailyLimit: "", document: null });
+      setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", fuelType: "diesel", numberOfMills: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -186,13 +186,16 @@ const RegisterMillHouseOwner = () => {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Daily Limit [Liters]</Label>
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <Home className="w-4 h-4 text-primary" /> 
+                Number of Mills
+              </Label>
               <div className="relative group">
                 <Input
                   className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                  placeholder="Enter daily liter limit"
-                  name="dailyLimit"
-                  value={form.dailyLimit}
+                  placeholder="Enter number of mills (e.g. 2)"
+                  name="numberOfMills"
+                  value={form.numberOfMills}
                   type="number"
                   onChange={handleChange}
                   required
@@ -310,7 +313,7 @@ const RegisterMillHouseOwner = () => {
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({fullName:"", phoneNumber:"", kebele:"", woreda:"", fuelType: "diesel", dailyLimit: "", document:null})}
+                onClick={() => setForm({fullName:"", phoneNumber:"", kebele:"", woreda:"", fuelType: "diesel", numberOfMills: "", document:null})}
                >
                 Clear
                </Button>

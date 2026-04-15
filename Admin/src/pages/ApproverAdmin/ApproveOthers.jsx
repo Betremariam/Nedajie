@@ -130,7 +130,7 @@ const ApproveOthers = () => {
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Usage Limit</p>
-                  <p className="font-bold text-foreground">{approvedUser.maxUses === -1 ? "Unlimited" : approvedUser.maxUses + " Uses"}</p>
+                  <p className="font-bold text-foreground">{approvedUser.totalAllowedLiters}L Bucket</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">ID</p>
@@ -191,9 +191,9 @@ const ApproveOthers = () => {
                     </div>
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
-                        <Award className="w-3 h-3" /> Usage
+                        <Award className="w-3 h-3" /> Bucket
                       </Label>
-                      <p className="text-sm font-bold uppercase">{user.maxUses === -1 ? "Unlimited" : user.maxUses + "X"}</p>
+                      <p className="text-sm font-bold uppercase">{user.totalAllowedLiters}L</p>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">

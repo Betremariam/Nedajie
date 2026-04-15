@@ -24,6 +24,7 @@ const RegisterFarmer = () => {
     phoneNumber: "",
     kebele: "",
     woreda: "",
+    landSize: "",
     document: null,
   });
 
@@ -53,6 +54,7 @@ const RegisterFarmer = () => {
     formData.append("phoneNumber", form.phoneNumber);
     formData.append("kebele", form.kebele);
     formData.append("woreda", form.woreda);
+    formData.append("landSize", form.landSize);
     if(form.document) formData.append("document", form.document);
 
     try {
@@ -61,7 +63,7 @@ const RegisterFarmer = () => {
       });
 
       setSuccess("Farmer registered successfully.");
-      setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", document: null });
+      setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", landSize: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -188,8 +190,28 @@ const RegisterFarmer = () => {
               </div>
             </div>
 
+            {/* Land Size (Hectares) */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" /> 
+                Land Size (Hectares)
+              </Label>
+              <div className="relative group">
+                <Input
+                  type="number"
+                  step="0.1"
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="Enter land size in hectares (e.g. 2.5)"
+                  name="landSize"
+                  value={form.landSize}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
             {/* Document Upload */}
-            <div className="space-y-3 md:col-span-2">
+            <div className="space-y-3 md:col-span-1">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Agricultural Credentials</Label>
               <div className="relative group">
                 <input

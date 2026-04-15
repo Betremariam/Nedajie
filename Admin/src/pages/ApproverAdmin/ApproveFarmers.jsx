@@ -22,6 +22,7 @@ const ApproveFarmers = () => {
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [approvedFarmer, setApprovedFarmer] = useState(null);
+  const [expiryDates, setExpiryDates] = useState({}); // Track expiry date for each farmer
   const qrRef = useRef();
 
   const fetchFarmers = async () => {
@@ -37,12 +38,20 @@ const ApproveFarmers = () => {
 
   const handleApprove = async (id) => {
     try {
-      const { data } = await API.put(`/admins/approve-farmer/${id}`);
+      const expiryDate = expiryDates[id];
+      if (!expiryDate) return alert("Please set an expiry date for this farmer's QR.");
+
+      const { data } = await API.put(`/admins/approve-farmer/${id}`, { expiryDate });
       setFarmers((prev) => prev.filter((f) => f.id !== id));
       setApprovedFarmer(data.farmer);
     } catch (error) {
       console.error("Error approving farmer:", error);
+      alert(error.response?.data?.msg || "Approval failed");
     }
+  };
+
+  const handleExpiryChange = (id, date) => {
+    setExpiryDates(prev => ({ ...prev, [id]: date }));
   };
 
   const handleReject = async (id) => {
@@ -181,11 +190,17 @@ const ApproveFarmers = () => {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-                    <div className="space-y-1 col-span-2">
+                    <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
                         <MapPin className="w-3 h-3" /> Area
                       </Label>
                       <p className="text-sm font-bold">{farmer.woreda}, {farmer.kebele}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        <Wheat className="w-3 h-3" /> Land Size
+                      </Label>
+                      <p className="text-sm font-bold text-emerald-600">{farmer.landSize} Hectares</p>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
@@ -196,6 +211,18 @@ const ApproveFarmers = () => {
                             Verify <ArrowRight className="w-3 h-3" />
                          </a>
                       ) : <p className="text-sm font-bold text-red-500">Missing</p>}
+                    </div>
+                    <div className="space-y-1 col-span-2 sm:col-span-1">
+                      <Label className="text-[10px] font-black uppercase opacity-50 flex items-center gap-1.5">
+                        QR Expiry Date
+                      </Label>
+                      <input 
+                        type="date"
+                        className="w-full text-xs font-bold border rounded-lg p-1 px-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                        value={expiryDates[farmer.id] || ""}
+                        onChange={(e) => handleExpiryChange(farmer.id, e.target.value)}
+                        required
+                      />
                     </div>
                   </div>
                 </div>

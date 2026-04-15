@@ -30,6 +30,7 @@ const OtherRegistration = () => {
     phoneNumber: "",
     fuelType: "",
     maxUses: "-1",
+    totalAllowedLiters: "",
     document: null,
   });
 
@@ -63,6 +64,7 @@ const OtherRegistration = () => {
     formData.append("phoneNumber", form.phoneNumber);
     formData.append("fuelType", form.fuelType);
     formData.append("maxUses", form.maxUses);
+    formData.append("totalAllowedLiters", form.totalAllowedLiters);
     if(form.document) formData.append("document", form.document);
 
     try {
@@ -71,7 +73,7 @@ const OtherRegistration = () => {
       });
 
       setSuccess("Entity registered successfully.");
-      setForm({ fullName: "", phoneNumber: "", fuelType: "", maxUses: "-1", document: null });
+      setForm({ fullName: "", phoneNumber: "", fuelType: "", maxUses: "-1", totalAllowedLiters: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -197,6 +199,24 @@ const OtherRegistration = () => {
                 </SelectContent>
               </Select>
             </div>
+            {/* Total Allowed Liters (Bucket) */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
+                <Droplets className="w-4 h-4 text-primary" /> 
+                Total Allowed Liters (Bucket)
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                  placeholder="Enter total liters (e.g. 500)"
+                  name="totalAllowedLiters"
+                  value={form.totalAllowedLiters}
+                  type="number"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
             {/* Document Upload */}
             <div className="space-y-3 md:col-span-2">
@@ -272,7 +292,7 @@ const OtherRegistration = () => {
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({fullName:"", phoneNumber:"", fuelType:"", maxUses: "-1", document:null})}
+                onClick={() => setForm({fullName:"", phoneNumber:"", fuelType:"", maxUses: "-1", totalAllowedLiters: "", document:null})}
                >
                 Clear
                </Button>
