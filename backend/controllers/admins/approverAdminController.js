@@ -116,13 +116,21 @@ export async function rejectAttendant(req, res) {
 export async function approveFarmer(req, res) {
   try {
     const { farmerId } = req.params;
+    const { expiryDate } = req.body;
     const approverId = req.admin.id;
+
+    const updateData = {
+      isApproved: true,
+      approvedById: approverId,
+    };
+
+    if (expiryDate) {
+      updateData.expiryDate = new Date(expiryDate);
+    }
+
     const farmer = await prisma.farmer.update({
       where: { id: farmerId },
-      data: {
-        isApproved: true,
-        approvedById: approverId,
-      },
+      data: updateData,
       include: {
         approvedBy: {
           select: {

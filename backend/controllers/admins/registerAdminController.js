@@ -104,6 +104,7 @@ export async function registerFarmer(req, res) {
     }
 
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const landSize = parseFloat(req.body.landSize) || 0;
 
     const newFarmer = await prisma.farmer.create({
       data: {
@@ -111,6 +112,7 @@ export async function registerFarmer(req, res) {
         kebele,
         woreda,
         phoneNumber,
+        landSize,
         documentPath: req.file.path,
         region: admin.region,
         isApproved: false,
@@ -135,12 +137,14 @@ export const registerOtherUser = async (req, res) => {
     const documentPath = req.file ? req.file.path : null;
 
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const totalAllowedLiters = parseFloat(req.body.totalAllowedLiters) || 0;
 
     const newOtherUser = await prisma.otherUser.create({
       data: {
         fullName,
         phoneNumber,
         fuelType: fuelType.toLowerCase(),
+        totalAllowedLiters,
         documentPath,
         region: admin.region,
         maxUses: parseInt(maxUses) || -1,
@@ -177,6 +181,7 @@ export async function registerMillHouseOwner(req, res) {
     }
 
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const numberOfMills = parseInt(req.body.numberOfMills) || 1;
 
     const newOwner = await prisma.millHouseOwner.create({
       data: {
@@ -184,8 +189,9 @@ export async function registerMillHouseOwner(req, res) {
         kebele,
         woreda,
         phoneNumber,
+        numberOfMills,
         fuelType: fuelType || "diesel",
-        dailyLimit: parseFloat(dailyLimit) || 0,
+        dailyLimit: numberOfMills * 300, // Pre-calculate or use for display
         documentPath: req.file.path,
         region: admin.region,
         isApproved: false,

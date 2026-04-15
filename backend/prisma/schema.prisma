@@ -79,21 +79,24 @@ enum VehicleType {
 }
 
 model Farmer {
-  id              String   @id @default(cuid())
-  fullName        String
-  kebele          String
-  woreda          String
-  phoneNumber     String   @unique
+  id               String   @id @default(cuid())
+  fullName         String
+  kebele           String
+  woreda           String
+  phoneNumber      String   @unique
+  landSize         Float    @default(0) // In hectares
   litersUsed15Days Float    @default(0)
-  limitStartDate  DateTime? @default(now())
-  documentPath    String?
-  region          String?
-  approvedBy      Admin?   @relation(fields: [approvedById], references: [id])
-  approvedById    String?
-  isApproved      Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  limitStartDate   DateTime? @default(now())
+  expiryDate       DateTime? // For rainy season / letter limit
+  documentPath     String?
+  region           String?
+  approvedBy       Admin?   @relation(fields: [approvedById], references: [id])
+  approvedById     String?
+  isApproved       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  transactions    FuelTransaction[]
+  transactions     FuelTransaction[]
 }
 
 model FuelAttendant {
@@ -193,21 +196,24 @@ model FuelTransaction {
 }
 
 model OtherUser {
-  id             String   @id @default(cuid())
-  fullName       String
-  phoneNumber    String   @unique
-  fuelType       FuelType
-  dailyLimitUsed Float    @default(0)
-  maxUses        Int      @default(-1) // -1 for unlimited
-  useCount       Int      @default(0)
-  documentPath   String?
-  region         String?
-  isApproved     Boolean  @default(false)
-  approvedBy     Admin?   @relation(fields: [approvedById], references: [id])
-  approvedById   String?
-  createdAt      DateTime @default(now())
+  id                 String   @id @default(cuid())
+  fullName           String
+  phoneNumber        String   @unique
+  fuelType           FuelType
+  totalAllowedLiters Float    @default(0) // One-time bucket
+  litersUsed         Float    @default(0)
+  dailyLimitUsed     Float    @default(0) // Legacy
+  maxUses            Int      @default(-1) // -1 for unlimited
+  useCount           Int      @default(0)
+  documentPath       String?
+  region             String?
+  isApproved         Boolean  @default(false)
+  approvedBy         Admin?   @relation(fields: [approvedById], references: [id])
+  approvedById       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  transactions   FuelTransaction[]
+  transactions       FuelTransaction[]
 }
 
 model MillHouseOwner {
@@ -216,6 +222,7 @@ model MillHouseOwner {
   kebele         String
   woreda         String
   phoneNumber    String   @unique
+  numberOfMills  Int      @default(1)
   fuelType       FuelType @default(diesel)
   dailyLimit     Float    @default(0)
   documentPath   String?
@@ -224,6 +231,7 @@ model MillHouseOwner {
   approvedBy     Admin?   @relation(fields: [approvedById], references: [id])
   approvedById   String?
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   transactions   FuelTransaction[]
 }
