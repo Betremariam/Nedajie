@@ -16,7 +16,8 @@ import {
   UserCheck,
   Building2,
   Calendar,
-  Receipt
+  Receipt,
+  ShieldCheck
 } from "lucide-react";
 import { 
   Table, 

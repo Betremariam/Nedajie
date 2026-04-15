@@ -58,18 +58,19 @@ export async function confirmDeliveryBySuperAdmin(req, res) {
  */
 export async function getDeliveriesForOwner(req, res) {
   try {
-    const owner = await prisma.admin.findUnique({ where: { id: req.user.id } });
-    if (!owner || owner.role !== "stationOwner") {
+    const owner = req.admin;
+    if (!owner) {
       return res.status(403).json({ msg: "Access denied. Owner role required." });
     }
 
-    // Match by customer/destination names
+    // Match by customer/destination names (companyName or name)
+    const ownerName = owner.companyName || owner.name;
     const deliveries = await prisma.fuelDelivery.findMany({
       where: {
         status: "SUPERADMIN_ACCEPTED",
         OR: [
-          { customer: owner.companyName },
-          { destination: owner.companyName } // Depending on how user maps it
+          { customer: ownerName },
+          { destination: ownerName }
         ]
       },
       orderBy: { createdAt: "desc" }
@@ -87,7 +88,7 @@ export async function getDeliveriesForOwner(req, res) {
 export async function acceptDeliveryByOwner(req, res) {
   try {
     const { deliveryId } = req.params;
-    const owner = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const owner = req.admin;
 
     const delivery = await prisma.fuelDelivery.findUnique({ where: { id: deliveryId } });
     if (!delivery) return res.status(404).json({ msg: "Delivery not found." });

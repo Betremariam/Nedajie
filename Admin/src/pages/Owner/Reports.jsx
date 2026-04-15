@@ -83,7 +83,7 @@ const Reports = () => {
   const handleDownload = () => {
     if (!transactions.length) return;
     const data = transactions.map((tx) => ({
-      Date: new Date(tx.date).toLocaleString(),
+      Date: new Date(tx.createdAt).toLocaleString(),
       Driver: tx.driver?.name || tx.farmer?.fullName || "N/A",
       "Gas Type": tx.gasType,
       Liters: tx.liters,
@@ -262,14 +262,14 @@ const Reports = () => {
                   {transactions.map((tx) => (
                     <TableRow key={tx.id} className="hover:bg-muted/30 transition-all border-b border-border h-16 group">
                       <TableCell className="pl-8">
-                         <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-foreground/80">
-                               {new Date(tx.date).toLocaleDateString()}
-                            </span>
-                            <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
-                               {new Date(tx.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                         </div>
+                        <div className="flex flex-col">
+                           <span className="text-sm font-semibold text-foreground/80">
+                              {new Date(tx.createdAt).toLocaleDateString()}
+                           </span>
+                           <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
+                              {new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                           </span>
+                        </div>
                       </TableCell>
                       <TableCell>
                          <div className="flex items-center gap-2">
