@@ -24,7 +24,7 @@ router.use(verifyToken, isFederal);
 
 router.post("/create-super-admin", upload.single("document"), createRegionalSuperAdmin);
 router.post("/create-owner", upload.single("document"), createOwner);
-router.post("/add-fuel", addFuelDelivery);
+router.post("/add-fuel", upload.single("letter"), addFuelDelivery);
 router.get("/fuel-deliveries", getAllFuelDeliveries);
 router.get("/admins", getFederalAdmins);
 router.get("/dashboard-stats", getFederalDashboardStats);

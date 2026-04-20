@@ -14,6 +14,8 @@ import {
   Loader2,
   Search,
   History,
+  FileText,
+  Upload,
 } from "lucide-react";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
@@ -31,6 +33,7 @@ const FuelDeliveries = () => {
     volume: "",
     region: "",
     fuelType: "diesel",
+    letter: null
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -50,21 +53,40 @@ const FuelDeliveries = () => {
     fetchDeliveries();
   }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "letter") {
+      setForm({ ...form, letter: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
     setError("");
-    if (Object.values(form).some((v) => !v)) {
-      setError("All fields are required.");
+    
+    // Check all fields except letter (letter is required but handled separately in FormData check)
+    if (Object.keys(form).some((key) => key !== 'letter' && !form[key])) {
+      setError("All text fields are required.");
       return;
     }
+    if (!form.letter) {
+      setError("Assignment letter is required.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await addFuelDelivery(form);
-      setSuccess("Fuel delivery recorded successfully.");
-      setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel" });
+      const formData = new FormData();
+      Object.keys(form).forEach(key => {
+        formData.append(key, form[key]);
+      });
+
+      await addFuelDelivery(formData);
+      setSuccess("Fuel delivery recorded successfully with assignment letter.");
+      setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null });
       fetchDeliveries();
     } catch (err) {
       setError(err?.response?.data?.msg || "Failed to record delivery.");
@@ -272,11 +294,37 @@ const FuelDeliveries = () => {
               </div>
             </div>
 
+            {/* Assignment Letter Upload */}
+            <div className="md:col-span-2 space-y-3">
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-primary" />
+                ASSIGNMENT LETTER (PDF/IMAGE)
+              </Label>
+              <div className={`relative border-2 border-dashed rounded-2xl p-6 transition-all ${form.letter ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                <input
+                  type="file"
+                  name="letter"
+                  onChange={handleChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  accept=".pdf,image/*"
+                />
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Upload className={`w-8 h-8 ${form.letter ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <p className="text-[13px] font-semibold text-foreground">
+                    {form.letter ? form.letter.name : "Click or drag to upload federal assignment letter"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground uppercase font-bold tracking-widest">
+                    Maximum file size: 10MB
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Bottom Submit */}
           <div className="pt-8 pb-4 border-t border-border flex justify-end gap-3">
-            <Button type="button" variant="outline" className="h-11 px-8 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel" })}>
+            <Button type="button" variant="outline" className="h-11 px-8 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null })}>
               Clear
             </Button>
             <Button disabled={loading} className="h-11 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2" type="submit">

@@ -34,15 +34,15 @@ export const changePassword = (data) => API.post("/admin-auth/change-password", 
 // Federal APIs
 export const createRegionalSuperAdmin = (data) => API.post("/federal/create-super-admin", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const createOwner = (data) => API.post("/federal/create-owner", data, { headers: { "Content-Type": "multipart/form-data" } });
-export const addFuelDelivery = (data) => API.post("/federal/add-fuel", data);
+export const addFuelDelivery = (data) => API.post("/federal/add-fuel", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const getFederalDashboardStats = () => API.get("/federal/dashboard-stats");
 export const getAllFederalFuelDeliveries = () => API.get("/federal/fuel-deliveries");
 
 // Fuel Workflow APIs
 export const getPendingDeliveriesForSuperAdmin = () => API.get("/fuel-workflow/super/pending");
-export const confirmDeliveryBySuperAdmin = (deliveryId) => API.put(`/fuel-workflow/super/confirm/${deliveryId}`);
+export const confirmDeliveryBySuperAdmin = (deliveryId, data) => API.put(`/fuel-workflow/super/confirm/${deliveryId}`, data, { headers: { "Content-Type": "multipart/form-data" } });
 export const getPendingDeliveriesForOwner = () => API.get("/fuel-workflow/owner/pending");
-export const acceptDeliveryByOwner = (deliveryId) => API.put(`/fuel-workflow/owner/accept/${deliveryId}`);
+export const acceptDeliveryByOwner = (deliveryId, data) => API.put(`/fuel-workflow/owner/accept/${deliveryId}`, data, { headers: { "Content-Type": "multipart/form-data" } });
 
 // Super Admin APIs (Original but now regionally filtered in backend)
 export const getAllAdmins = () => API.get("/admins/admins");

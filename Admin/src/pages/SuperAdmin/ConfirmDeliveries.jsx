@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Truck, CheckCircle, Clock, AlertCircle, MapPin, Loader2, ShieldCheck, ChevronRight, RefreshCcw } from "lucide-react";
+import { Truck, CheckCircle, Clock, AlertCircle, MapPin, Loader2, ShieldCheck, ChevronRight, RefreshCcw, FileText, Download, Upload } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { 
@@ -34,6 +34,14 @@ const ConfirmDeliveries = () => {
   const [success, setSuccess] = useState("");
   const [confirmingDelivery, setConfirmingDelivery] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [signedDoc, setSignedDoc] = useState(null);
+
+  const downloadFile = (path) => {
+    if (!path) return;
+    const filename = path.split('\\').pop().split('/').pop();
+    const url = `http://localhost:5000/uploads/${filename}`;
+    window.open(url, '_blank');
+  };
 
   const fetchPendingDeliveries = async () => {
     try {
@@ -53,15 +61,23 @@ const ConfirmDeliveries = () => {
 
   const handleConfirm = async () => {
     if (!confirmingDelivery) return;
+    if (!signedDoc) {
+      setError("Please upload a picture of the signed document first.");
+      return;
+    }
     
     setIsProcessing(true);
     setError("");
     setSuccess("");
     
     try {
-      await confirmDeliveryBySuperAdmin(confirmingDelivery.id);
+      const formData = new FormData();
+      formData.append("document", signedDoc);
+
+      await confirmDeliveryBySuperAdmin(confirmingDelivery.id, formData);
       setSuccess(`Delivery ${confirmingDelivery.fdcNo} confirmed successfully!`);
       setConfirmingDelivery(null);
+      setSignedDoc(null);
       fetchPendingDeliveries();
     } catch (err) {
       setError(err.response?.data?.msg || "Failed to confirm delivery");
@@ -163,16 +179,30 @@ const ConfirmDeliveries = () => {
                       </div>
                     </div>
 
-                    <div className="p-3 bg-muted/30 rounded-lg flex items-center gap-4 border border-border/10">
-                       <div className="flex flex-col">
-                          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Destination Node</span>
-                          <span className="font-semibold">{delivery.destination}</span>
+                    <div className="p-3 bg-muted/30 rounded-lg flex items-center justify-between gap-4 border border-border/10">
+                       <div className="flex items-center gap-4">
+                          <div className="flex flex-col">
+                             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Destination Node</span>
+                             <span className="font-semibold">{delivery.destination}</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          <div className="flex flex-col">
+                             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Point of Delivery</span>
+                             <span className="font-semibold">{delivery.citter}</span>
+                          </div>
                        </div>
-                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                       <div className="flex flex-col">
-                          <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Point of Delivery</span>
-                          <span className="font-semibold">{delivery.citter}</span>
-                       </div>
+                       
+                       {delivery.federalLetterPath && (
+                         <Button 
+                           variant="outline" 
+                           size="sm" 
+                           className="h-9 gap-2 text-[11px] font-bold border-primary/20 hover:bg-primary/5 text-primary"
+                           onClick={() => downloadFile(delivery.federalLetterPath)}
+                         >
+                           <Download className="w-3.5 h-3.5" />
+                           LETTER
+                         </Button>
+                       )}
                     </div>
                   </div>
 
@@ -203,7 +233,23 @@ const ConfirmDeliveries = () => {
             <AlertDialogDescription className="text-center">
               You are about to authorize the receipt of <span className="font-bold text-foreground">{confirmingDelivery?.volume.toLocaleString()}L</span> of <span className="font-bold text-foreground">{confirmingDelivery?.fuelType.toUpperCase()}</span> for the <span className="font-bold text-foreground">{confirmingDelivery?.region}</span> region.
               <br /><br />
-              This will forward the delivery to the station owner for final validation.
+              <div className="space-y-3 mt-4 text-left p-4 bg-muted/50 rounded-xl border border-border">
+                <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Upload Signed Confirmation Document</Label>
+                <div className={`relative border-2 border-dashed rounded-xl p-4 transition-all ${signedDoc ? 'border-primary/50 bg-primary/5' : 'border-border hover:bg-muted/80'}`}>
+                  <input
+                    type="file"
+                    onChange={(e) => setSignedDoc(e.target.files[0])}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    accept="image/*"
+                  />
+                  <div className="flex items-center gap-3">
+                    <Upload className={`w-5 h-5 ${signedDoc ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className="text-[13px] font-medium truncate">
+                      {signedDoc ? signedDoc.name : "Select picture of signed doc..."}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="grid grid-cols-2 gap-3 sm:space-x-0">

@@ -23,9 +23,35 @@ import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Switch } from "../../components/ui/Switch";
 
+const REGIONS = [
+  "Addis Ababa",
+  "Afar",
+  "Amhara",
+  "Benishangul-Gumuz",
+  "Central Ethiopia",
+  "Dire Dawa",
+  "Gambella",
+  "Harari",
+  "Oromia",
+  "Sidama",
+  "Somali",
+  "South Ethiopia",
+  "Southwest Ethiopia",
+  "Tigray",
+];
+
 const ManageOwners = () => {
   const [owners, setOwners] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "", companyName: "", region: "", document: null });
+  const [form, setForm] = useState({ 
+    name: "", 
+    email: "", 
+    companyName: "", 
+    region: "", 
+    zone: "",
+    woreda: "",
+    stockName: "",
+    document: null 
+  });
   const [selectedOwner, setSelectedOwner] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -64,13 +90,25 @@ const ManageOwners = () => {
     formData.append("email", form.email);
     formData.append("companyName", form.companyName);
     formData.append("region", form.region);
+    formData.append("zone", form.zone);
+    formData.append("woreda", form.woreda);
+    formData.append("stockName", form.stockName);
     if (form.document) formData.append("document", form.document);
 
     try {
       const res = await createOwner(formData);
       setSuccess("Station owner created successfully.");
       setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
-      setForm({ name: "", email: "", companyName: "", region: "", document: null });
+      setForm({ 
+        name: "", 
+        email: "", 
+        companyName: "", 
+        region: "", 
+        zone: "",
+        woreda: "",
+        stockName: "",
+        document: null 
+      });
       // Reset file input visually
       const fileInput = document.getElementById("documentUpload");
       if (fileInput) fileInput.value = "";
@@ -223,14 +261,77 @@ const ManageOwners = () => {
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                Region / Zone
+                Region
+              </Label>
+              <div className="relative group">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
+                <select
+                  className="w-full h-12 pl-12 pr-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-foreground appearance-none"
+                  name="region"
+                  value={form.region}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="" disabled>Select Region</option>
+                  {REGIONS.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Zone / Woreda / Company */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Zone
               </Label>
               <div className="relative group">
                 <Input
                   className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                  placeholder="e.g., Addis Ababa"
-                  name="region"
-                  value={form.region}
+                  placeholder="e.g., East Gojjam"
+                  name="zone"
+                  value={form.zone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Woreda
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
+                  placeholder="e.g., Debre Markos"
+                  name="woreda"
+                  value={form.woreda}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Stock Name */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-primary" />
+                Stock Name
+              </Label>
+              <div className="relative group">
+                <Input
+                  className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
+                  placeholder="e.g., NOC Station"
+                  name="stockName"
+                  value={form.stockName}
                   onChange={handleChange}
                   required
                 />
@@ -277,7 +378,16 @@ const ManageOwners = () => {
                 {!loading && <ArrowRight className="w-4 h-4 ml-1 opacity-90" />}
               </Button>
               <Button type="button" variant="outline" className="w-full h-11 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => {
-                setForm({ name: "", email: "", companyName: "", region: "", document: null });
+                setForm({ 
+                  name: "", 
+                  email: "", 
+                  companyName: "", 
+                  region: "", 
+                  zone: "",
+                  woreda: "",
+                  stockName: "",
+                  document: null 
+                });
                 const fileInput = document.getElementById("documentUpload");
                 if (fileInput) fileInput.value = "";
               }}>
@@ -392,7 +502,7 @@ const ManageOwners = () => {
                 <p className="text-sm font-medium text-foreground">{selectedOwner.email}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Region / Zone</p>
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Region</p>
                 <p className="text-sm font-medium text-foreground">{selectedOwner.region || "—"}</p>
               </div>
               {selectedOwner.documentPath && (

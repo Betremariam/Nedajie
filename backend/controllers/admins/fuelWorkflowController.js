@@ -39,11 +39,14 @@ export async function confirmDeliveryBySuperAdmin(req, res) {
       return res.status(403).json({ msg: "You can only confirm deliveries for your region." });
     }
 
+    const superAdminSignedPath = req.file ? req.file.path : null;
+
     const updated = await prisma.fuelDelivery.update({
       where: { id: deliveryId },
       data: {
         status: "SUPERADMIN_ACCEPTED",
-        superAdminId: admin.id
+        superAdminId: admin.id,
+        superAdminSignedPath
       }
     });
 
@@ -107,12 +110,14 @@ export async function acceptDeliveryByOwner(req, res) {
     // Use a transaction to ensure atomic updates
     const result = await prisma.$transaction(async (tx) => {
       // 1. Update delivery status
+      const ownerSignedPath = req.file ? req.file.path : null;
       const updatedDelivery = await tx.fuelDelivery.update({
         where: { id: deliveryId },
         data: {
           status: "OWNER_ACCEPTED",
           ownerId: owner.id,
-          isConfirmed: true
+          isConfirmed: true,
+          ownerSignedPath
         }
       });
 

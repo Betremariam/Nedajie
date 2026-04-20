@@ -59,7 +59,7 @@ export async function createRegionalSuperAdmin(req, res) {
  */
 export async function createOwner(req, res) {
   try {
-    const { name, email, companyName, region, stationIds } = req.body;
+    const { name, email, companyName, region, stationIds, zone, woreda, stockName } = req.body;
     const documentPath = req.file ? req.file.path : null;
 
     if (!name || !email || !companyName || !region) {
@@ -77,6 +77,35 @@ export async function createOwner(req, res) {
       } else if (Array.isArray(stationIds)) {
         parsedStationIds = stationIds;
       }
+    }
+
+    // Automatically create stocks if stockName, zone, and woreda are provided
+    if (stockName && zone && woreda) {
+      const fullStockName = `${stockName} (${zone} - ${woreda})`;
+      
+      // Create Benzene Stock
+      const benzeneStock = await prisma.fuelStock.create({
+        data: {
+          stationName: fullStockName,
+          city: woreda,
+          region,
+          gasType: "benzene",
+          litersReceived: 0
+        }
+      });
+      
+      // Create Diesel Stock
+      const dieselStock = await prisma.fuelStock.create({
+        data: {
+          stationName: fullStockName,
+          city: woreda,
+          region,
+          gasType: "diesel",
+          litersReceived: 0
+        }
+      });
+
+      parsedStationIds.push(benzeneStock.id, dieselStock.id);
     }
 
     const existing = await prisma.admin.findUnique({ where: { email } });
@@ -119,6 +148,7 @@ export async function createOwner(req, res) {
 export async function addFuelDelivery(req, res) {
   try {
     const { date, customer, destination, citter, fdcNo, volume, region, fuelType } = req.body;
+    const federalLetterPath = req.file ? req.file.path : null;
 
     if (!date || !customer || !destination || !citter || !fdcNo || !volume || !region || !fuelType) {
       return res.status(400).json({ msg: "All fields are required for fuel delivery." });
@@ -134,7 +164,8 @@ export async function addFuelDelivery(req, res) {
         volume: parseFloat(volume),
         region,
         fuelType,
-        status: "PENDING"
+        status: "PENDING",
+        federalLetterPath
       }
     });
 

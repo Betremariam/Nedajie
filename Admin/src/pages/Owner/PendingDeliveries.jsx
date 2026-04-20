@@ -14,7 +14,10 @@ import {
   Zap,
   ChevronRight,
   TrendingUp,
-  Database
+  Database,
+  Download,
+  Upload,
+  FileText
 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
@@ -43,6 +46,14 @@ const PendingDeliveries = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [accepting, setAccepting] = useState(false);
+  const [signedDoc, setSignedDoc] = useState(null);
+
+  const downloadFile = (path) => {
+    if (!path) return;
+    const filename = path.split('\\').pop().split('/').pop();
+    const url = `http://localhost:5000/uploads/${filename}`;
+    window.open(url, '_blank');
+  };
 
   const fetchPendingDeliveries = async () => {
     try {
@@ -69,10 +80,19 @@ const PendingDeliveries = () => {
 
   const handleConfirmAccept = async () => {
     if (!selectedDelivery) return;
+    if (!signedDoc) {
+      setError("Please upload a picture of the signed document first.");
+      return;
+    }
+
     try {
       setAccepting(true);
-      await acceptDeliveryByOwner(selectedDelivery.id);
+      const formData = new FormData();
+      formData.append("document", signedDoc);
+
+      await acceptDeliveryByOwner(selectedDelivery.id, formData);
       setConfirmOpen(false);
+      setSignedDoc(null);
       fetchPendingDeliveries();
     } catch (err) {
       console.error("Accept error:", err);
@@ -149,23 +169,36 @@ const PendingDeliveries = () => {
                       </div>
                    </div>
 
-                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                      <div>
-                         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Inbound Payload</p>
-                         <h3 className="text-3xl font-bold tracking-tight tabular-nums text-foreground group-hover:text-primary transition-colors">
-                            {delivery.volume.toLocaleString()} <span className="text-lg font-semibold text-muted-foreground uppercase tracking-widest ml-1">Liters</span>
-                         </h3>
-                      </div>
-                      <div className="space-y-2 text-right">
-                         <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground/80 justify-end">
-                            <Building2 className="w-4 h-4 text-primary" />
-                            {delivery.destination}
-                         </div>
-                         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
-                            FDC: <span className="text-foreground tracking-normal font-mono">{delivery.fdcNo}</span>
-                         </p>
-                      </div>
-                   </div>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                       <div className="flex-1">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Inbound Payload</p>
+                          <h3 className="text-3xl font-bold tracking-tight tabular-nums text-foreground group-hover:text-primary transition-colors">
+                             {delivery.volume.toLocaleString()} <span className="text-lg font-semibold text-muted-foreground uppercase tracking-widest ml-1">Liters</span>
+                          </h3>
+                       </div>
+                       
+                       {delivery.superAdminSignedPath && (
+                         <Button 
+                           variant="outline" 
+                           size="sm" 
+                           className="h-10 gap-2 text-[11px] font-bold border-primary/20 hover:bg-primary/5 text-primary rounded-xl"
+                           onClick={() => downloadFile(delivery.superAdminSignedPath)}
+                         >
+                           <Download className="w-4 h-4" />
+                           SIGNED DOC
+                         </Button>
+                       )}
+
+                       <div className="space-y-2 text-right">
+                          <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground/80 justify-end">
+                             <Building2 className="w-4 h-4 text-primary" />
+                             {delivery.destination}
+                          </div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                             FDC: <span className="text-foreground tracking-normal font-mono">{delivery.fdcNo}</span>
+                          </p>
+                       </div>
+                    </div>
                 </div>
                 
                 <div className="w-full md:w-80 bg-muted/30 border-t md:border-t-0 md:border-l border-border/20 p-8 flex flex-col justify-center gap-4">
@@ -203,6 +236,24 @@ const PendingDeliveries = () => {
             <AlertDialogDescription className="text-center font-medium text-muted-foreground pt-2 text-base leading-relaxed">
                You are about to authorize the discharge of <span className="text-foreground font-bold">{selectedDelivery?.volume.toLocaleString()} L</span> of <span className="text-primary font-bold uppercase">{selectedDelivery?.fuelType}</span> into the station reservoir.
                <br /><br />
+               <div className="space-y-3 mt-4 text-left p-4 bg-muted/50 rounded-xl border border-border">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Upload Your Signed Confirmation Picture</p>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${signedDoc ? 'border-primary/50 bg-primary/5' : 'border-border hover:bg-muted/80'}`}>
+                  <input
+                    type="file"
+                    onChange={(e) => setSignedDoc(e.target.files[0])}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    accept="image/*"
+                  />
+                  <div className="flex items-center gap-3">
+                    <Upload className={`w-5 h-5 ${signedDoc ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className="text-[13px] font-medium truncate">
+                      {signedDoc ? signedDoc.name : "Select signed document picture..."}
+                    </span>
+                  </div>
+                </div>
+              </div>
+               <br />
                This protocol is <span className="text-destructive font-bold">immutable</span> and will update operational metrics immediately.
             </AlertDialogDescription>
           </AlertDialogHeader>
