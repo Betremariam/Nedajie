@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { addFuelDelivery, getAllFederalFuelDeliveries } from "../../services/api";
+import { addFuelDelivery, getAllFederalFuelDeliveries, getAllAdmins, getAllFuelStocks } from "../../services/api";
+
+const REGIONS = [
+  "Addis Ababa",
+  "Afar",
+  "Amhara",
+  "Benishangul-Gumuz",
+  "Central Ethiopia",
+  "Dire Dawa",
+  "Gambella",
+  "Harari",
+  "Oromia",
+  "Sidama",
+  "Somali",
+  "South Ethiopia",
+  "Southwest Ethiopia",
+  "Tigray",
+];
 import {
   Truck,
   Calendar,
@@ -33,25 +50,66 @@ const FuelDeliveries = () => {
     volume: "",
     region: "",
     fuelType: "diesel",
-    letter: null
+    letter: null,
+    ownerId: ""
   });
+  const [owners, setOwners] = useState([]);
+  const [allStations, setAllStations] = useState([]);
+  const [filteredOwners, setFilteredOwners] = useState([]);
+  const [filteredStations, setFilteredStations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
-  const fetchDeliveries = async () => {
+  const fetchData = async () => {
     try {
-      const res = await getAllFederalFuelDeliveries();
-      setDeliveries(res.data);
+      const [delRes, adminRes, stockRes] = await Promise.all([
+        getAllFederalFuelDeliveries(),
+        getAllAdmins(),
+        getAllFuelStocks()
+      ]);
+      setDeliveries(delRes.data);
+      setOwners(adminRes.data.filter(a => a.role === 'stationOwner'));
+      setAllStations(stockRes.data);
     } catch (err) {
       console.error(err);
+      setError("Failed to load initial data.");
     }
   };
 
   useEffect(() => {
-    fetchDeliveries();
+    fetchData();
   }, []);
+
+  // Update filtered owners when region changes
+  useEffect(() => {
+    if (form.region) {
+      const filtered = owners.filter(o => o.region === form.region);
+      setFilteredOwners(filtered);
+      // Reset customer and destination if they are no longer valid
+      if (!filtered.find(o => o.name === form.customer)) {
+        setForm(prev => ({ ...prev, customer: "", ownerId: "", destination: "" }));
+      }
+    } else {
+      setFilteredOwners([]);
+    }
+  }, [form.region, owners]);
+
+  // Update filtered stations when customer/owner changes
+  useEffect(() => {
+    if (form.ownerId) {
+      const selectedOwner = owners.find(o => o.id === form.ownerId);
+      if (selectedOwner && selectedOwner.stationIds) {
+        const stations = allStations.filter(s => selectedOwner.stationIds.includes(s.id));
+        setFilteredStations(stations);
+      } else {
+        setFilteredStations([]);
+      }
+    } else {
+      setFilteredStations([]);
+    }
+  }, [form.ownerId, allStations, owners]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -85,9 +143,9 @@ const FuelDeliveries = () => {
       });
 
       await addFuelDelivery(formData);
-      setSuccess("Fuel delivery recorded successfully with assignment letter.");
-      setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null });
-      fetchDeliveries();
+      setSuccess("Fuel delivery recorded successfully.");
+      setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null, ownerId: "" });
+      fetchData();
     } catch (err) {
       setError(err?.response?.data?.msg || "Failed to record delivery.");
     } finally {
@@ -172,36 +230,60 @@ const FuelDeliveries = () => {
               />
             </div>
 
-            {/* Customer */}
+            {/* Customer (Owner Selection) */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5">CUSTOMER</Label>
+              <Label className="text-[13px] font-bold text-foreground ml-0.5">CUSTOMER (OWNER)</Label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <Input
-                  className="h-12 pl-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                  placeholder="Owner or entity name"
-                  name="customer"
-                  value={form.customer}
-                  onChange={handleChange}
+                <select
+                  name="ownerId"
+                  value={form.ownerId}
+                  onChange={(e) => {
+                    const owner = owners.find(o => o.id === e.target.value);
+                    setForm({ ...form, ownerId: e.target.value, customer: owner ? owner.name : "" });
+                  }}
+                  className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
+                  disabled={!form.region}
                   required
-                />
+                >
+                  <option value="" disabled>{form.region ? "Select Owner" : "Select Region First"}</option>
+                  {filteredOwners.map((o) => (
+                    <option key={o.id} value={o.id}>{o.name} {o.companyName ? `(${o.companyName})` : ''}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
 
-            {/* Destination */}
+            {/* Destination (Station Selection) */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <Building className="w-4 h-4 text-primary" />
-                Destination
+                Destination (Station)
               </Label>
-              <Input
-                className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                placeholder="e.g., Station A"
-                name="destination"
-                value={form.destination}
-                onChange={handleChange}
-                required
-              />
+              <div className="relative group">
+                <select
+                  name="destination"
+                  value={form.destination}
+                  onChange={handleChange}
+                  className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
+                  disabled={!form.ownerId}
+                  required
+                >
+                  <option value="" disabled>{form.ownerId ? "Select Station" : "Select Owner First"}</option>
+                  {filteredStations.map((s) => (
+                    <option key={s.id} value={s.stationName}>{s.stationName} ({s.gasType})</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Sub-City / Citter */}
@@ -254,20 +336,31 @@ const FuelDeliveries = () => {
               />
             </div>
 
-            {/* Region */}
+            {/* Region Selection */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
                 Region
               </Label>
-              <Input
-                className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                placeholder="e.g., Addis Ababa"
-                name="region"
-                value={form.region}
-                onChange={handleChange}
-                required
-              />
+              <div className="relative group">
+                <select
+                  name="region"
+                  value={form.region}
+                  onChange={handleChange}
+                  className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
+                  required
+                >
+                  <option value="" disabled>Select Region</option>
+                  {REGIONS.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Fuel Type */}
@@ -324,7 +417,7 @@ const FuelDeliveries = () => {
 
           {/* Bottom Submit */}
           <div className="pt-8 pb-4 border-t border-border flex justify-end gap-3">
-            <Button type="button" variant="outline" className="h-11 px-8 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null })}>
+            <Button type="button" variant="outline" className="h-11 px-8 bg-card hover:bg-muted/50 text-foreground font-bold border-border rounded-xl" onClick={() => setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null, ownerId: "" })}>
               Clear
             </Button>
             <Button disabled={loading} className="h-11 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2" type="submit">

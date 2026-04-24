@@ -147,7 +147,7 @@ export async function createOwner(req, res) {
  */
 export async function addFuelDelivery(req, res) {
   try {
-    const { date, customer, destination, citter, fdcNo, volume, region, fuelType } = req.body;
+    const { date, customer, destination, citter, fdcNo, volume, region, fuelType, ownerId } = req.body;
     const federalLetterPath = req.file ? req.file.path : null;
 
     if (!date || !customer || !destination || !citter || !fdcNo || !volume || !region || !fuelType) {
@@ -165,7 +165,8 @@ export async function addFuelDelivery(req, res) {
         region,
         fuelType,
         status: "PENDING",
-        federalLetterPath
+        federalLetterPath,
+        ownerId: ownerId || null
       }
     });
 
