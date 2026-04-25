@@ -16,6 +16,8 @@ import {
   Building2,
   Users,
   Search,
+  Upload,
+  FileText,
 } from "lucide-react";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
@@ -367,91 +369,145 @@ const ManageOwners = () => {
 
               {/* Legal business documents */}
               <div className="space-y-3">
-                <Label className="text-[13px] font-bold text-foreground ml-0.5">Legal business documents</Label>
-                <div className="relative group">
-                  <Input
+                <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Legal business documents
+                </Label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${form.legalDoc ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input
                     type="file"
                     name="legalDoc"
-                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
                     onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,image/*"
                     required
                   />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Upload className={`w-5 h-5 ${form.legalDoc ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <p className="text-[11px] font-semibold text-foreground text-center line-clamp-1">
+                      {form.legalDoc ? form.legalDoc.name : "Upload Legal Doc"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Fuel sector license */}
               <div className="space-y-3">
-                <Label className="text-[13px] font-bold text-foreground ml-0.5">Fuel sector license</Label>
-                <div className="relative group">
-                  <Input
+                <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Fuel sector license
+                </Label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${form.fuelLicense ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input
                     type="file"
                     name="fuelLicense"
-                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
                     onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,image/*"
                     required
                   />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Upload className={`w-5 h-5 ${form.fuelLicense ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <p className="text-[11px] font-semibold text-foreground text-center line-clamp-1">
+                      {form.fuelLicense ? form.fuelLicense.name : "Upload License"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Construction approval */}
               <div className="space-y-3">
-                <Label className="text-[13px] font-bold text-foreground ml-0.5">Construction approval</Label>
-                <div className="relative group">
-                  <Input
+                <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Construction approval
+                </Label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${form.constructionDoc ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input
                     type="file"
                     name="constructionDoc"
-                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
                     onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,image/*"
                     required
                   />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Upload className={`w-5 h-5 ${form.constructionDoc ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <p className="text-[11px] font-semibold text-foreground text-center line-clamp-1">
+                      {form.constructionDoc ? form.constructionDoc.name : "Upload Approval"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Safety certification */}
               <div className="space-y-3">
-                <Label className="text-[13px] font-bold text-foreground ml-0.5">Safety certification</Label>
-                <div className="relative group">
-                  <Input
+                <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Safety certification
+                </Label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${form.safetyCert ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input
                     type="file"
                     name="safetyCert"
-                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
                     onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,image/*"
                     required
                   />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Upload className={`w-5 h-5 ${form.safetyCert ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <p className="text-[11px] font-semibold text-foreground text-center line-clamp-1">
+                      {form.safetyCert ? form.safetyCert.name : "Upload Certificate"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Environmental clearance */}
               <div className="space-y-3">
-                <Label className="text-[13px] font-bold text-foreground ml-0.5">Environmental clearance</Label>
-                <div className="relative group">
-                  <Input
+                <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Environmental clearance
+                </Label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${form.envClearance ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input
                     type="file"
                     name="envClearance"
-                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
                     onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,image/*"
                     required
                   />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Upload className={`w-5 h-5 ${form.envClearance ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <p className="text-[11px] font-semibold text-foreground text-center line-clamp-1">
+                      {form.envClearance ? form.envClearance.name : "Upload Clearance"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Pump calibration approval */}
               <div className="space-y-3">
-                <Label className="text-[13px] font-bold text-foreground ml-0.5">Pump calibration approval</Label>
-                <div className="relative group">
-                  <Input
+                <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Pump calibration approval
+                </Label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${form.pumpCalibration ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input
                     type="file"
                     name="pumpCalibration"
-                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
                     onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,image/*"
                     required
                   />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Upload className={`w-5 h-5 ${form.pumpCalibration ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <p className="text-[11px] font-semibold text-foreground text-center line-clamp-1">
+                      {form.pumpCalibration ? form.pumpCalibration.name : "Upload Calibration"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

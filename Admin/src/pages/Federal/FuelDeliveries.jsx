@@ -56,7 +56,6 @@ const FuelDeliveries = () => {
   const [owners, setOwners] = useState([]);
   const [allStations, setAllStations] = useState([]);
   const [filteredOwners, setFilteredOwners] = useState([]);
-  const [filteredStations, setFilteredStations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -96,20 +95,6 @@ const FuelDeliveries = () => {
     }
   }, [form.region, owners]);
 
-  // Update filtered stations when customer/owner changes
-  useEffect(() => {
-    if (form.ownerId) {
-      const selectedOwner = owners.find(o => o.id === form.ownerId);
-      if (selectedOwner && selectedOwner.stationIds) {
-        const stations = allStations.filter(s => selectedOwner.stationIds.includes(s.id));
-        setFilteredStations(stations);
-      } else {
-        setFilteredStations([]);
-      }
-    } else {
-      setFilteredStations([]);
-    }
-  }, [form.ownerId, allStations, owners]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -230,24 +215,23 @@ const FuelDeliveries = () => {
               />
             </div>
 
-            {/* Customer (Owner Selection) */}
+            {/* Region Selection */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5">CUSTOMER (OWNER)</Label>
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Region
+              </Label>
               <div className="relative group">
                 <select
-                  name="ownerId"
-                  value={form.ownerId}
-                  onChange={(e) => {
-                    const owner = owners.find(o => o.id === e.target.value);
-                    setForm({ ...form, ownerId: e.target.value, customer: owner ? owner.name : "" });
-                  }}
+                  name="region"
+                  value={form.region}
+                  onChange={handleChange}
                   className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
-                  disabled={!form.region}
                   required
                 >
-                  <option value="" disabled>{form.region ? "Select Owner" : "Select Region First"}</option>
-                  {filteredOwners.map((o) => (
-                    <option key={o.id} value={o.id}>{o.name} {o.companyName ? `(${o.companyName})` : ''}</option>
+                  <option value="" disabled>Select Region</option>
+                  {REGIONS.map((r) => (
+                    <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
@@ -258,24 +242,29 @@ const FuelDeliveries = () => {
               </div>
             </div>
 
-            {/* Destination (Station Selection) */}
+            {/* Station Selection */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
-                <Building className="w-4 h-4 text-primary" />
-                Destination (Station)
-              </Label>
+              <Label className="text-[13px] font-bold text-foreground ml-0.5">CUSTOMER</Label>
               <div className="relative group">
                 <select
-                  name="destination"
-                  value={form.destination}
-                  onChange={handleChange}
+                  name="ownerId"
+                  value={form.ownerId}
+                  onChange={(e) => {
+                    const owner = owners.find(o => o.id === e.target.value);
+                    setForm({ 
+                      ...form, 
+                      ownerId: e.target.value, 
+                      customer: owner ? owner.stationName : "",
+                      destination: owner ? `${owner.woreda} ${owner.city}` : ""
+                    });
+                  }}
                   className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
-                  disabled={!form.ownerId}
+                  disabled={!form.region}
                   required
                 >
-                  <option value="" disabled>{form.ownerId ? "Select Station" : "Select Owner First"}</option>
-                  {filteredStations.map((s) => (
-                    <option key={s.id} value={s.stationName}>{s.stationName} ({s.gasType})</option>
+                  <option value="" disabled>{form.region ? "Select Station" : "Select Region First"}</option>
+                  {filteredOwners.map((o) => (
+                    <option key={o.id} value={o.id}>{o.stationName} ({o.name})</option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
@@ -284,6 +273,21 @@ const FuelDeliveries = () => {
                   </svg>
                 </div>
               </div>
+            </div>
+
+            {/* Destination (Woreda + City) */}
+            <div className="space-y-3">
+              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
+                <Building className="w-4 h-4 text-primary" />
+                DESTINATION (WOREDA + CITY)
+              </Label>
+              <Input
+                className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
+                name="destination"
+                value={form.destination}
+                placeholder="Auto-filled from owner"
+                readOnly
+              />
             </div>
 
             {/* Sub-City / Citter */}
@@ -336,32 +340,6 @@ const FuelDeliveries = () => {
               />
             </div>
 
-            {/* Region Selection */}
-            <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                Region
-              </Label>
-              <div className="relative group">
-                <select
-                  name="region"
-                  value={form.region}
-                  onChange={handleChange}
-                  className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
-                  required
-                >
-                  <option value="" disabled>Select Region</option>
-                  {REGIONS.map((r) => (
-                    <option key={r} value={r}>{r}</option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
 
             {/* Fuel Type */}
             <div className="space-y-3">
@@ -462,8 +440,8 @@ const FuelDeliveries = () => {
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
                   <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Date</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Customer</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Destination</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Station</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Destination (Woreda/City)</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Citer</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">FDC No</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Vol 20C</th>

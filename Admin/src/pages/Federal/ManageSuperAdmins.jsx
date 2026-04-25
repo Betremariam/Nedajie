@@ -15,6 +15,8 @@ import {
   ShieldAlert,
   Users,
   Search,
+  Upload,
+  FileText,
 } from "lucide-react";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
@@ -235,19 +237,30 @@ const ManageSuperAdmins = () => {
             </div>
 
             {/* Document Upload */}
-            <div className="space-y-3">
+            <div className="md:col-span-2 space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
-                Document Upload (PDF/Image)
+                <FileText className="w-4 h-4 text-primary" />
+                OFFICIAL APPOINTMENT/AUTHORIZATION LETTER (PDF/IMAGE)
               </Label>
-              <div className="relative group">
-                <Input
+              <div className={`relative border-2 border-dashed rounded-2xl p-6 transition-all ${form.document ? 'border-primary/50 bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                <input
                   type="file"
                   id="documentUpload"
-                  className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                  name="document"
                   onChange={handleFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   accept=".pdf,image/*"
                   required
                 />
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Upload className={`w-8 h-8 ${form.document ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <p className="text-[13px] font-semibold text-foreground text-center">
+                    {form.document ? form.document.name : "Click or drag to upload authorization letter"}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground uppercase font-bold tracking-widest">
+                    Maximum file size: 10MB
+                  </p>
+                </div>
               </div>
             </div>
 
