@@ -45,21 +45,32 @@ export const loginAdmin = async (req, res) => {
   }
 
   try {
-    const admin = await prisma.admin.findUnique({ where: { email } });
-    if (!admin) return res.status(404).json({ msg: "Admin not found" });
+    // 1. Try finding in Admin table
+    let admin = await prisma.admin.findUnique({ where: { email } });
+    let isFuelStation = false;
+
+    // 2. If not found in Admin, try finding in FuelStation table
+    if (!admin) {
+      admin = await prisma.fuelStation.findUnique({ where: { email } });
+      if (admin) isFuelStation = true;
+    }
+
+    if (!admin) return res.status(404).json({ msg: "User not found" });
 
     // Check if account is blocked
     if (admin.isBlocked) {
-      return res.status(403).json({ msg: "Your account has been blocked. Please contact the Super Admin." });
+      return res.status(403).json({ msg: "Your account has been blocked. Please contact the administrator." });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) return res.status(401).json({ msg: "Invalid credentials" });
 
     // Build JWT payload
-    const payload = { id: admin.id, role: admin.role };
-    if (admin.role === "stationOwner" && admin.stationIds?.length > 0) {
-      payload.stationIds = admin.stationIds;
+    const payload = { id: admin.id, role: isFuelStation ? "stationOwner" : admin.role };
+    
+    // For station owners, we might want to include stationName or associated IDs
+    if (isFuelStation) {
+      payload.stationName = admin.stationName;
     }
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
@@ -70,16 +81,16 @@ export const loginAdmin = async (req, res) => {
         id: admin.id,
         name: admin.name,
         email: admin.email,
-        role: admin.role,
-        stationIds: admin.stationIds || [],
+        role: isFuelStation ? "stationOwner" : admin.role,
+        stationName: isFuelStation ? admin.stationName : null,
       },
       mustChangePassword: admin.mustChangePassword,
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ msg: "Server error" });
   }
 };
+
 
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;

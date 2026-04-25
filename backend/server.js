@@ -38,9 +38,11 @@ app.use('/uploads', express.static('uploads'));
 const initializeSystem = async () => {
   try {
     // 1. Create Federal Admin from ENV
-    const existingFederal = await prisma.admin.findFirst({
+    const federals = await prisma.admin.findMany({
       where: { role: "federal" },
+      take: 1,
     });
+    const existingFederal = federals[0];
     if (!existingFederal && process.env.FEDERAL_EMAIL) {
       const hashedPassword = await bcrypt.hash(process.env.FEDERAL_PASSWORD || "FederalSecure123", 10);
       await prisma.admin.create({
@@ -56,9 +58,11 @@ const initializeSystem = async () => {
     }
 
     // 2. Create fallback Super Admin if none exists
-    const existingSuperAdmin = await prisma.admin.findFirst({
+    const supers = await prisma.admin.findMany({
       where: { role: "super" },
+      take: 1,
     });
+    const existingSuperAdmin = supers[0];
     if (!existingSuperAdmin) {
       const hashedPassword = await bcrypt.hash("SuperSecure123", 10);
       await prisma.admin.create({
@@ -74,7 +78,8 @@ const initializeSystem = async () => {
       console.log("✅ Default Super Admin created successfully.");
     }
   } catch (err) {
-    console.error("❌ initialization error:", err.message);
+    console.error("❌ initialization error:");
+    console.error(err);
   }
 };
 

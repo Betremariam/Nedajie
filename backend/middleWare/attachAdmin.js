@@ -2,9 +2,16 @@ import prisma from "../lib/prisma.js";
 
 const attachAdmin = async (req, res, next) => {
   try {
-    const admin = await prisma.admin.findUnique({
+    let admin = await prisma.admin.findUnique({
       where: { id: req.user.id },
     });
+
+    if (!admin) {
+      admin = await prisma.fuelStation.findUnique({
+        where: { id: req.user.id },
+      });
+    }
+
     if (!admin) {
       return res.status(401).json({ msg: "Admin not found" });
     }

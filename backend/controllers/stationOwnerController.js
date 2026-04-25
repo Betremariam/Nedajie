@@ -3,24 +3,18 @@ import bcrypt from "bcryptjs";
 
 export const getOwnerFuelStock = async (req, res) => {
   try {
-    let { stationIds } = req.query;
+    const { stationName } = req.admin;
 
-    if (!stationIds) {
-      return res.status(400).json({ msg: "No station IDs provided" });
-    }
-
-    if (!Array.isArray(stationIds)) {
-      stationIds = [stationIds];
+    if (!stationName) {
+      return res.status(400).json({ msg: "No station name associated with this owner" });
     }
 
     const stocks = await prisma.fuelStock.findMany({
-      where: {
-        id: { in: stationIds },
-      },
+      where: { stationName },
     });
 
     if (!stocks || stocks.length === 0) {
-      return res.status(404).json({ msg: "No fuel stock found for these stations" });
+      return res.status(404).json({ msg: "No fuel stock found for this station" });
     }
 
     let benzeneTotal = 0;
@@ -46,21 +40,18 @@ export const getOwnerFuelStock = async (req, res) => {
   }
 };
 
+
 export const ownerFuelReceived = async (req, res) => {
   try {
-    let { stationIds } = req.query;
+    const { stationName } = req.admin;
 
-    if (!stationIds) {
-      return res.status(400).json({ msg: "No station IDs provided" });
-    }
-
-    if (!Array.isArray(stationIds)) {
-      stationIds = [stationIds];
+    if (!stationName) {
+      return res.status(400).json({ msg: "No station associated" });
     }
 
     const records = await prisma.fuelReceived.findMany({
       where: {
-        stationId: { in: stationIds },
+        station: { stationName: stationName }
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -75,7 +66,7 @@ export const ownerFuelReceived = async (req, res) => {
     });
 
     if (!records || records.length === 0) {
-      return res.status(404).json({ msg: "No fuel received records found for these stations" });
+      return res.status(404).json({ msg: "No fuel received records found" });
     }
 
     const formatted = records.map((r) => ({
@@ -94,17 +85,16 @@ export const ownerFuelReceived = async (req, res) => {
   }
 };
 
+
 export const ownerStations = async (req, res) => {
   try {
-    let stationIds = req.admin.stationIds; // array of strings (Ids)
-    if (!stationIds || stationIds.length === 0) {
-      return res.status(400).json({ msg: "⚠️ No stations assigned to this owner" });
+    const { stationName } = req.admin;
+    if (!stationName) {
+      return res.status(400).json({ msg: "⚠️ No station assigned to this owner" });
     }
 
     const stations = await prisma.fuelStock.findMany({
-      where: {
-        id: { in: stationIds },
-      },
+      where: { stationName },
       select: {
         id: true,
         stationName: true,
@@ -118,33 +108,16 @@ export const ownerStations = async (req, res) => {
   }
 };
 
+
 export const ownerTransactions = async (req, res) => {
   try {
-    let { stationIds } = req.query;
-    if (!stationIds) {
-      return res.status(400).json({ msg: "No station IDs provided" });
+    const { stationName } = req.admin;
+    if (!stationName) {
+      return res.status(400).json({ msg: "No station associated" });
     }
-    if (!Array.isArray(stationIds)) {
-      stationIds = [stationIds];
-    }
-
-    const stocks = await prisma.fuelStock.findMany({
-      where: { id: { in: stationIds } },
-    });
-
-    if (stocks.length === 0) {
-      return res.status(404).json({ msg: "No stations found" });
-    }
-
-    const orConditions = stocks.map(stock => ({
-      stationName: stock.stationName,
-      city: stock.city,
-    }));
 
     const transactions = await prisma.fuelTransaction.findMany({
-      where: {
-        OR: orConditions,
-      },
+      where: { stationName },
       orderBy: { createdAt: 'desc' },
       include: {
         driver: { select: { name: true } },
@@ -153,7 +126,7 @@ export const ownerTransactions = async (req, res) => {
     });
 
     if (!transactions || transactions.length === 0) {
-      return res.status(404).json({ msg: "No transactions for these stations" });
+      return res.status(404).json({ msg: "No transactions for this station" });
     }
 
     res.json(transactions);
@@ -163,28 +136,14 @@ export const ownerTransactions = async (req, res) => {
   }
 };
 
+
 export const ownerReports = async (req, res) => {
   try {
-    let { stationIds, type } = req.query;
-    if (!stationIds) {
-      return res.status(400).json({ msg: "No station IDs provided" });
+    const { stationName } = req.admin;
+    const { type } = req.query;
+    if (!stationName) {
+      return res.status(400).json({ msg: "No station associated" });
     }
-    if (!Array.isArray(stationIds)) {
-      stationIds = [stationIds];
-    }
-
-    const stocks = await prisma.fuelStock.findMany({
-      where: { id: { in: stationIds } },
-    });
-
-    if (stocks.length === 0) {
-      return res.status(404).json({ msg: "No stations found" });
-    }
-
-    const orConditions = stocks.map(stock => ({
-      stationName: stock.stationName,
-      city: stock.city,
-    }));
 
     let startDate = new Date();
     switch (type) {
@@ -206,8 +165,8 @@ export const ownerReports = async (req, res) => {
 
     const transactions = await prisma.fuelTransaction.findMany({
       where: {
-        OR: orConditions,
-        createdAt: { gte: startDate }, // Using createdAt consistently
+        stationName,
+        createdAt: { gte: startDate },
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -223,6 +182,7 @@ export const ownerReports = async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+
 
 export async function registerAttendant(req, res) {
   try {
@@ -259,6 +219,7 @@ export async function registerAttendant(req, res) {
         isEnabled: true,
       },
     });
+
 
     res.status(201).json({ 
       msg: "Registered successfully. Await admin approval.", 

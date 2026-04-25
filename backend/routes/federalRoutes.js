@@ -23,7 +23,15 @@ const isFederal = (req, res, next) => {
 router.use(verifyToken, isFederal);
 
 router.post("/create-super-admin", upload.single("document"), createRegionalSuperAdmin);
-router.post("/create-owner", upload.single("document"), createOwner);
+router.post("/create-owner", upload.fields([
+  { name: 'legalDoc', maxCount: 1 },
+  { name: 'fuelLicense', maxCount: 1 },
+  { name: 'constructionDoc', maxCount: 1 },
+  { name: 'safetyCert', maxCount: 1 },
+  { name: 'envClearance', maxCount: 1 },
+  { name: 'pumpCalibration', maxCount: 1 }
+]), createOwner);
+
 router.post("/add-fuel", upload.single("letter"), addFuelDelivery);
 router.get("/fuel-deliveries", getAllFuelDeliveries);
 router.get("/admins", getFederalAdmins);

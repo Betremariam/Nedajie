@@ -45,14 +45,19 @@ const ManageOwners = () => {
   const [form, setForm] = useState({ 
     name: "", 
     email: "", 
-    companyName: "", 
     region: "", 
     zone: "",
     woreda: "",
-    stockName: "",
-    document: null 
+    city: "",
+    stationName: "",
+    legalDoc: null,
+    fuelLicense: null,
+    constructionDoc: null,
+    safetyCert: null,
+    envClearance: null,
+    pumpCalibration: null
   });
-  const [selectedOwner, setSelectedOwner] = useState(null);
+   const [selectedOwner, setSelectedOwner] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -76,7 +81,10 @@ const ManageOwners = () => {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleFileChange = (e) => setForm({ ...form, document: e.target.files[0] });
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setForm({ ...form, [name]: files[0] });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,12 +96,18 @@ const ManageOwners = () => {
     const formData = new FormData();
     formData.append("name", form.name);
     formData.append("email", form.email);
-    formData.append("companyName", form.companyName);
     formData.append("region", form.region);
     formData.append("zone", form.zone);
     formData.append("woreda", form.woreda);
-    formData.append("stockName", form.stockName);
-    if (form.document) formData.append("document", form.document);
+    formData.append("city", form.city);
+    formData.append("stationName", form.stationName);
+    
+    if (form.legalDoc) formData.append("legalDoc", form.legalDoc);
+    if (form.fuelLicense) formData.append("fuelLicense", form.fuelLicense);
+    if (form.constructionDoc) formData.append("constructionDoc", form.constructionDoc);
+    if (form.safetyCert) formData.append("safetyCert", form.safetyCert);
+    if (form.envClearance) formData.append("envClearance", form.envClearance);
+    if (form.pumpCalibration) formData.append("pumpCalibration", form.pumpCalibration);
 
     try {
       const res = await createOwner(formData);
@@ -102,16 +116,22 @@ const ManageOwners = () => {
       setForm({ 
         name: "", 
         email: "", 
-        companyName: "", 
         region: "", 
         zone: "",
         woreda: "",
-        stockName: "",
-        document: null 
+        city: "",
+        stationName: "",
+        legalDoc: null,
+        fuelLicense: null,
+        constructionDoc: null,
+        safetyCert: null,
+        envClearance: null,
+        pumpCalibration: null
       });
-      // Reset file input visually
-      const fileInput = document.getElementById("documentUpload");
-      if (fileInput) fileInput.value = "";
+      // Reset file inputs visually
+      document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.value = "";
+      });
       fetchOwners();
     } catch (err) {
       setError(err?.response?.data?.msg || "Registration failed.");
@@ -132,7 +152,7 @@ const ManageOwners = () => {
     (o) =>
       o.name?.toLowerCase().includes(search.toLowerCase()) ||
       o.email?.toLowerCase().includes(search.toLowerCase()) ||
-      o.companyName?.toLowerCase().includes(search.toLowerCase()) ||
+      o.stationName?.toLowerCase().includes(search.toLowerCase()) ||
       o.region?.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -206,9 +226,9 @@ const ManageOwners = () => {
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
 
-            {/* Full Name */}
+            {/* Owner Name */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5">Full Name</Label>
+              <Label className="text-[13px] font-bold text-foreground ml-0.5">Owner Name</Label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
@@ -239,23 +259,6 @@ const ManageOwners = () => {
               </div>
             </div>
 
-            {/* Company Name */}
-            <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
-                <Building className="w-4 h-4 text-primary" />
-                Company Name
-              </Label>
-              <div className="relative group">
-                <Input
-                  className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                  placeholder="Company or business name"
-                  name="companyName"
-                  value={form.companyName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
 
             {/* Region */}
             <div className="space-y-3">
@@ -320,40 +323,139 @@ const ManageOwners = () => {
               </div>
             </div>
 
-            {/* Stock Name */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-primary" />
-                Stock Name
+                <MapPin className="w-4 h-4 text-primary" />
+                City
               </Label>
               <div className="relative group">
                 <Input
                   className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
-                  placeholder="e.g., NOC Station"
-                  name="stockName"
-                  value={form.stockName}
+                  placeholder="e.g., Debre Markos City"
+                  name="city"
+                  value={form.city}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
 
-            {/* Document Upload */}
+            {/* Station Name */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-foreground ml-0.5 flex items-center gap-2">
-                Document Upload (PDF/Image)
+                <Building2 className="w-4 h-4 text-primary" />
+                Station Name
               </Label>
               <div className="relative group">
                 <Input
-                  type="file"
-                  id="documentUpload"
-                  className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
-                  onChange={handleFileChange}
-                  accept=".pdf,image/*"
+                  className="h-12 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground"
+                  placeholder="e.g., NOC Station"
+                  name="stationName"
+                  value={form.stationName}
+                  onChange={handleChange}
                   required
                 />
               </div>
             </div>
+
+            {/* Document Upload Section */}
+            <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 pt-6 border-t border-border">
+              <div className="md:col-span-2">
+                <h3 className="text-sm font-bold text-foreground">Documentation Upload</h3>
+                <p className="text-xs text-muted-foreground">Please upload required documents in PDF or Image format</p>
+              </div>
+
+              {/* Legal business documents */}
+              <div className="space-y-3">
+                <Label className="text-[13px] font-bold text-foreground ml-0.5">Legal business documents</Label>
+                <div className="relative group">
+                  <Input
+                    type="file"
+                    name="legalDoc"
+                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".pdf,image/*"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Fuel sector license */}
+              <div className="space-y-3">
+                <Label className="text-[13px] font-bold text-foreground ml-0.5">Fuel sector license</Label>
+                <div className="relative group">
+                  <Input
+                    type="file"
+                    name="fuelLicense"
+                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".pdf,image/*"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Construction approval */}
+              <div className="space-y-3">
+                <Label className="text-[13px] font-bold text-foreground ml-0.5">Construction approval</Label>
+                <div className="relative group">
+                  <Input
+                    type="file"
+                    name="constructionDoc"
+                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".pdf,image/*"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Safety certification */}
+              <div className="space-y-3">
+                <Label className="text-[13px] font-bold text-foreground ml-0.5">Safety certification</Label>
+                <div className="relative group">
+                  <Input
+                    type="file"
+                    name="safetyCert"
+                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".pdf,image/*"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Environmental clearance */}
+              <div className="space-y-3">
+                <Label className="text-[13px] font-bold text-foreground ml-0.5">Environmental clearance</Label>
+                <div className="relative group">
+                  <Input
+                    type="file"
+                    name="envClearance"
+                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".pdf,image/*"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Pump calibration approval */}
+              <div className="space-y-3">
+                <Label className="text-[13px] font-bold text-foreground ml-0.5">Pump calibration approval</Label>
+                <div className="relative group">
+                  <Input
+                    type="file"
+                    name="pumpCalibration"
+                    className="h-12 pt-3 pl-4 rounded-xl border-border bg-muted/30 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-foreground cursor-pointer"
+                    onChange={handleFileChange}
+                    accept=".pdf,image/*"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
 
           </div>
 
@@ -381,18 +483,25 @@ const ManageOwners = () => {
                 setForm({ 
                   name: "", 
                   email: "", 
-                  companyName: "", 
                   region: "", 
                   zone: "",
                   woreda: "",
-                  stockName: "",
-                  document: null 
+                  city: "",
+                  stationName: "",
+                  legalDoc: null,
+                  fuelLicense: null,
+                  constructionDoc: null,
+                  safetyCert: null,
+                  envClearance: null,
+                  pumpCalibration: null
                 });
-                const fileInput = document.getElementById("documentUpload");
-                if (fileInput) fileInput.value = "";
+                document.querySelectorAll('input[type="file"]').forEach(input => {
+                  input.value = "";
+                });
               }}>
                 Clear
               </Button>
+
             </div>
           </div>
         </form>
@@ -433,7 +542,7 @@ const ManageOwners = () => {
                 <tr className="bg-muted/50 border-b border-border">
                   <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Owner</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Email</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Company</th>
+                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Station Name</th>
                   <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Region</th>
                   <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
                   <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Action</th>
@@ -454,7 +563,7 @@ const ManageOwners = () => {
                     <td className="py-4">
                       <div className="flex items-center gap-1.5 text-[13px] font-medium text-foreground">
                         <Building className="w-3.5 h-3.5 text-muted-foreground/50" />
-                        {owner.companyName || "—"}
+                        {owner.stationName || "—"}
                       </div>
                     </td>
                     <td className="py-4">
@@ -488,36 +597,63 @@ const ManageOwners = () => {
               <h3 className="text-lg font-bold text-foreground">Owner Details</h3>
               <Button variant="ghost" size="sm" onClick={() => setSelectedOwner(null)} className="h-8 w-8 rounded-full p-0">✕</Button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
               <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Full Name</p>
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Owner Name</p>
                 <p className="text-sm font-medium text-foreground">{selectedOwner.name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Company Name</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.companyName || "—"}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-semibold uppercase">Email Address</p>
                 <p className="text-sm font-medium text-foreground">{selectedOwner.email}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Region</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.region || "—"}</p>
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Station Name</p>
+                <p className="text-sm font-medium text-foreground">{selectedOwner.stationName || "—"}</p>
               </div>
-              {selectedOwner.documentPath && (
-                <div className="pt-2">
-                  <p className="text-xs text-muted-foreground font-semibold uppercase mb-2">Uploaded Document</p>
-                  <a
-                    href={`http://localhost:5000/${selectedOwner.documentPath.replace(/\\/g, '/')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center h-9 px-4 rounded-xl bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition-colors"
-                  >
-                    View Document
-                  </a>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">Region</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.region || "—"}</p>
                 </div>
-              )}
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">Zone</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.zone || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">Woreda</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.woreda || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">City</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.city || "—"}</p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-border space-y-3">
+                <p className="text-xs text-muted-foreground font-semibold uppercase">Uploaded Documents</p>
+                
+                {[
+                  { label: "Legal Business", path: selectedOwner.legalDocPath },
+                  { label: "Fuel Sector License", path: selectedOwner.fuelLicensePath },
+                  { label: "Construction Approval", path: selectedOwner.constructionDocPath },
+                  { label: "Safety Cert", path: selectedOwner.safetyCertPath },
+                  { label: "Env Clearance", path: selectedOwner.envClearancePath },
+                  { label: "Pump Calibration", path: selectedOwner.pumpCalibrationPath },
+                  { label: "General Document", path: selectedOwner.documentPath },
+                ].map((doc, idx) => doc.path && (
+                  <div key={idx} className="flex items-center justify-between bg-muted/30 p-2 rounded-lg">
+                    <span className="text-[12px] font-medium text-foreground">{doc.label}</span>
+                    <a
+                      href={`http://localhost:5000/${doc.path.replace(/\\/g, '/')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-primary hover:underline"
+                    >
+                      View
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

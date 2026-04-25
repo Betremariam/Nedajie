@@ -59,12 +59,20 @@ export async function createRegionalSuperAdmin(req, res) {
  */
 export async function createOwner(req, res) {
   try {
-    const { name, email, companyName, region, stationIds, zone, woreda, stockName } = req.body;
-    const documentPath = req.file ? req.file.path : null;
+    const { name, email, region, stationIds, zone, woreda, city, stationName } = req.body;
+    
+    // Extract file paths from req.files
+    const legalDocPath = req.files?.legalDoc?.[0]?.path || null;
+    const fuelLicensePath = req.files?.fuelLicense?.[0]?.path || null;
+    const constructionDocPath = req.files?.constructionDoc?.[0]?.path || null;
+    const safetyCertPath = req.files?.safetyCert?.[0]?.path || null;
+    const envClearancePath = req.files?.envClearance?.[0]?.path || null;
+    const pumpCalibrationPath = req.files?.pumpCalibration?.[0]?.path || null;
 
-    if (!name || !email || !companyName || !region) {
-      return res.status(400).json({ msg: "Name, email, companyName, and region are required." });
+    if (!name || !email || !region) {
+      return res.status(400).json({ msg: "Name, email, and region are required." });
     }
+
 
     let parsedStationIds = [];
     if (stationIds) {
@@ -79,15 +87,13 @@ export async function createOwner(req, res) {
       }
     }
 
-    // Automatically create stocks if stockName, zone, and woreda are provided
-    if (stockName && zone && woreda) {
-      const fullStockName = `${stockName} (${zone} - ${woreda})`;
-      
+    // Automatically create stocks if stationName, zone, and woreda are provided
+    if (stationName && zone && woreda) {
       // Create Benzene Stock
-      const benzeneStock = await prisma.fuelStock.create({
+      await prisma.fuelStock.create({
         data: {
-          stationName: fullStockName,
-          city: woreda,
+          stationName,
+          city: city || woreda,
           region,
           gasType: "benzene",
           litersReceived: 0
@@ -95,52 +101,59 @@ export async function createOwner(req, res) {
       });
       
       // Create Diesel Stock
-      const dieselStock = await prisma.fuelStock.create({
+      await prisma.fuelStock.create({
         data: {
-          stationName: fullStockName,
-          city: woreda,
+          stationName,
+          city: city || woreda,
           region,
           gasType: "diesel",
           litersReceived: 0
         }
       });
-
-      parsedStationIds.push(benzeneStock.id, dieselStock.id);
     }
 
     const existing = await prisma.admin.findUnique({ where: { email } });
-    if (existing) {
+    const existingStation = await prisma.fuelStation.findUnique({ where: { email } });
+    if (existing || existingStation) {
       return res.status(400).json({ msg: "Email already exists." });
     }
 
     const tempPassword = generateTempPassword();
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    const owner = await prisma.admin.create({
+    const owner = await prisma.fuelStation.create({
       data: {
         name,
         email,
         password: hashedPassword,
         role: "stationOwner",
-        companyName,
         region,
-        stationIds: parsedStationIds,
-        documentPath,
+        zone,
+        woreda,
+        city,
+        stationName,
         mustChangePassword: true,
-        isApproved: true // Federal approved them directly
+        isApproved: true,
+        legalDocPath,
+        fuelLicensePath,
+        constructionDocPath,
+        safetyCertPath,
+        envClearancePath,
+        pumpCalibrationPath
       }
     });
 
     res.status(201).json({
-      msg: "Owner created and approved successfully.",
+      msg: "Owner created and approved successfully under Fuel Station table.",
       tempPassword,
-      owner: { id: owner.id, name: owner.name, companyName, region }
+      owner: { id: owner.id, name: owner.name, stationName, region }
     });
   } catch (err) {
     console.error("Create Owner Error:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
+
 
 /**
  * Federal - Add Fuel Delivery
@@ -196,25 +209,29 @@ export async function getAllFuelDeliveries(req, res) {
  */
 export async function getFederalAdmins(req, res) {
   try {
-    const admins = await prisma.admin.findMany({
-      where: {
-        role: { in: ["super", "stationOwner"] }
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        region: true,
-        companyName: true,
-        stationIds: true,
-        isBlocked: true,
-        isApproved: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" }
-    });
-    res.status(200).json(admins);
+    const [admins, stations] = await Promise.all([
+      prisma.admin.findMany({
+        where: { role: "super" },
+        select: {
+          id: true, name: true, email: true, role: true, region: true,
+          isBlocked: true, isApproved: true, createdAt: true,
+        }
+      }),
+      prisma.fuelStation.findMany({
+        select: {
+          id: true, name: true, email: true, role: true, region: true,
+          zone: true, woreda: true, city: true, stationName: true,
+          isBlocked: true, isApproved: true, createdAt: true,
+        }
+      })
+    ]);
+
+    // Combine and sort by createdAt
+    const combined = [...admins, ...stations].sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    res.status(200).json(combined);
   } catch (err) {
     console.error("Get Federal Admins Error:", err);
     res.status(500).json({ msg: "Failed to fetch administrative records", error: err.message });
@@ -227,7 +244,7 @@ export async function getFederalAdmins(req, res) {
 export async function getFederalDashboardStats(req, res) {
   try {
     const superAdminsCount = await prisma.admin.count({ where: { role: "super" } });
-    const stationOwnersCount = await prisma.admin.count({ where: { role: "stationOwner", isApproved: true } });
+    const stationOwnersCount = await prisma.fuelStation.count({ where: { isApproved: true } });
     
     const totalDeliveries = await prisma.fuelDelivery.count();
 

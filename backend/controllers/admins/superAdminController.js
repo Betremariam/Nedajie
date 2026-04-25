@@ -66,13 +66,15 @@ export async function getAllFuelStocks(req, res) {
 
 export async function addFuelStock(req, res) {
   try {
-    const { stationName, city, gasType, litersReceived } = req.body;
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    
     const newStock = await prisma.fuelStock.create({
       data: {
         stationName,
         city,
         gasType,
         litersReceived,
+        region: admin?.region,
       },
     });
     res.status(201).json({ msg: "Fuel stock added", stock: newStock });
@@ -409,8 +411,18 @@ export async function createStationOwner(req, res) {
     const tempPassword = generateTempPassword();
     const hashed = await bcrypt.hash(tempPassword, 10);
 
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+
     const owner = await prisma.admin.create({
-      data: { name, email, password: hashed, role: "stationOwner", stationIds, mustChangePassword: true },
+      data: { 
+        name, 
+        email, 
+        password: hashed, 
+        role: "stationOwner", 
+        stationIds, 
+        mustChangePassword: true,
+        region: admin?.region 
+      },
     });
 
     res.status(201).json({ msg: "Station owner created", ownerId: owner.id, tempPassword });

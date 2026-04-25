@@ -22,8 +22,6 @@ model Admin {
   isBlocked           Boolean   @default(false)
   mustChangePassword  Boolean   @default(false)
   region              String?
-  companyName         String?
-  stationIds          String[]
   documentPath        String?
   createdAt           DateTime  @default(now())
 
@@ -31,7 +29,6 @@ model Admin {
   farmers         Farmer[]
   millHouseOwners MillHouseOwner[]
   otherUsers      OtherUser[]
-  attendants      FuelAttendant[]
 }
 
 enum AdminRole {
@@ -110,12 +107,42 @@ model FuelAttendant {
   isApproved   Boolean  @default(false)
   isEnabled    Boolean  @default(true)
   documentPath String
-  owner        Admin?   @relation(fields: [ownerId], references: [id])
+  owner        FuelStation? @relation(fields: [ownerId], references: [id])
   ownerId      String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
 }
 
+model FuelStation {
+
+  id                  String   @id @default(cuid())
+  name                String   // Owner Name
+  email               String   @unique
+  password            String
+  role                String   @default("stationOwner")
+  region              String
+  zone                String
+  woreda              String
+  city                String
+  stationName         String   @unique
+  
+  isApproved          Boolean  @default(true)
+  isBlocked           Boolean  @default(false)
+  mustChangePassword  Boolean  @default(false)
+  
+  // Documents
+  legalDocPath        String?
+  fuelLicensePath     String?
+  constructionDocPath String?
+  safetyCertPath      String?
+  envClearancePath    String?
+  pumpCalibrationPath String?
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  
+  attendants          FuelAttendant[]
+}
 model FuelDelivery {
   id                String             @id @default(cuid())
   date              String
