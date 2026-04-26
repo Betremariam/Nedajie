@@ -64,10 +64,13 @@ const Dashboard = () => {
       );
       const todayLiters = todayTxs.reduce((sum, tx) => sum + (tx.liters || 0), 0);
 
-      // Calculate aggregates
-      const totalVol = stockData.benzene + stockData.diesel;
+      // Calculate aggregates safely
+      const benzVol = Number(stockData?.benzene) || 0;
+      const diesVol = Number(stockData?.diesel) || 0;
+      const totalVol = benzVol + diesVol;
+      
       const MAX_TOTAL = 100000; // Scalable max for aggregate display
-      const stockPercent = Math.min(Math.round((totalVol / MAX_TOTAL) * 100), 100);
+      const stockPercent = Math.min(Math.round((totalVol / MAX_TOTAL) * 100), 100) || 0;
 
       setStats([
         { label: "Total Volume", value: `${totalVol.toLocaleString()} L`, icon: Droplets, color: "emerald", desc: "Benzene & Diesel" },

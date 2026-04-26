@@ -112,6 +112,7 @@ const ManageOwners = () => {
     if (form.pumpCalibration) formData.append("pumpCalibration", form.pumpCalibration);
 
     try {
+      console.log("Submitting Owner Registration (FormData key-values):", Object.fromEntries(formData.entries()));
       const res = await createOwner(formData);
       setSuccess("Station owner created successfully.");
       setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
@@ -136,6 +137,11 @@ const ManageOwners = () => {
       });
       fetchOwners();
     } catch (err) {
+      console.error("Registration Request Failed:", {
+        status: err.response?.status,
+        data: err.response?.data,
+        msg: err.response?.data?.msg
+      });
       setError(err?.response?.data?.msg || "Registration failed.");
     } finally {
       setLoading(false);

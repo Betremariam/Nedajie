@@ -63,13 +63,13 @@ const OwnerFuelStock = () => {
     </div>
   );
 
-  const benzene = fuelStock?.benzene ?? 0;
-  const diesel = fuelStock?.diesel ?? 0;
+  const benzene = Number(fuelStock?.benzene) || 0;
+  const diesel = Number(fuelStock?.diesel) || 0;
 
   // Visual thresholds (assuming some max capacity for display purposes)
-  const MAX_CAPACITY = 20000; 
-  const benzenePercent = Math.min((benzene / MAX_CAPACITY) * 100, 100);
-  const dieselPercent = Math.min((diesel / MAX_CAPACITY) * 100, 100);
+  const MAX_CAPACITY = 100000; 
+  const benzenePercent = Math.min((benzene / MAX_CAPACITY) * 100, 100) || 0;
+  const dieselPercent = Math.min((diesel / MAX_CAPACITY) * 100, 100) || 0;
 
   return (
     <div className="p-6 md:p-8 space-y-8 max-w-6xl mx-auto font-sans">

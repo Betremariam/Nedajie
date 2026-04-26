@@ -70,6 +70,7 @@ export async function createOwner(req, res) {
     const pumpCalibrationPath = req.files?.pumpCalibration?.[0]?.path || null;
 
     if (!name || !email || !region) {
+      console.warn("createOwner 400: Missing required fields", { name: !!name, email: !!email, region: !!region });
       return res.status(400).json({ msg: "Name, email, and region are required." });
     }
 
@@ -88,9 +89,19 @@ export async function createOwner(req, res) {
     }
 
     const existing = await prisma.admin.findUnique({ where: { email } });
-    const existingStation = await prisma.fuelStation.findUnique({ where: { email } });
-    if (existing || existingStation) {
+    const existingStationByEmail = await prisma.fuelStation.findUnique({ where: { email } });
+    
+    if (existing || existingStationByEmail) {
+      console.warn("createOwner 400: Email already exists", email);
       return res.status(400).json({ msg: "Email already exists." });
+    }
+
+    if (stationName) {
+      const existingStationByName = await prisma.fuelStation.findUnique({ where: { stationName } });
+      if (existingStationByName) {
+        console.warn("createOwner 400: Station name already exists", stationName);
+        return res.status(400).json({ msg: "Station name already exists." });
+      }
     }
 
     const tempPassword = generateTempPassword();
@@ -150,6 +161,12 @@ export async function createOwner(req, res) {
     });
   } catch (err) {
     console.error("Create Owner Error:", err);
+    if (err.code === 'P2002') {
+      const target = err.meta?.target || [];
+      return res.status(400).json({ 
+        msg: `Unique constraint failed: ${target.join(', ')} already exists.` 
+      });
+    }
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }

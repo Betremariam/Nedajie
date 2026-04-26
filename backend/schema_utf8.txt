@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id                 String           @id @default(cuid())
+  name               String
+  email              String           @unique
+  password           String
+  role               AdminRole
+  createdAt          DateTime         @default(now())
+  isApproved         Boolean          @default(true)
+  isBlocked          Boolean          @default(false)
+  mustChangePassword Boolean          @default(false)
+  region             String?
+  companyName        String?
+  documentPath       String?
+  farmers            Farmer[]
+  millHouseOwners    MillHouseOwner[]
+  otherUsers         OtherUser[]
+  vehicles           Vehicle[]
+}
+
+model Vehicle {
+  id             String            @id @default(cuid())
+  ownerName      String
+  phone          String            @unique
+  vehicleType    VehicleType
+  carPlate       String
+  qrCode         String?
+  password       String
+  dailyLimitUsed Float             @default(0)
+  lastFuelDate   DateTime?
+  fullCapacity   Float             @default(0)
+  isApproved     Boolean           @default(false)
+  documentPath   String?
+  region         String?
+  approvedById   String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @default(now()) @updatedAt
+  transactions   FuelTransaction[]
+  approvedBy     Admin?            @relation(fields: [approvedById], references: [id])
+}
+
+model Farmer {
+  id               String            @id @default(cuid())
+  fullName         String
+  kebele           String
+  woreda           String
+  phoneNumber      String            @unique
+  litersUsed15Days Float             @default(0)
+  limitStartDate   DateTime?         @default(now())
+  documentPath     String?
+  approvedById     String?
+  isApproved       Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  region           String?
+  expiryDate       DateTime?
+  landSize         Float             @default(0)
+  updatedAt        DateTime          @default(now()) @updatedAt
+  approvedBy       Admin?            @relation(fields: [approvedById], references: [id])
+  transactions     FuelTransaction[]
+}
+
+model FuelAttendant {
+  id           String       @id @default(cuid())
+  name         String
+  phone        String       @unique
+  password     String
+  stationName  String
+  city         String
+  isApproved   Boolean      @default(false)
+  documentPath String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+  region       String?
+  isEnabled    Boolean      @default(true)
+  ownerId      String?
+  owner        FuelStation? @relation(fields: [ownerId], references: [id])
+}
+
+model FuelStation {
+  id                  String          @id @default(cuid())
+  name                String
+  email               String          @unique
+  password            String
+  role                String          @default("stationOwner")
+  region              String
+  zone                String
+  woreda              String
+  city                String
+  stationName         String          @unique
+  isApproved          Boolean         @default(true)
+  isBlocked           Boolean         @default(false)
+  mustChangePassword  Boolean         @default(false)
+  legalDocPath        String?
+  fuelLicensePath     String?
+  constructionDocPath String?
+  safetyCertPath      String?
+  envClearancePath    String?
+  pumpCalibrationPath String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @default(now()) @updatedAt
+  attendants          FuelAttendant[]
+}
+
+model FuelDelivery {
+  id                   String             @id @default(cuid())
+  date                 String
+  customer             String
+  destination          String
+  citter               String
+  fdcNo                String
+  volume               Float
+  region               String
+  fuelType             FuelType
+  isConfirmed          Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  ownerId              String?
+  status               FuelDeliveryStatus @default(PENDING)
+  superAdminId         String?
+  federalLetterPath    String?
+  ownerSignedPath      String?
+  superAdminSignedPath String?
+}
+
+model FuelReceived {
+  id          String    @id @default(cuid())
+  stationId   String
+  stationName String
+  city        String
+  gasType     FuelType
+  liters      Float
+  date        DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  region      String?
+  station     FuelStock @relation(fields: [stationId], references: [id])
+}
+
+model FuelStock {
+  id              String         @id @default(cuid())
+  stationName     String
+  city            String
+  gasType         FuelType
+  litersReceived  Float
+  litersDispensed Float          @default(0)
+  date            DateTime       @default(now())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now()) @updatedAt
+  region          String?
+  fuelReceived    FuelReceived[]
+}
+
+model FuelTransaction {
+  id               String          @id @default(cuid())
+  farmerId         String?
+  otherUserId      String?
+  gasType          FuelType
+  liters           Float
+  stationName      String
+  attendantName    String
+  city             String
+  date             DateTime        @default(now())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+  region           String?
+  vehicleId        String?
+  millHouseOwnerId String?
+  farmer           Farmer?         @relation(fields: [farmerId], references: [id])
+  millHouseOwner   MillHouseOwner? @relation(fields: [millHouseOwnerId], references: [id])
+  otherUser        OtherUser?      @relation(fields: [otherUserId], references: [id])
+  vehicle          Vehicle?        @relation(fields: [vehicleId], references: [id])
+}
+
+model OtherUser {
+  id                 String            @id @default(cuid())
+  fullName           String
+  phoneNumber        String            @unique
+  fuelType           FuelType
+  dailyLimitUsed     Float             @default(0)
+  documentPath       String?
+  isApproved         Boolean           @default(false)
+  approvedById       String?
+  createdAt          DateTime          @default(now())
+  region             String?
+  maxUses            Int               @default(-1)
+  useCount           Int               @default(0)
+  litersUsed         Float             @default(0)
+  password           String            @default("")
+  totalAllowedLiters Float             @default(0)
+  updatedAt          DateTime          @default(now()) @updatedAt
+  transactions       FuelTransaction[]
+  approvedBy         Admin?            @relation(fields: [approvedById], references: [id])
+}
+
+model MillHouseOwner {
+  id            String            @id @default(cuid())
+  fullName      String
+  kebele        String
+  woreda        String
+  phoneNumber   String            @unique
+  fuelType      FuelType          @default(diesel)
+  dailyLimit    Float             @default(0)
+  documentPath  String?
+  region        String?
+  isApproved    Boolean           @default(false)
+  approvedById  String?
+  createdAt     DateTime          @default(now())
+  numberOfMills Int               @default(1)
+  updatedAt     DateTime          @default(now()) @updatedAt
+  transactions  FuelTransaction[]
+  approvedBy    Admin?            @relation(fields: [approvedById], references: [id])
+}
+
+enum AdminRole {
+  super
+  approver
+  register
+  federal
+}
+
+enum VehicleType {
+  bajaj
+  taxi
+  heavy
+  car
+  truck
+  bus
+  motorcycle
+  boat
+  ship
+  machinery
+  ambulance
+  other
+}
+
+enum FuelDeliveryStatus {
+  PENDING
+  SUPERADMIN_ACCEPTED
+  OWNER_ACCEPTED
+  REJECTED
+}
+
+enum FuelType {
+  diesel
+  benzene
+}
+
+
