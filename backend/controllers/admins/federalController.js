@@ -87,31 +87,6 @@ export async function createOwner(req, res) {
       }
     }
 
-    // Automatically create stocks if stationName, zone, and woreda are provided
-    if (stationName && zone && woreda) {
-      // Create Benzene Stock
-      await prisma.fuelStock.create({
-        data: {
-          stationName,
-          city: city || woreda,
-          region,
-          gasType: "benzene",
-          litersReceived: 0
-        }
-      });
-      
-      // Create Diesel Stock
-      await prisma.fuelStock.create({
-        data: {
-          stationName,
-          city: city || woreda,
-          region,
-          gasType: "diesel",
-          litersReceived: 0
-        }
-      });
-    }
-
     const existing = await prisma.admin.findUnique({ where: { email } });
     const existingStation = await prisma.fuelStation.findUnique({ where: { email } });
     if (existing || existingStation) {
@@ -142,6 +117,31 @@ export async function createOwner(req, res) {
         pumpCalibrationPath
       }
     });
+
+    // Automatically create stocks if stationName, zone, and woreda are provided
+    if (stationName && zone && woreda) {
+      // Create Benzene Stock
+      await prisma.fuelStock.create({
+        data: {
+          stationName,
+          city: city || woreda,
+          region,
+          gasType: "benzene",
+          litersReceived: 0
+        }
+      });
+      
+      // Create Diesel Stock
+      await prisma.fuelStock.create({
+        data: {
+          stationName,
+          city: city || woreda,
+          region,
+          gasType: "diesel",
+          litersReceived: 0
+        }
+      });
+    }
 
     res.status(201).json({
       msg: "Owner created and approved successfully under Fuel Station table.",

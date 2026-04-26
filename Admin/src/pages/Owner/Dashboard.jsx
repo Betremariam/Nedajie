@@ -33,7 +33,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const stationIds = JSON.parse(localStorage.getItem("stationIds") || "[]");
   const token = localStorage.getItem("adminToken");
 
   const fetchData = async () => {
@@ -41,15 +40,8 @@ const Dashboard = () => {
       setLoading(true);
       setError("");
 
-      if (stationIds.length === 0) {
-        setError("No operational nodes identified.");
-        setLoading(false);
-        return;
-      }
-
       // 1. Fetch Stock
-      const query = stationIds.map((id) => `stationIds=${id}`).join("&");
-      const stockRes = await API.get(`/owners/stock?${query}`);
+      const stockRes = await API.get(`/owners/stock`);
       const stockData = stockRes.data || { benzene: 0, diesel: 0 };
       setStockLevels(stockData);
 
@@ -58,12 +50,12 @@ const Dashboard = () => {
       const attendantsCount = attendantsRes.data?.length || 0;
 
       // 3. Fetch Recent Deliveries (Fuel Received)
-      const deliveriesRes = await API.get(`/owners/fuel-received?${query}`);
+      const deliveriesRes = await API.get(`/owners/fuel-received`);
       const deliveriesData = deliveriesRes.data || [];
       setRecentDeliveries(deliveriesData.slice(0, 3));
 
       // 4. Fetch Transactions for Daily Sales (Sum liters * estimated price or just liters for now)
-      const transactionsRes = await API.get(`/owners/transactions?${query}`);
+      const transactionsRes = await API.get(`/owners/transactions`);
       const transactionsData = transactionsRes.data || [];
       
       const today = new Date().toISOString().split('T')[0];

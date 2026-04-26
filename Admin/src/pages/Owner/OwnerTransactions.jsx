@@ -39,10 +39,6 @@ const OwnerTransactions = () => {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("adminToken");
-  const [stationIds] = useState(
-    () => JSON.parse(localStorage.getItem("stationIds") || "[]")
-  );
-
   const fetchTransactions = async () => {
     try {
       setLoading(true);
@@ -51,13 +47,9 @@ const OwnerTransactions = () => {
         setError("Authorization sequence failed. Re-authentication required.");
         return;
       }
-      if (stationIds.length === 0) {
-        setError("No operational nodes identified for this account.");
-        return;
-      }
 
       const res = await API.get(
-        `/owners/transactions?stationIds=${stationIds.join("&stationIds=")}`,
+        `/owners/transactions`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
