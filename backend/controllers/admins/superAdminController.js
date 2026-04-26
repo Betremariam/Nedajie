@@ -6,7 +6,8 @@ import path from "path";
 
 export async function getAllFuelTransactions(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     
     const where = (admin && admin.role === "super" && admin.region) 
       ? { region: admin.region } 
@@ -46,7 +47,8 @@ export async function getAllFuelTransactions(req, res) {
 
 export async function getAllFuelStocks(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     
     const where = (admin && admin.role === "super" && admin.region) 
       ? { region: admin.region } 
@@ -66,7 +68,8 @@ export async function getAllFuelStocks(req, res) {
 
 export async function addFuelStock(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     
     const newStock = await prisma.fuelStock.create({
       data: {
@@ -185,7 +188,8 @@ export async function getFarmerDetails(req, res) {
 
 export async function getAllFarmers(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
 
     const farmers = await prisma.farmer.findMany({
@@ -245,7 +249,8 @@ export async function getVehicleDetails(req, res) {
 
 export async function getAllVehicles(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
 
     const vehicles = await prisma.vehicle.findMany({
@@ -330,27 +335,57 @@ export async function createAdmin(req, res) {
  */
 export async function getAllAdmins(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    let admin = null;
+    if (adminId) {
+      admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    }
+    
+    // If federal but no DB record yet, treat as national
     const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
 
-    const admins = await prisma.admin.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        region: true,
-        companyName: true,
-        stationIds: true,
-        documentPath: true,
-        isBlocked: true,
-        mustChangePassword: true,
-        createdAt: true,
-      },
-    });
-    res.status(200).json(admins);
+    const [admins, stations] = await Promise.all([
+      prisma.admin.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          region: true,
+          companyName: true,
+          documentPath: true,
+          isBlocked: true,
+          mustChangePassword: true,
+          createdAt: true,
+        },
+      }),
+      prisma.fuelStation.findMany({
+        where: where.region ? { region: where.region } : {},
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          region: true,
+          stationName: true,
+          isBlocked: true,
+          mustChangePassword: true,
+          createdAt: true,
+        },
+      })
+    ]);
+
+    // Combine and mark correctly
+    const combined = [
+      ...admins,
+      ...stations.map(s => ({ ...s, role: "stationOwner" })) // Ensure role is set for frontend
+    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.status(200).json(combined);
   } catch (err) {
+    const fs = await import('fs');
+    fs.appendFileSync('error.log', `${new Date().toISOString()} - ${err.message}\n${err.stack}\n\n`);
     res.status(500).json({ msg: "Failed to fetch admins", error: err.message });
   }
 }
@@ -358,16 +393,24 @@ export async function getAllAdmins(req, res) {
 export async function blockAdmin(req, res) {
   try {
     const { adminId } = req.params;
-    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    
+    let admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    let model = prisma.admin;
+
+    if (!admin) {
+      admin = await prisma.fuelStation.findUnique({ where: { id: adminId } });
+      model = prisma.fuelStation;
+    }
+
     if (!admin) return res.status(404).json({ msg: "Admin not found" });
 
-    const updated = await prisma.admin.update({
+    const updated = await model.update({
       where: { id: adminId },
       data: { isBlocked: !admin.isBlocked },
     });
 
     res.status(200).json({
-      msg: updated.isBlocked ? "Admin has been blocked." : "Admin has been unblocked.",
+      msg: updated.isBlocked ? "Account has been blocked." : "Account has been unblocked.",
       isBlocked: updated.isBlocked,
     });
   } catch (err) {
@@ -381,9 +424,14 @@ export async function blockAdmin(req, res) {
 export async function deleteAdmin(req, res) {
   try {
     const { adminId } = req.params;
-    await prisma.admin.delete({
-      where: { id: adminId },
-    });
+    
+    const count = await prisma.admin.count({ where: { id: adminId } });
+    if (count > 0) {
+      await prisma.admin.delete({ where: { id: adminId } });
+    } else {
+      await prisma.fuelStation.delete({ where: { id: adminId } });
+    }
+    
     res.status(200).json({ msg: "Admin deleted successfully." });
   } catch (err) {
     res.status(500).json({ msg: "Error deleting admin", error: err.message });
@@ -392,36 +440,33 @@ export async function deleteAdmin(req, res) {
 
 export async function createStationOwner(req, res) {
   try {
-    const { name, email, stationIds } = req.body;
+    const { name, email, stationName, region, zone, woreda, city } = req.body;
 
-    if (!stationIds || !Array.isArray(stationIds) || stationIds.length === 0) {
-      return res.status(400).json({ msg: "At least one stationId is required" });
-    }
-
-    const stations = await prisma.fuelStock.findMany({
-      where: { id: { in: stationIds } },
-    });
-    if (stations.length !== stationIds.length) {
-      return res.status(404).json({ msg: "One or more stations not found" });
+    if (!email || !name) {
+      return res.status(400).json({ msg: "Name and email are required" });
     }
 
     const exists = await prisma.admin.findUnique({ where: { email } });
-    if (exists) return res.status(400).json({ msg: "Email already used" });
+    const existsStat = await prisma.fuelStation.findUnique({ where: { email } });
+    if (exists || existsStat) return res.status(400).json({ msg: "Email already used" });
 
     const tempPassword = generateTempPassword();
     const hashed = await bcrypt.hash(tempPassword, 10);
 
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const creator = await prisma.admin.findUnique({ where: { id: req.user.id } });
 
-    const owner = await prisma.admin.create({
+    const owner = await prisma.fuelStation.create({
       data: { 
         name, 
         email, 
         password: hashed, 
         role: "stationOwner", 
-        stationIds, 
+        stationName: stationName || "Default Station",
+        region: region || creator?.region || "Unknown",
+        zone: zone || "Unknown",
+        woreda: woreda || "Unknown",
+        city: city || "Unknown",
         mustChangePassword: true,
-        region: admin?.region 
       },
     });
 
@@ -434,7 +479,8 @@ export async function createStationOwner(req, res) {
 
 export async function getAllOthers(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
 
     const others = await prisma.otherUser.findMany({
@@ -458,7 +504,8 @@ export async function getAllOthers(req, res) {
 
 export async function getAllMillHouseOwners(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
 
     const owners = await prisma.millHouseOwner.findMany({
@@ -543,7 +590,8 @@ export async function getFuelDeliveries(req, res) {
   }
 
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     const where = { fuelType };
     if (admin && admin.region) where.region = admin.region;
 
@@ -582,7 +630,8 @@ export async function approveFuelDelivery(req, res) {
 
 export async function getSuperAdminDashboardStats(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const adminId = req.user?.id;
+    const admin = adminId ? await prisma.admin.findUnique({ where: { id: adminId } }) : null;
     if (!admin || admin.role !== "super") {
       return res.status(403).json({ msg: "Access denied. Super Admin role required." });
     }

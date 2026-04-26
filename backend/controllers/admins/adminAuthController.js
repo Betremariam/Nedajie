@@ -105,7 +105,14 @@ export const changePassword = async (req, res) => {
   }
 
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    let admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    let model = prisma.admin;
+
+    if (!admin) {
+      admin = await prisma.fuelStation.findUnique({ where: { id: adminId } });
+      model = prisma.fuelStation;
+    }
+
     if (!admin) return res.status(404).json({ msg: "Admin not found" });
 
     const isMatch = await bcrypt.compare(currentPassword, admin.password);
@@ -113,7 +120,7 @@ export const changePassword = async (req, res) => {
 
     const hashed = await bcrypt.hash(newPassword, 10);
 
-    await prisma.admin.update({
+    await model.update({
       where: { id: adminId },
       data: { password: hashed, mustChangePassword: false },
     });

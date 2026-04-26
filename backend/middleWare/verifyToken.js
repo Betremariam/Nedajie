@@ -16,6 +16,9 @@ const verifyToken = (req, res, next) => {
     req.user = decoded; // attach decoded user to request
     next();
   } catch (err) {
+    import('fs').then(fs => {
+       fs.appendFileSync('error.log', `VerifyToken Error: ${err.message}\n${err.stack}\n\n`);
+    }).catch(() => {});
     return res.status(401).json({ msg: "Invalid or expired token." });
   }
 };
