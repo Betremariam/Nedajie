@@ -14,7 +14,7 @@ export const getOwnerFuelStock = async (req, res) => {
     });
 
     if (!stocks || stocks.length === 0) {
-      return res.status(404).json({ msg: "No fuel stock found for this station" });
+      return res.json({ benzene: 0, diesel: 0, count: 0 });
     }
 
     let benzeneTotal = 0;
@@ -66,7 +66,7 @@ export const ownerFuelReceived = async (req, res) => {
     });
 
     if (!records || records.length === 0) {
-      return res.status(404).json({ msg: "No fuel received records found" });
+      return res.json([]);
     }
 
     const formatted = records.map((r) => ({
@@ -116,18 +116,24 @@ export const ownerTransactions = async (req, res) => {
       return res.status(400).json({ msg: "No station associated" });
     }
 
-    const transactions = await prisma.fuelTransaction.findMany({
+    const transactionsRaw = await prisma.fuelTransaction.findMany({
       where: { stationName },
       orderBy: { createdAt: 'desc' },
       include: {
-        driver: { select: { name: true } },
+        vehicle: { select: { ownerName: true } },
         farmer: { select: { fullName: true } },
       },
     });
 
-    if (!transactions || transactions.length === 0) {
-      return res.status(404).json({ msg: "No transactions for this station" });
+    if (!transactionsRaw || transactionsRaw.length === 0) {
+      return res.json([]);
     }
+
+    const transactions = transactionsRaw.map((tx) => ({
+      ...tx,
+      driver: tx.vehicle ? { name: tx.vehicle.ownerName } : undefined,
+      vehicle: undefined,
+    }));
 
     res.json(transactions);
   } catch (err) {
@@ -163,17 +169,23 @@ export const ownerReports = async (req, res) => {
         startDate = new Date(0); // all time
     }
 
-    const transactions = await prisma.fuelTransaction.findMany({
+    const transactionsRaw = await prisma.fuelTransaction.findMany({
       where: {
         stationName,
         createdAt: { gte: startDate },
       },
       orderBy: { createdAt: 'desc' },
       include: {
-        driver: { select: { name: true } },
+        vehicle: { select: { ownerName: true } },
         farmer: { select: { fullName: true } },
       },
     });
+
+    const transactions = transactionsRaw.map((tx) => ({
+      ...tx,
+      driver: tx.vehicle ? { name: tx.vehicle.ownerName } : undefined,
+      vehicle: undefined,
+    }));
 
     const totalLiters = transactions.reduce((sum, t) => sum + (t.liters || 0), 0);
 

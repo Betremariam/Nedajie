@@ -46,11 +46,9 @@ const FuelReceived = () => {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("adminToken");
-  const stationIds = JSON.parse(localStorage.getItem("stationIds") || "[]");
 
   const fetchStations = async () => {
     try {
-      if (stationIds.length === 0) return;
       const res = await API.get("/owners/stations", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,7 +59,7 @@ const FuelReceived = () => {
     }
   };
 
-  const fetchFuelRecords = async (stationId) => {
+  const fetchFuelRecords = async () => {
     try {
       setLoading(true);
       setError("");
@@ -71,21 +69,8 @@ const FuelReceived = () => {
         return;
       }
       
-      let queryIds = [];
-      if (stationId && stationId !== "all") {
-        queryIds = [stationId];
-      } else {
-        queryIds = stationIds;
-      }
-
-      if (queryIds.length === 0) {
-        setError("Target identification parameters missing.");
-        setLoading(false);
-        return;
-      }
-
       const res = await API.get(
-        `/owners/fuel-received?stationIds=${queryIds.join("&stationIds=")}`,
+        `/owners/fuel-received`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setRecords(res.data);
@@ -99,10 +84,7 @@ const FuelReceived = () => {
 
   useEffect(() => {
     fetchStations();
-  }, []);
-
-  useEffect(() => {
-    if (stationIds.length > 0) fetchFuelRecords(selectedStation);
+    fetchFuelRecords();
   }, [selectedStation]);
 
   if (loading && records.length === 0) return (

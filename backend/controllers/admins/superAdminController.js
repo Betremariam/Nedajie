@@ -425,15 +425,49 @@ export async function deleteAdmin(req, res) {
   try {
     const { adminId } = req.params;
     
-    const count = await prisma.admin.count({ where: { id: adminId } });
-    if (count > 0) {
+    // 1. Check if it's an Admin
+    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
+    if (admin) {
       await prisma.admin.delete({ where: { id: adminId } });
-    } else {
-      await prisma.fuelStation.delete({ where: { id: adminId } });
+      return res.status(200).json({ msg: "Admin deleted successfully." });
+    }
+
+    // 2. Check if it's a FuelStation (Station Owner)
+    const station = await prisma.fuelStation.findUnique({ where: { id: adminId } });
+    if (station) {
+      const stationName = station.stationName;
+      
+      // We use a transaction to clean up related stocks and the station itself
+      await prisma.$transaction(async (tx) => {
+        // Find all stock IDs for this station to clean up fuelReceived
+        const stocks = await tx.fuelStock.findMany({
+          where: { stationName },
+          select: { id: true }
+        });
+        const stockIds = stocks.map(s => s.id);
+
+        if (stockIds.length > 0) {
+          // Delete related received records first
+          await tx.fuelReceived.deleteMany({
+            where: { stationId: { in: stockIds } }
+          });
+          
+          // Delete stocks
+          await tx.fuelStock.deleteMany({
+            where: { stationName }
+          });
+        }
+
+        // Finally delete the station owner
+        await tx.fuelStation.delete({ where: { id: adminId } });
+      });
+
+      return res.status(200).json({ msg: "Station owner and associated stocks deleted successfully." });
     }
     
-    res.status(200).json({ msg: "Admin deleted successfully." });
+    res.status(404).json({ msg: "Admin or Station Owner not found." });
   } catch (err) {
+    console.error("Delete Admin Error:", err);
     res.status(500).json({ msg: "Error deleting admin", error: err.message });
   }
 }

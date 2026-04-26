@@ -66,7 +66,7 @@ const Dashboard = () => {
 
       // Calculate aggregates
       const totalVol = stockData.benzene + stockData.diesel;
-      const MAX_TOTAL = 40000; // Estimated max for percentage display
+      const MAX_TOTAL = 100000; // Scalable max for aggregate display
       const stockPercent = Math.min(Math.round((totalVol / MAX_TOTAL) * 100), 100);
 
       setStats([
@@ -180,14 +180,14 @@ const Dashboard = () => {
                <div className="flex justify-between items-end px-1">
                  <div className="space-y-1">
                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Benzene Aggregate</span>
-                   <span className="text-2xl font-black text-foreground tabular-nums">{stockLevels.benzene.toLocaleString()} L <span className="text-[14px] font-bold text-muted-foreground/60 uppercase">/ 20k</span></span>
+                   <span className="text-2xl font-black text-foreground tabular-nums">{stockLevels.benzene.toLocaleString()} L</span>
                  </div>
-                 <span className="text-[12px] font-black text-primary">{Math.min(Math.round((stockLevels.benzene / 20000) * 100), 100)}%</span>
+                 <span className="text-[12px] font-black text-primary">{Math.min(Math.round((stockLevels.benzene / 50000) * 100), 100)}%</span>
                </div>
                 <div className="h-4 w-full bg-muted rounded-full overflow-hidden p-1 border border-border">
                   <div 
                     className="h-full bg-primary rounded-full transition-all duration-500" 
-                    style={{ width: `${Math.min((stockLevels.benzene / 20000) * 100, 100)}%` }} 
+                    style={{ width: `${Math.min((stockLevels.benzene / 50000) * 100, 100)}%` }} 
                   />
                 </div>
              </div>
@@ -196,14 +196,14 @@ const Dashboard = () => {
                <div className="flex justify-between items-end px-1">
                  <div className="space-y-1">
                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Diesel Aggregate</span>
-                   <span className="text-2xl font-black text-foreground tabular-nums">{stockLevels.diesel.toLocaleString()} L <span className="text-[14px] font-bold text-muted-foreground/60 uppercase">/ 20k</span></span>
+                   <span className="text-2xl font-black text-foreground tabular-nums">{stockLevels.diesel.toLocaleString()} L</span>
                  </div>
-                 <span className="text-[12px] font-black text-emerald-500">{Math.min(Math.round((stockLevels.diesel / 20000) * 100), 100)}%</span>
+                 <span className="text-[12px] font-black text-emerald-500">{Math.min(Math.round((stockLevels.diesel / 50000) * 100), 100)}%</span>
                </div>
                 <div className="h-4 w-full bg-muted rounded-full overflow-hidden p-1 border border-border">
                   <div 
                     className="h-full bg-emerald-500 rounded-full transition-all duration-500" 
-                    style={{ width: `${Math.min((stockLevels.diesel / 20000) * 100, 100)}%` }} 
+                    style={{ width: `${Math.min((stockLevels.diesel / 50000) * 100, 100)}%` }} 
                   />
                 </div>
              </div>

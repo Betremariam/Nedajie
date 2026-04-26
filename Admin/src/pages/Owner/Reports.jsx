@@ -47,23 +47,14 @@ const Reports = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const [stationIds] = useState(
-    () => JSON.parse(localStorage.getItem("stationIds") || "[]")
-  );
-
   useEffect(() => {
     const fetchReport = async () => {
       try {
         setLoading(true);
         setError("");
-        if (stationIds.length === 0) {
-          setError("No operational nodes available for analysis.");
-          setTransactions([]);
-          setTotalLiters(0);
-          return;
-        }
+        
         const res = await API.get(
-          `/owners/reports?type=${reportType}&stationIds=${stationIds.join("&stationIds=")}`,
+          `/owners/reports?type=${reportType}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` } }
         );
         setTransactions(res.data.transactions);
@@ -78,7 +69,7 @@ const Reports = () => {
       }
     };
     fetchReport();
-  }, [reportType, stationIds]);
+  }, [reportType]);
 
   const handleDownload = () => {
     if (!transactions.length) return;
@@ -164,10 +155,6 @@ const Reports = () => {
                   <div className="flex items-center justify-between px-1">
                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/40">Data Integrity</span>
                      <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-widest border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Verified</Badge>
-                  </div>
-                  <div className="flex items-center justify-between px-1">
-                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/40">Nodes Scanned</span>
-                     <span className="text-[11px] font-bold text-foreground">{stationIds.length} Nodes</span>
                   </div>
                   <div className="flex items-center justify-between px-1">
                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/40">Timestamp</span>

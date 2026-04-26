@@ -24,7 +24,6 @@ const OwnerFuelStock = () => {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("adminToken");
-  const stationIds = JSON.parse(localStorage.getItem("stationIds") || "[]");
 
   useEffect(() => {
     const fetchFuelStock = async () => {
@@ -35,14 +34,7 @@ const OwnerFuelStock = () => {
           return;
         }
 
-        if (!stationIds || stationIds.length === 0) {
-          setError("Operational node identification failed. No stations assigned.");
-          setLoading(false);
-          return;
-        }
-
-        const query = stationIds.map((id) => `stationIds=${id}`).join("&");
-        const res = await API.get(`/owners/stock?${query}`, {
+        const res = await API.get(`/owners/stock`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

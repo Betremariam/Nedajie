@@ -163,7 +163,7 @@ const AdminLogin = () => {
                     id="email"
                     type="email"
                     placeholder="name@example.com"
-                    className="pl-11 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    className="pl-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -183,7 +183,7 @@ const AdminLogin = () => {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-11 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

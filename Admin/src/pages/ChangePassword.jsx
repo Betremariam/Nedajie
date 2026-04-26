@@ -148,7 +148,7 @@ const ChangePassword = () => {
                   <Input
                     id="current-password"
                     type={showCurrent ? "text" : "password"}
-                    className="pl-11 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     placeholder="Enter temp password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -176,7 +176,7 @@ const ChangePassword = () => {
                   <Input
                     id="new-password"
                     type={showNew ? "text" : "password"}
-                    className="pl-11 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     placeholder="Min. 6 characters"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -199,17 +199,24 @@ const ChangePassword = () => {
                 </Label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                    <CheckCircle2 className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Lock className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   </div>
                   <Input
                     id="confirm-password"
                     type={showNew ? "text" : "password"}
-                    className="pl-11 pr-4 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     placeholder="Re-enter new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground focus:outline-none z-10"
+                    onClick={() => setShowNew(!showNew)}
+                  >
+                    {showNew ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
               </div>
 
