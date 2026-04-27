@@ -346,7 +346,9 @@ export async function getAllAdmins(req, res) {
 
     const [admins, stations] = await Promise.all([
       prisma.admin.findMany({
-        where,
+        where: {
+          ...where
+        },
         select: {
           id: true,
           name: true,
@@ -368,6 +370,9 @@ export async function getAllAdmins(req, res) {
           email: true,
           role: true,
           region: true,
+          zone: true,
+          woreda: true,
+          city: true,
           stationName: true,
           isBlocked: true,
           mustChangePassword: true,
@@ -381,6 +386,7 @@ export async function getAllAdmins(req, res) {
       ...admins,
       ...stations.map(s => ({ ...s, role: "stationOwner" })) // Ensure role is set for frontend
     ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
 
     res.status(200).json(combined);
   } catch (err) {

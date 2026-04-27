@@ -87,7 +87,7 @@ const FuelDeliveries = () => {
       const filtered = owners.filter(o => o.region === form.region);
       setFilteredOwners(filtered);
       // Reset customer and destination if they are no longer valid
-      if (!filtered.find(o => o.name === form.customer)) {
+      if (form.ownerId && !filtered.find(o => o.id === form.ownerId)) {
         setForm(prev => ({ ...prev, customer: "", ownerId: "", destination: "" }));
       }
     } else {
@@ -250,12 +250,12 @@ const FuelDeliveries = () => {
                   name="ownerId"
                   value={form.ownerId}
                   onChange={(e) => {
-                    const owner = owners.find(o => o.id === e.target.value);
+                    const owner = owners.find(o => String(o.id) === String(e.target.value));
                     setForm({ 
                       ...form, 
                       ownerId: e.target.value, 
                       customer: owner ? owner.stationName : "",
-                      destination: owner ? `${owner.woreda} ${owner.city}` : ""
+                      destination: owner ? [owner.woreda, owner.city].filter(Boolean).join(" ") : ""
                     });
                   }}
                   className="h-12 w-full pl-4 rounded-xl border border-border bg-muted/30 font-medium text-[14px] text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer"
