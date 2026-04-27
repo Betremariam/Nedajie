@@ -15,7 +15,8 @@ import {
   Warehouse,
   ChevronRight,
   Database,
-  ArrowDownToLine
+  ArrowDownToLine,
+  FileText
 } from "lucide-react";
 import { 
   Table, 
@@ -46,6 +47,13 @@ const FuelReceived = () => {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("adminToken");
+
+  const downloadFile = (path) => {
+    if (!path) return;
+    const webPath = path.replace(/\\/g, '/');
+    const url = `http://localhost:5000/${webPath}`;
+    window.open(url, '_blank');
+  };
 
   const fetchStations = async () => {
     try {
@@ -181,6 +189,7 @@ const FuelReceived = () => {
                     <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Fuel Specification</TableHead>
                     <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-right">Transfer Volume</TableHead>
                     <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-right">Timestamp</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Document</TableHead>
                     <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Integrity</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -226,6 +235,20 @@ const FuelReceived = () => {
                               {new Date(rec.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                            </span>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {rec.documentPath ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 text-[10px] font-bold uppercase bg-transparent text-primary border-primary/20 hover:bg-primary/10 rounded-lg px-3 flex items-center justify-center m-auto"
+                            onClick={() => downloadFile(rec.documentPath)}
+                          >
+                            <FileText className="w-3.5 h-3.5 mr-1" /> View
+                          </Button>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase">N/A</span>
+                        )}
                       </TableCell>
                       <TableCell className="pr-8 text-right">
                          <div className="flex flex-col items-end gap-1.5">

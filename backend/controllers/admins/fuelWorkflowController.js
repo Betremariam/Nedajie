@@ -124,7 +124,6 @@ export async function acceptDeliveryByOwner(req, res) {
       let stock = await tx.fuelStock.findFirst({
         where: {
           stationName,
-          woreda,
           city,
           region,
           gasType: delivery.fuelType
@@ -163,7 +162,8 @@ export async function acceptDeliveryByOwner(req, res) {
           region,
           gasType: delivery.fuelType,
           liters: delivery.volume,
-          date: new Date()
+          date: new Date(),
+          documentPath: ownerSignedPath
         }
       });
 

@@ -76,6 +76,7 @@ export const ownerFuelReceived = async (req, res) => {
       gasType: r.gasType,
       liters: r.liters,
       date: r.date,
+      documentPath: r.documentPath,
     }));
 
     res.json(formatted);

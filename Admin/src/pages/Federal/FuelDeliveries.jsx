@@ -61,6 +61,13 @@ const FuelDeliveries = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
+  const downloadFile = (path) => {
+    if (!path) return;
+    const webPath = path.replace(/\\/g, '/');
+    const url = `http://localhost:5000/${webPath}`;
+    window.open(url, '_blank');
+  };
+
   const fetchData = async () => {
     try {
       const [delRes, adminRes, stockRes] = await Promise.all([
@@ -439,50 +446,65 @@ const FuelDeliveries = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Date</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Station</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Destination (Woreda/City)</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Citer</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">FDC No</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Vol 20C</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Region</th>
-                  <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                  <th className="text-left pl-6 md:pl-8 pr-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Date</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Station</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Destination (Woreda/City)</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Citer</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">FDC No</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Vol 20C</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Region</th>
+                  <th className="text-left px-4 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Status</th>
+                  <th className="text-center pl-4 pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Owner Document</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((d) => (
                   <tr key={d._id || d.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                    <td className="pl-6 md:pl-8 py-4">
+                    <td className="pl-6 md:pl-8 pr-4 py-4 whitespace-nowrap">
                       <span className="text-[13px] font-semibold text-foreground tabular-nums">
                         {d.date ? new Date(d.date).toLocaleDateString() : "—"}
                       </span>
                     </td>
-                    <td className="py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <span className="text-[13px] font-semibold text-foreground">{d.customer}</span>
                     </td>
-                    <td className="py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <span className="text-[13px] font-medium text-foreground">{d.destination}</span>
                     </td>
-                    <td className="py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <span className="text-[13px] font-medium text-foreground">{d.citter}</span>
                     </td>
-                    <td className="py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <span className="text-[13px] font-mono font-medium text-muted-foreground">#{d.fdcNo}</span>
                     </td>
-                    <td className="py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-1.5 text-[13px] font-bold text-foreground">
                         <Droplets className={`w-3.5 h-3.5 ${d.fuelType === "benzene" ? "text-primary" : "text-emerald-600 dark:text-emerald-400"}`} />
                         {Number(d.volume).toLocaleString()} L
                       </div>
                       <span className={`text-[10px] font-semibold uppercase ${d.fuelType === "benzene" ? "text-primary" : "text-emerald-600 dark:text-emerald-400"}`}>{d.fuelType}</span>
                     </td>
-                    <td className="py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <span className="text-[13px] font-medium text-foreground">{d.region}</span>
                     </td>
-                    <td className="pr-6 md:pr-8 py-4 text-right">
+                    <td className="px-4 py-4 text-left whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border ${statusColor(d.status)}`}>
                         {d.status?.replace(/_/g, " ") || "Pending"}
                       </span>
+                    </td>
+                    <td className="pl-4 pr-6 md:pr-8 py-4 text-center whitespace-nowrap">
+                      {d.ownerSignedPath ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-[10px] font-bold uppercase bg-transparent text-primary border-primary/20 hover:bg-primary/10 rounded-lg px-3 flex items-center justify-center m-auto"
+                          onClick={() => downloadFile(d.ownerSignedPath)}
+                        >
+                          <FileText className="w-3.5 h-3.5 mr-1" /> View
+                        </Button>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase">N/A</span>
+                      )}
                     </td>
                   </tr>
                 ))}
