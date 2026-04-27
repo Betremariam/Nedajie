@@ -135,6 +135,7 @@ export async function createOwner(req, res) {
       await prisma.fuelStock.create({
         data: {
           stationName,
+          woreda,
           city: city || woreda,
           region,
           gasType: "benzene",
@@ -146,6 +147,7 @@ export async function createOwner(req, res) {
       await prisma.fuelStock.create({
         data: {
           stationName,
+          woreda,
           city: city || woreda,
           region,
           gasType: "diesel",

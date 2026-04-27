@@ -39,8 +39,8 @@ const ConfirmDeliveries = () => {
 
   const downloadFile = (path) => {
     if (!path) return;
-    const filename = path.split('\\').pop().split('/').pop();
-    const url = `http://localhost:5000/uploads/${filename}`;
+    const webPath = path.replace(/\\/g, '/');
+    const url = `http://localhost:5000/${webPath}`;
     window.open(url, '_blank');
   };
 

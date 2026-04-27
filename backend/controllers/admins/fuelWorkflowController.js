@@ -67,13 +67,13 @@ export async function getDeliveriesForOwner(req, res) {
     }
 
     // Match by customer/destination names (companyName or name)
-    const ownerName = owner.companyName || owner.name;
     const deliveries = await prisma.fuelDelivery.findMany({
       where: {
         status: "SUPERADMIN_ACCEPTED",
         OR: [
-          { customer: ownerName },
-          { destination: ownerName }
+          { ownerId: owner.id },
+          { customer: owner.stationName || "" },
+          { destination: owner.stationName || "" }
         ]
       },
       orderBy: { createdAt: "desc" }
@@ -104,9 +104,8 @@ export async function acceptDeliveryByOwner(req, res) {
     // The user said: "it will be added in the fuelstock of the superadmin section"
     // I will find/create a FuelStock entry for this station (named after destination or owner's company)
     
-    const stationName = delivery.destination;
-    const city = delivery.citter;
-
+    const { stationName, city, woreda, region } = owner;
+    
     // Use a transaction to ensure atomic updates
     const result = await prisma.$transaction(async (tx) => {
       // 1. Update delivery status
@@ -124,9 +123,10 @@ export async function acceptDeliveryByOwner(req, res) {
       // 2. Find or create fuel stock for this station
       let stock = await tx.fuelStock.findFirst({
         where: {
-          stationName: stationName,
-          city: city,
-          region: delivery.region,
+          stationName,
+          woreda,
+          city,
+          region,
           gasType: delivery.fuelType
         }
       });
@@ -137,15 +137,16 @@ export async function acceptDeliveryByOwner(req, res) {
           data: {
             litersReceived: { increment: delivery.volume },
             date: new Date(),
-            region: delivery.region // Ensure region is set
+            region // Ensure region is set
           }
         });
       } else {
         stock = await tx.fuelStock.create({
           data: {
             stationName,
+            woreda,
             city,
-            region: delivery.region,
+            region,
             gasType: delivery.fuelType,
             litersReceived: delivery.volume,
             date: new Date()
@@ -157,9 +158,9 @@ export async function acceptDeliveryByOwner(req, res) {
       await tx.fuelReceived.create({
         data: {
           stationId: stock.id,
-          stationName: stationName,
-          city: city,
-          region: delivery.region,
+          stationName,
+          city,
+          region,
           gasType: delivery.fuelType,
           liters: delivery.volume,
           date: new Date()

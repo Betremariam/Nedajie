@@ -91,15 +91,16 @@ const FuelStockManager = () => {
               <TableHeader>
                 <TableRow className="hover:bg-transparent bg-muted/40">
                   <TableHead className="pl-6 h-12 uppercase text-[10px] font-bold tracking-wider">Station Name</TableHead>
-                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Locality</TableHead>
-                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Product Type</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Woreda</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">City</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Fuel Type</TableHead>
                   <TableHead className="pr-6 h-12 text-right uppercase text-[10px] font-bold tracking-wider">Volume Remaining</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stations.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-48 text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="h-48 text-center text-muted-foreground">
                       {loading ? (
                         <div className="flex flex-col items-center gap-2">
                            <Loader2 className="animate-spin h-6 w-6" />
@@ -112,26 +113,28 @@ const FuelStockManager = () => {
                   stations.map((stock) => (
                     <TableRow key={stock.id} className="group transition-colors hover:bg-muted/30">
                       <TableCell className="pl-6 font-semibold">{stock.stationName}</TableCell>
-                      <TableCell className="text-muted-foreground">{stock.city}</TableCell>
+                      <TableCell className="text-muted-foreground whitespace-nowrap">{stock.woreda || "—"}</TableCell>
+                      <TableCell className="text-muted-foreground whitespace-nowrap">{stock.city}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="capitalize px-2 py-0">
-                          {stock.gasType}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${stock.gasType === 'benzene' ? 'bg-blue-500' : 'bg-emerald-500'}`} />
+                          <span className="capitalize text-[13px] font-medium">{stock.gasType}</span>
+                        </div>
                       </TableCell>
                       <TableCell className="pr-6 text-right">
                         <div className="flex flex-col items-end">
-                          <span className="text-sm font-bold text-foreground">
+                          <span className="text-sm font-bold text-foreground tabular-nums">
                             {(stock.litersReceived - stock.litersDispensed).toLocaleString()} L
                           </span>
-                          <div className="w-24 h-1 bg-muted rounded-full overflow-hidden mt-1">
+                          <div className="w-24 h-1 bg-muted rounded-full overflow-hidden mt-1 inline-block">
                             <div 
                               className={`h-full ${
-                                (stock.litersReceived - stock.litersDispensed) / stock.litersReceived < 0.2 
+                                (stock.litersReceived - stock.litersDispensed) / (stock.litersReceived || 1) < 0.2 
                                   ? "bg-red-500" 
                                   : "bg-emerald-500"
                               }`}
                               style={{ 
-                                width: `${Math.min(100, ((stock.litersReceived - stock.litersDispensed) / stock.litersReceived) * 100)}%` 
+                                width: `${Math.min(100, ((stock.litersReceived - stock.litersDispensed) / (stock.litersReceived || 1)) * 100)}%` 
                               }}
                             />
                           </div>

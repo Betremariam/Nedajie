@@ -194,6 +194,7 @@ model FuelReceived {
 model FuelStock {
   id              String   @id @default(cuid())
   stationName     String
+  woreda          String?
   city            String
   region          String?
   gasType         FuelType
