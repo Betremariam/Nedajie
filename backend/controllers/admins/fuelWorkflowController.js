@@ -100,12 +100,8 @@ export async function acceptDeliveryByOwner(req, res) {
       return res.status(400).json({ msg: "Delivery must be confirmed by Super Admin first." });
     }
 
-    // Logic: If owner accepts, it adds to stock.
-    // The user said: "it will be added in the fuelstock of the superadmin section"
-    // I will find/create a FuelStock entry for this station (named after destination or owner's company)
-    
     const { stationName, city, woreda, region } = owner;
-    
+
     // Use a transaction to ensure atomic updates
     const result = await prisma.$transaction(async (tx) => {
       // 1. Update delivery status
@@ -125,27 +121,27 @@ export async function acceptDeliveryByOwner(req, res) {
         where: {
           stationName,
           city,
-          region,
           gasType: delivery.fuelType
         }
       });
 
       if (stock) {
+        // Update existing stock - increment the volume
         stock = await tx.fuelStock.update({
           where: { id: stock.id },
           data: {
             litersReceived: { increment: delivery.volume },
-            date: new Date(),
-            region // Ensure region is set
+            date: new Date()
           }
         });
       } else {
+        // Create new stock entry
         stock = await tx.fuelStock.create({
           data: {
             stationName,
-            woreda,
+            woreda: woreda || null,
             city,
-            region,
+            region: region || null,
             gasType: delivery.fuelType,
             litersReceived: delivery.volume,
             date: new Date()
@@ -159,11 +155,10 @@ export async function acceptDeliveryByOwner(req, res) {
           stationId: stock.id,
           stationName,
           city,
-          region,
+          region: region || null,
           gasType: delivery.fuelType,
           liters: delivery.volume,
-          date: new Date(),
-          documentPath: ownerSignedPath
+          date: new Date()
         }
       });
 

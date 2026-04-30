@@ -235,25 +235,25 @@ const PendingDeliveries = () => {
             <AlertDialogTitle className="text-2xl font-semibold tracking-tight text-center">Authorization Required</AlertDialogTitle>
             <AlertDialogDescription className="text-center font-medium text-muted-foreground pt-2 text-base leading-relaxed">
                You are about to authorize the discharge of <span className="text-foreground font-bold">{selectedDelivery?.volume.toLocaleString()} L</span> of <span className="text-primary font-bold uppercase">{selectedDelivery?.fuelType}</span> into the station reservoir.
-               <br /><br />
-               <div className="space-y-3 mt-4 text-left p-4 bg-muted/50 rounded-xl border border-border">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Upload Your Signed Confirmation Picture</p>
-                <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${signedDoc ? 'border-primary/50 bg-primary/5' : 'border-border hover:bg-muted/80'}`}>
-                  <input
-                    type="file"
-                    onChange={(e) => setSignedDoc(e.target.files[0])}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    accept="image/*"
-                  />
-                  <div className="flex items-center gap-3">
-                    <Upload className={`w-5 h-5 ${signedDoc ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className="text-[13px] font-medium truncate">
-                      {signedDoc ? signedDoc.name : "Select signed document picture..."}
-                    </span>
-                  </div>
+            </AlertDialogDescription>
+            <div className="space-y-3 mt-4 text-left p-4 bg-muted/50 rounded-xl border border-border">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Upload Your Signed Confirmation Picture</p>
+              <div className={`relative border-2 border-dashed rounded-2xl p-4 transition-all ${signedDoc ? 'border-primary/50 bg-primary/5' : 'border-border hover:bg-muted/80'}`}>
+                <input
+                  type="file"
+                  onChange={(e) => setSignedDoc(e.target.files[0])}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  accept="image/*"
+                />
+                <div className="flex items-center gap-3">
+                  <Upload className={`w-5 h-5 ${signedDoc ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className="text-[13px] font-medium truncate">
+                    {signedDoc ? signedDoc.name : "Select signed document picture..."}
+                  </span>
                 </div>
               </div>
-               <br />
+            </div>
+            <AlertDialogDescription className="text-center font-medium text-muted-foreground pt-2 text-sm">
                This protocol is <span className="text-destructive font-bold">immutable</span> and will update operational metrics immediately.
             </AlertDialogDescription>
           </AlertDialogHeader>
