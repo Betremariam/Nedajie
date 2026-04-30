@@ -377,6 +377,12 @@ export async function getAllAdmins(req, res) {
           isBlocked: true,
           mustChangePassword: true,
           createdAt: true,
+          legalDocPath: true,
+          fuelLicensePath: true,
+          constructionDocPath: true,
+          safetyCertPath: true,
+          envClearancePath: true,
+          pumpCalibrationPath: true,
         },
       })
     ]);

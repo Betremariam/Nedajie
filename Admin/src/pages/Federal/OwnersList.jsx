@@ -21,6 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 const OwnersList = () => {
   const [owners, setOwners] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState(null);
+  const [showDocuments, setShowDocuments] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +32,8 @@ const OwnersList = () => {
     setLoading(true);
     try {
       const res = await getAllAdmins();
-      setOwners(res.data.filter((a) => a.role === "stationOwner"));
+      const filteredOwners = res.data.filter((a) => a.role === "stationOwner");
+      setOwners(filteredOwners);
     } catch {
       setError("Failed to load owners.");
     } finally {
@@ -125,7 +127,7 @@ const OwnersList = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[900px]">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
                   <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Owner</th>
@@ -175,14 +177,34 @@ const OwnersList = () => {
                     </td>
                     <td className="pr-6 md:pr-8 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setSelectedOwner(owner)} className="h-8 px-3 rounded-lg text-xs font-semibold">View</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => {
+                            setSelectedOwner(owner);
+                            setShowDocuments(false);
+                          }} 
+                          className="h-8 px-3 rounded-lg text-xs font-semibold"
+                        >
+                          View
+                        </Button>
                         <Button 
                           variant={owner.isBlocked ? "outline" : "destructive"}
                           size="sm" 
                           onClick={() => setBlockingOwner(owner)} 
-                          className={`h-8 px-3 rounded-lg text-xs font-semibold ${owner.isBlocked ? 'border-emerald-200 text-emerald-700 hover:bg-emerald-50' : ''}`}
+                          className={`h-8 px-3 rounded-lg text-xs font-semibold whitespace-nowrap ${owner.isBlocked ? 'border-emerald-200 text-emerald-700 hover:bg-emerald-50' : ''}`}
                         >
-                          {owner.isBlocked ? <Unlock className="w-3 h-3" /> : <Ban className="w-3 h-3" />}
+                          {owner.isBlocked ? (
+                            <>
+                              <Unlock className="w-3 h-3 mr-1" />
+                              Unblock
+                            </>
+                          ) : (
+                            <>
+                              <Ban className="w-3 h-3 mr-1" />
+                              Block
+                            </>
+                          )}
                         </Button>
                       </div>
                     </td>
@@ -197,89 +219,140 @@ const OwnersList = () => {
       {/* Owner Details Modal */}
       {selectedOwner && (
         <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-          onClick={() => setSelectedOwner(null)}
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            zIndex: 9999
+          }}
+          onClick={() => {
+            setSelectedOwner(null);
+            setShowDocuments(false);
+          }}
         >
           <div 
-            className="bg-card w-full max-w-md rounded-2xl shadow-2xl border border-border p-6 space-y-6 my-8 relative"
-            style={{ maxHeight: '90vh', overflowY: 'auto' }}
+            className="bg-card w-full max-w-md rounded-2xl shadow-2xl border border-border p-6 space-y-6 relative"
+            style={{ maxHeight: '70vh', display: 'flex', flexDirection: 'column' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-4 border-b border-border bg-card">
-              <h3 className="text-lg font-bold text-foreground">Owner Details</h3>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedOwner(null)} className="h-8 w-8 rounded-full p-0 hover:bg-muted">✕</Button>
+            <div className="flex items-center justify-between pb-4 border-b border-border bg-card flex-shrink-0">
+              <h3 className="text-lg font-bold text-foreground">
+                {showDocuments ? "Owner Documents" : "Owner Details"}
+              </h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  setSelectedOwner(null);
+                  setShowDocuments(false);
+                }} 
+                className="h-8 w-8 rounded-full p-0 hover:bg-muted"
+              >
+                ✕
+              </Button>
             </div>
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Owner Name</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Email Address</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.email}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Station Name</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.stationName || "—"}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Region</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.region || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Zone</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.zone || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Woreda</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.woreda || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">City</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.city || "—"}</p>
-                </div>
-              </div>
 
-              <div className="pt-4 border-t border-border space-y-3">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Uploaded Documents</p>
-                
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              {!showDocuments ? (
+                <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">Owner Name</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">Email Address</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">Station Name</p>
+                  <p className="text-sm font-medium text-foreground">{selectedOwner.stationName || "—"}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase">Region</p>
+                    <p className="text-sm font-medium text-foreground">{selectedOwner.region || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase">Zone</p>
+                    <p className="text-sm font-medium text-foreground">{selectedOwner.zone || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase">Woreda</p>
+                    <p className="text-sm font-medium text-foreground">{selectedOwner.woreda || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase">City</p>
+                    <p className="text-sm font-medium text-foreground">{selectedOwner.city || "—"}</p>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border">
+                  <Button 
+                    onClick={() => setShowDocuments(true)}
+                    className="w-full h-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold flex items-center justify-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    View Documents
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
                 {(() => {
                   const docs = [
-                    { label: "Legal Business", path: selectedOwner.legalDocPath },
+                    { label: "Legal Business Document", path: selectedOwner.legalDocPath },
                     { label: "Fuel Sector License", path: selectedOwner.fuelLicensePath },
                     { label: "Construction Approval", path: selectedOwner.constructionDocPath },
-                    { label: "Safety Cert", path: selectedOwner.safetyCertPath },
-                    { label: "Env Clearance", path: selectedOwner.envClearancePath },
-                    { label: "Pump Calibration", path: selectedOwner.pumpCalibrationPath },
+                    { label: "Safety Certificate", path: selectedOwner.safetyCertPath },
+                    { label: "Environmental Clearance", path: selectedOwner.envClearancePath },
+                    { label: "Pump Calibration Certificate", path: selectedOwner.pumpCalibrationPath },
                   ];
                   
                   const availableDocs = docs.filter(doc => doc.path);
                   
                   if (availableDocs.length === 0) {
                     return (
-                      <div className="text-center py-4 text-muted-foreground text-xs">
-                        No documents uploaded
+                      <div className="text-center py-6 text-muted-foreground">
+                        <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                        <p className="text-sm font-medium">No documents uploaded</p>
                       </div>
                     );
                   }
                   
                   return availableDocs.map((doc, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-muted/30 p-2 rounded-lg">
-                      <span className="text-[12px] font-medium text-foreground">{doc.label}</span>
+                    <div key={idx} className="flex items-center justify-between bg-muted/30 p-2.5 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-3.5 h-3.5 text-primary" />
+                        </div>
+                        <span className="text-xs font-medium text-foreground">{doc.label}</span>
+                      </div>
                       <a
                         href={`http://localhost:5000/${doc.path.replace(/\\/g, '/')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[11px] font-bold text-primary hover:underline"
+                        className="text-xs font-bold text-primary hover:underline px-2.5 py-1 rounded-lg hover:bg-primary/10 transition-colors flex-shrink-0"
                       >
                         View
                       </a>
                     </div>
                   ));
                 })()}
+
+                <div className="pt-3 border-t border-border">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowDocuments(false)}
+                    className="w-full h-9 rounded-xl font-semibold text-sm"
+                  >
+                    Back to Details
+                  </Button>
+                </div>
               </div>
+            )}
             </div>
           </div>
         </div>
@@ -288,8 +361,15 @@ const OwnersList = () => {
       {/* Block/Unblock Confirmation Dialog */}
       {blockingOwner && (
         <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            zIndex: 9999 
+          }}
           onClick={() => setBlockingOwner(null)}
         >
           <div 

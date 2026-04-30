@@ -51,6 +51,7 @@ import PendingDeliveries from "./pages/Owner/PendingDeliveries";
 import FederalSidebar from "./components/FederalSidebar";
 import FederalDashboard from "./pages/Federal/FederalDashboard";
 import ManageSuperAdmins from "./pages/Federal/ManageSuperAdmins";
+import SuperAdminsList from "./pages/Federal/SuperAdminsList";
 import ManageOwners from "./pages/Federal/ManageOwners";
 import OwnersList from "./pages/Federal/OwnersList";
 import FuelDeliveries from "./pages/Federal/FuelDeliveries";
@@ -111,6 +112,7 @@ function App() {
           <Route path="/federal" element={<DashboardLayout Sidebar={FederalSidebar} />}>
             <Route path="dashboard" element={<FederalDashboard />} />
             <Route path="manage-super-admins" element={<ManageSuperAdmins />} />
+            <Route path="super-admins-list" element={<SuperAdminsList />} />
             <Route path="manage-owners" element={<ManageOwners />} />
             <Route path="owners-list" element={<OwnersList />} />
             <Route path="fuel-deliveries" element={<FuelDeliveries />} />
