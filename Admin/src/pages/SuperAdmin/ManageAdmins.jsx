@@ -20,7 +20,6 @@ import {
   SelectContent, 
   SelectItem 
 } from "../../components/ui/Select";
-import { Checkbox } from "../../components/ui/Checkbox";
 import { 
   Card, 
   CardHeader, 
@@ -50,12 +49,10 @@ import {
 
 const ManageAdmins = () => {
   const [admins, setAdmins] = useState([]);
-  const [stations, setStations] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "register", 
-    stationIds: [],
+    role: "register",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,7 +69,10 @@ const ManageAdmins = () => {
     setLoading(true);
     try {
       const res = await API.get("/admins/admins");
-      const filtered = res.data.filter(admin => admin.role !== "superadmin" && admin.role !== "super");
+      // Only show register and approver admins (not super, federal, or stationOwner)
+      const filtered = res.data.filter(admin => 
+        admin.role === "register" || admin.role === "approver"
+      );
       setAdmins(filtered);
     } catch (err) {
       setError(err.response?.data?.msg || "Failed to load admins");
@@ -80,18 +80,8 @@ const ManageAdmins = () => {
     setLoading(false);
   };
 
-  const fetchStations = async () => {
-    try {
-      const res = await API.get("/admins/fuel-stocks");
-      setStations(res.data);
-    } catch (err) {
-      console.error("Failed to load stations:", err);
-    }
-  };
-
   useEffect(() => {
     fetchAdmins();
-    fetchStations();
   }, []);
 
   const handleChange = (e) => {
@@ -100,17 +90,6 @@ const ManageAdmins = () => {
 
   const handleRoleChange = (role) => {
     setFormData(prev => ({ ...prev, role }));
-  };
-
-  const handleStationToggle = (stationId) => {
-    setFormData(prev => {
-      const current = prev.stationIds;
-      if (current.includes(stationId)) {
-        return { ...prev, stationIds: current.filter(id => id !== stationId) };
-      } else {
-        return { ...prev, stationIds: [...current, stationId] };
-      }
-    });
   };
 
   const handleSubmit = async (e) => {
@@ -127,20 +106,11 @@ const ManageAdmins = () => {
 
     setLoading(true);
     try {
-      let res;
-      if (role === "stationOwner") {
-        if (stationIds.length === 0) {
-          setLoading(false);
-          return setError("Please select at least one station.");
-        }
-        res = await API.post("/admins/owners", { name, email, stationIds });
-      } else {
-        res = await API.post("/admins/admins", { name, email, role });
-      }
+      const res = await API.post("/admins/admins", { name, email, role });
       
       setSuccess("Admin created successfully");
       setNewAdminCreds({ email, tempPassword: res.data.tempPassword });
-      setFormData({ name: "", email: "", role: "register", stationIds: [] });
+      setFormData({ name: "", email: "", role: "register" });
       fetchAdmins();
     } catch (err) {
       setError(err.response?.data?.msg || "Failed to create admin");
@@ -253,36 +223,10 @@ const ManageAdmins = () => {
                   <SelectContent>
                     <SelectItem value="register">Registration Admin</SelectItem>
                     <SelectItem value="approver">Approval Admin</SelectItem>
-                    <SelectItem value="stationOwner">Station Owner</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-
-            {formData.role === "stationOwner" && (
-              <div className="mt-4 p-5 border border-border rounded-xl bg-muted/20 space-y-4">
-                <Label className="text-sm font-semibold text-foreground">Assigned Stations *</Label>
-                {stations.length === 0 ? (
-                  <p className="text-sm text-yellow-600 font-medium">No stations available. Please add fuel stock first.</p>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {stations.map(station => (
-                      <div key={station.id} className="flex items-center space-x-3 p-3 border border-border rounded-lg bg-card hover:bg-muted/50 transition-all">
-                        <Checkbox 
-                          id={`station-${station.id}`}
-                          checked={formData.stationIds.includes(station.id)}
-                          onCheckedChange={() => handleStationToggle(station.id)}
-                        />
-                        <Label htmlFor={`station-${station.id}`} className="text-sm cursor-pointer leading-tight">
-                          <span className="font-semibold block">{station.stationName}</span>
-                          <span className="text-xs text-muted-foreground">{station.city}</span>
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
 
             <div className="pt-2">
               <Button

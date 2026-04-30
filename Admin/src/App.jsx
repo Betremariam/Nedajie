@@ -3,6 +3,7 @@ import AdminLogin from "./pages/AdminLogin";
 import ChangePassword from "./pages/ChangePassword";
 import SuperAdminDashboard from "./pages/SuperAdmin/SuperAdminDashboard";
 import ManageAdmins from "./pages/SuperAdmin/ManageAdmins";
+import ManageStationOwners from "./pages/SuperAdmin/ManageStationOwners";
 import FuelStockManager from "./pages/SuperAdmin/FuelStockManager";
 import TransactionHistory from "./pages/SuperAdmin/TransactionHistory";
 import VehicleLists from "./pages/SuperAdmin/VehicleLists";
@@ -65,6 +66,7 @@ function App() {
           <Route path="/super-admin" element={<DashboardLayout Sidebar={SuperAdminSidebar} />}>
             <Route path="dashboard" element={<SuperAdminDashboard />}/>
             <Route path="manage-admins" element={<ManageAdmins />} />
+            <Route path="manage-owners" element={<ManageStationOwners />} />
             <Route path="fuel-stock" element={<FuelStockManager />} />
             <Route path="transactions" element={<TransactionHistory />}/>
             <Route path="vehicles-list" element={<VehicleLists />} />

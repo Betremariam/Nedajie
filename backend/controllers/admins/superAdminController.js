@@ -400,25 +400,53 @@ export async function blockAdmin(req, res) {
   try {
     const { adminId } = req.params;
     
+    // Check if it's an Admin first
     let admin = await prisma.admin.findUnique({ where: { id: adminId } });
-    let model = prisma.admin;
+    
+    if (admin) {
+      // Super admins can only block register and approver admins
+      const requestingAdmin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+      
+      if (requestingAdmin?.role === "super") {
+        if (admin.role !== "register" && admin.role !== "approver") {
+          return res.status(403).json({ msg: "Super Admins can only block Register and Approver admins." });
+        }
+      }
+      
+      const updated = await prisma.admin.update({
+        where: { id: adminId },
+        data: { isBlocked: !admin.isBlocked },
+      });
 
-    if (!admin) {
-      admin = await prisma.fuelStation.findUnique({ where: { id: adminId } });
-      model = prisma.fuelStation;
+      return res.status(200).json({
+        msg: updated.isBlocked ? "Account has been blocked." : "Account has been unblocked.",
+        isBlocked: updated.isBlocked,
+      });
     }
 
-    if (!admin) return res.status(404).json({ msg: "Admin not found" });
+    // Check if it's a FuelStation (Station Owner)
+    const station = await prisma.fuelStation.findUnique({ where: { id: adminId } });
+    
+    if (station) {
+      // Only federal admins can block station owners
+      const requestingAdmin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+      
+      if (requestingAdmin?.role !== "federal") {
+        return res.status(403).json({ msg: "Only Federal admins can block Station Owners." });
+      }
+      
+      const updated = await prisma.fuelStation.update({
+        where: { id: adminId },
+        data: { isBlocked: !station.isBlocked },
+      });
 
-    const updated = await model.update({
-      where: { id: adminId },
-      data: { isBlocked: !admin.isBlocked },
-    });
+      return res.status(200).json({
+        msg: updated.isBlocked ? "Station owner has been blocked." : "Station owner has been unblocked.",
+        isBlocked: updated.isBlocked,
+      });
+    }
 
-    res.status(200).json({
-      msg: updated.isBlocked ? "Account has been blocked." : "Account has been unblocked.",
-      isBlocked: updated.isBlocked,
-    });
+    res.status(404).json({ msg: "Admin or Station Owner not found." });
   } catch (err) {
     res.status(500).json({ msg: "Error toggling block status", error: err.message });
   }
