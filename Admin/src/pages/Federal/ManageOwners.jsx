@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { getAllAdmins, createOwner } from "../../services/api";
+import React, { useState } from "react";
+import { createOwner } from "../../services/api";
 import {
   User,
   Mail,
@@ -14,8 +14,6 @@ import {
   Check,
   Loader2,
   Building2,
-  Users,
-  Search,
   Upload,
   FileText,
 } from "lucide-react";
@@ -24,6 +22,23 @@ import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Switch } from "../../components/ui/Switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/Dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/AlertDialog";
 
 const REGIONS = [
   "Addis Ababa",
@@ -43,7 +58,6 @@ const REGIONS = [
 ];
 
 const ManageOwners = () => {
-  const [owners, setOwners] = useState([]);
   const [form, setForm] = useState({ 
     name: "", 
     email: "", 
@@ -59,27 +73,12 @@ const ManageOwners = () => {
     envClearance: null,
     pumpCalibration: null
   });
-   const [selectedOwner, setSelectedOwner] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [newCreds, setNewCreds] = useState(null);
   const [copied, setCopied] = useState(false);
   const [sendAlert, setSendAlert] = useState(true);
-  const [search, setSearch] = useState("");
-
-  const fetchOwners = async () => {
-    try {
-      const res = await getAllAdmins();
-      setOwners(res.data.filter((a) => a.role === "stationOwner"));
-    } catch {
-      setError("Failed to load owners.");
-    }
-  };
-
-  useEffect(() => {
-    fetchOwners();
-  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -135,7 +134,6 @@ const ManageOwners = () => {
       document.querySelectorAll('input[type="file"]').forEach(input => {
         input.value = "";
       });
-      fetchOwners();
     } catch (err) {
       console.error("Registration Request Failed:", {
         status: err.response?.status,
@@ -155,14 +153,6 @@ const ManageOwners = () => {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-  const filtered = owners.filter(
-    (o) =>
-      o.name?.toLowerCase().includes(search.toLowerCase()) ||
-      o.email?.toLowerCase().includes(search.toLowerCase()) ||
-      o.stationName?.toLowerCase().includes(search.toLowerCase()) ||
-      o.region?.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
     <div className="p-6 md:p-8 space-y-8 max-w-5xl mx-auto font-sans">
@@ -569,160 +559,9 @@ const ManageOwners = () => {
         </form>
       </div>
 
-      {/* Owners Table Card */}
-      <div className="bg-card rounded-[24px] shadow-sm border border-border overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 md:p-8 pb-4 border-b border-border">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-[12px] bg-muted/50 border border-border flex items-center justify-center text-foreground shadow-sm">
-              <Users className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-[17px] font-bold text-foreground tracking-tight">Registered Owners</h2>
-              <p className="text-muted-foreground text-[13px] font-medium">{owners.length} owner{owners.length !== 1 ? "s" : ""} in the system</p>
-            </div>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search owners..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="h-10 pl-11 rounded-xl border-border bg-muted/30 font-medium text-[13px] w-full sm:w-[220px] text-foreground"
-            />
-          </div>
-        </div>
-
-        {filtered.length === 0 ? (
-          <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-3">
-            <Building2 className="w-10 h-10 opacity-30" />
-            <p className="text-[13px] font-medium">{search ? "No owners match your search." : "No owners registered yet."}</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  <th className="text-left pl-6 md:pl-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Owner</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Email</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Station Name</th>
-                  <th className="text-left h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Region</th>
-                  <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="text-right pr-6 md:pr-8 h-11 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((owner) => (
-                  <tr key={owner._id || owner.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                    <td className="pl-6 md:pl-8 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-muted border border-border flex items-center justify-center text-foreground font-bold text-[13px]">
-                          {owner.name?.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                        </div>
-                        <span className="text-[14px] font-semibold text-foreground">{owner.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-[13px] text-muted-foreground font-medium">{owner.email}</td>
-                    <td className="py-4">
-                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-foreground">
-                        <Building className="w-3.5 h-3.5 text-muted-foreground/50" />
-                        {owner.stationName || "—"}
-                      </div>
-                    </td>
-                    <td className="py-4">
-                      <div className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground">
-                        <MapPin className="w-3.5 h-3.5 text-muted-foreground/50" />
-                        {owner.region || "—"}
-                      </div>
-                    </td>
-                    <td className="pr-6 md:pr-8 py-4 text-right">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:text-emerald-400">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        Active
-                      </span>
-                    </td>
-                    <td className="pr-6 md:pr-8 py-4 text-right">
-                      <Button variant="outline" size="sm" onClick={() => setSelectedOwner(owner)} className="h-8 px-3 rounded-lg text-xs font-semibold">View</Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Owner Details Modal */}
-      {selectedOwner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card w-full max-w-md rounded-2xl shadow-lg border border-border p-6 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-border">
-              <h3 className="text-lg font-bold text-foreground">Owner Details</h3>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedOwner(null)} className="h-8 w-8 rounded-full p-0">✕</Button>
-            </div>
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Owner Name</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Email Address</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.email}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Station Name</p>
-                <p className="text-sm font-medium text-foreground">{selectedOwner.stationName || "—"}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Region</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.region || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Zone</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.zone || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">Woreda</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.woreda || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-semibold uppercase">City</p>
-                  <p className="text-sm font-medium text-foreground">{selectedOwner.city || "—"}</p>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-border space-y-3">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">Uploaded Documents</p>
-                
-                {[
-                  { label: "Legal Business", path: selectedOwner.legalDocPath },
-                  { label: "Fuel Sector License", path: selectedOwner.fuelLicensePath },
-                  { label: "Construction Approval", path: selectedOwner.constructionDocPath },
-                  { label: "Safety Cert", path: selectedOwner.safetyCertPath },
-                  { label: "Env Clearance", path: selectedOwner.envClearancePath },
-                  { label: "Pump Calibration", path: selectedOwner.pumpCalibrationPath },
-                  { label: "General Document", path: selectedOwner.documentPath },
-                ].map((doc, idx) => doc.path && (
-                  <div key={idx} className="flex items-center justify-between bg-muted/30 p-2 rounded-lg">
-                    <span className="text-[12px] font-medium text-foreground">{doc.label}</span>
-                    <a
-                      href={`http://localhost:5000/${doc.path.replace(/\\/g, '/')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] font-bold text-primary hover:underline"
-                    >
-                      View
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 };
 
 export default ManageOwners;
+
