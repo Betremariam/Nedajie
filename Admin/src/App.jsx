@@ -55,6 +55,7 @@ import SuperAdminsList from "./pages/Federal/SuperAdminsList";
 import ManageOwners from "./pages/Federal/ManageOwners";
 import OwnersList from "./pages/Federal/OwnersList";
 import FuelDeliveries from "./pages/Federal/FuelDeliveries";
+import ManageVehicleTypes from "./pages/Federal/ManageVehicleTypes";
 
 function App() {
   return (
@@ -115,6 +116,7 @@ function App() {
             <Route path="super-admins-list" element={<SuperAdminsList />} />
             <Route path="manage-owners" element={<ManageOwners />} />
             <Route path="owners-list" element={<OwnersList />} />
+            <Route path="vehicle-types" element={<ManageVehicleTypes />} />
             <Route path="fuel-deliveries" element={<FuelDeliveries />} />
           </Route>
         </Routes>

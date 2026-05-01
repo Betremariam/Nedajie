@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../../services/api.js";
 import { 
   User, 
@@ -37,7 +37,6 @@ const RegisterVehicle = () => {
     phone: "",
     vehicleType: "",
     carPlate: "",
-    fullCapacity: "",
     document: null,
   });
 
@@ -47,6 +46,22 @@ const RegisterVehicle = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [fuelCapacity, setFuelCapacity] = useState(null);
+  const [vehicleTypes, setVehicleTypes] = useState([]);
+
+  useEffect(() => {
+    fetchVehicleTypes();
+  }, []);
+
+  const fetchVehicleTypes = async () => {
+    try {
+      const res = await API.get("/admins/vehicle-type-configs");
+      setVehicleTypes(res.data);
+    } catch (err) {
+      console.error("Failed to fetch vehicle types:", err);
+    }
+  };
 
   const handleChange = (e) => {
     if (e.target.name === "document") {
@@ -58,6 +73,13 @@ const RegisterVehicle = () => {
 
   const handleSelectChange = (value) => {
     setForm({ ...form, vehicleType: value });
+    // Find fuel capacity for this vehicle type
+    const config = vehicleTypes.find(c => c.vehicleType === value.toLowerCase());
+    if (config) {
+      setFuelCapacity(config.fuelCapacity);
+    } else {
+      setFuelCapacity(null);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -71,7 +93,6 @@ const RegisterVehicle = () => {
     formData.append("phone", form.phone);
     formData.append("vehicleType", form.vehicleType);
     formData.append("carPlate", form.carPlate);
-    formData.append("fullCapacity", form.fullCapacity);
     if(form.document) formData.append("document", form.document);
 
     try {
@@ -82,17 +103,19 @@ const RegisterVehicle = () => {
       });
 
       setSuccess(res.data.msg || "Vehicle registered successfully.");
+      setGeneratedPassword(res.data.generatedPassword || "");
+      setFuelCapacity(res.data.fuelCapacity || null);
       setForm({
         ownerName: "",
         phone: "",
         vehicleType: "",
         carPlate: "",
-        fullCapacity: "",
         document: null,
       });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
+      setGeneratedPassword("");
     } finally {
       setLoading(false);
     }
@@ -105,7 +128,15 @@ const RegisterVehicle = () => {
         <Alert className="border-emerald-500/50 bg-emerald-50 text-emerald-800">
           <CheckCircle2 className="h-4 w-4" />
           <AlertTitle className="font-bold">Success</AlertTitle>
-          <AlertDescription>{success}</AlertDescription>
+          <AlertDescription>
+            {success}
+            {generatedPassword && (
+              <div className="mt-2 p-3 bg-white rounded-lg border border-emerald-200">
+                <p className="text-sm font-semibold text-emerald-900">Generated Password: <span className="font-mono text-base">{generatedPassword}</span></p>
+                <p className="text-xs text-emerald-700 mt-1">Please save this password and share it with the vehicle owner.</p>
+              </div>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 
@@ -190,18 +221,17 @@ const RegisterVehicle = () => {
                 <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] transition-all text-foreground">
                   <SelectValue placeholder="Select vehicle type" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-border shadow-xl bg-card">
-                  <SelectItem value="bajaj" className="font-medium py-2.5">Light Transport (Bajaj)</SelectItem>
-                  <SelectItem value="taxi" className="font-medium py-2.5">Public Transit (Taxi)</SelectItem>
-                  <SelectItem value="car" className="font-medium py-2.5">Private Car</SelectItem>
-                  <SelectItem value="motorcycle" className="font-medium py-2.5">Motorcycle</SelectItem>
-                  <SelectItem value="bus" className="font-medium py-2.5">Bus</SelectItem>
-                  <SelectItem value="truck" className="font-medium py-2.5">Truck / Freight</SelectItem>
-                  <SelectItem value="heavy" className="font-medium py-2.5">Heavy Machinery</SelectItem>
-                  <SelectItem value="boat" className="font-medium py-2.5">Boat / Marine</SelectItem>
-                  <SelectItem value="ship" className="font-medium py-2.5">Ship / Large Vessel</SelectItem>
-                  <SelectItem value="ambulance" className="font-medium py-2.5">Ambulance / Emergency</SelectItem>
-                  <SelectItem value="other" className="font-medium py-2.5">Other Vehicle</SelectItem>
+                <SelectContent className="rounded-xl border-border shadow-xl bg-card max-h-[300px] overflow-y-auto">
+                  {vehicleTypes.map((type) => (
+                    <SelectItem 
+                      key={type.vehicleType} 
+                      value={type.vehicleType} 
+                      className="font-medium py-2.5"
+                    >
+                      {type.description || type.vehicleType}
+                      {type.isCustom && <span className="ml-2 text-xs text-primary">(Custom)</span>}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -226,7 +256,7 @@ const RegisterVehicle = () => {
               </div>
             </div>
 
-            {/* Fuel Capacity */}
+            {/* Fuel Capacity - Read Only Display */}
             <div className="space-y-3">
               <Label className="text-[13px] font-bold text-slate-800 ml-0.5 flex items-center gap-2">
                 <Fuel className="w-4 h-4 text-primary" /> 
@@ -234,17 +264,17 @@ const RegisterVehicle = () => {
               </Label>
               <div className="relative group">
                 <Input
-                  className="h-12 pl-4 pr-12 rounded-xl border-slate-200 bg-slate-50/50 font-medium text-[14px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                  placeholder="e.g., 50"
-                  type="number"
-                  name="fullCapacity"
-                  value={form.fullCapacity}
-                  onChange={handleChange}
-                  required
-                  min="1"
+                  className="h-12 pl-4 pr-12 rounded-xl border-slate-200 bg-slate-100 font-medium text-[14px] cursor-not-allowed"
+                  placeholder={form.vehicleType ? (fuelCapacity !== null ? `${fuelCapacity} Liters` : "Not configured") : "Select vehicle type first"}
+                  value={fuelCapacity !== null ? fuelCapacity : ""}
+                  readOnly
+                  disabled
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-bold text-primary pointer-events-none">LITERS</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-bold text-slate-400 pointer-events-none">LITERS</span>
               </div>
+              {form.vehicleType && fuelCapacity === null && (
+                <p className="text-xs text-red-500 ml-1">⚠️ Fuel capacity not configured for this vehicle type. Contact federal admin.</p>
+              )}
             </div>
 
             {/* Document Upload */}
@@ -324,7 +354,7 @@ const RegisterVehicle = () => {
                 type="button" 
                 variant="outline"
                 className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({ownerName:"", phone:"", vehicleType:"", carPlate:"", fullCapacity:"", document:null})}
+                onClick={() => setForm({ownerName:"", phone:"", vehicleType:"", carPlate:"", document:null})}
                >
                 Clear Form
                </Button>

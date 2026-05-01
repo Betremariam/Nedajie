@@ -28,6 +28,18 @@ import {
 } from "../controllers/admins/superAdminController.js";
 
 import {
+  createRegionalSuperAdmin,
+  createOwner,
+  addFuelDelivery,
+  getAllFuelDeliveries,
+  getFederalAdmins,
+  getFederalDashboardStats,
+  getVehicleTypeConfigs,
+  upsertVehicleTypeConfig,
+  deleteVehicleTypeConfig
+} from "../controllers/admins/federalController.js";
+
+import {
   approveVehicle,
   getUnapprovedVehicles,
   rejectVehicle,
@@ -54,8 +66,10 @@ const router = express.Router();
 
 // All routes below are for super admin only
 const protectSuper = [verifyToken, authorizeRoles("super", "federal")];
-const approverOnly = [verifyToken, authorizeRoles("approver"),attachAdmin];
-const registerAdmin = [verifyToken, authorizeRoles("register")];
+const approverOnly = [verifyToken, authorizeRoles("approver"), attachAdmin];
+const registerAdmin = [verifyToken, authorizeRoles("register"), attachAdmin];
+const federalOnly = [verifyToken, authorizeRoles("federal")];
+const allAdmins = [verifyToken, authorizeRoles("super", "federal", "register", "approver")];
 
 
 const storage = multer.diskStorage({
@@ -162,6 +176,10 @@ router.post(
 
 router.get("/register-dashboard-stats", registerAdmin, getRegisterDashboardStats);
 
+// Vehicle Type Configuration routes
+router.get("/vehicle-type-configs", allAdmins, getVehicleTypeConfigs); // All admins can read
+router.post("/vehicle-type-configs", federalOnly, upsertVehicleTypeConfig); // Only Federal can create/update
+router.delete("/vehicle-type-configs/:vehicleType", federalOnly, deleteVehicleTypeConfig); // Only Federal can delete
 
 
 export default router;

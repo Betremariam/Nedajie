@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, UserPlus, Truck, List, ShieldPlus } from "lucide-react";
+import { LayoutGrid, Users, UserPlus, Truck, List, ShieldPlus, Car } from "lucide-react";
 import BaseSidebar from "./BaseSidebar";
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { title: "Super Admins List", url: "/federal/super-admins-list", icon: Users },
   { title: "Register Owner", url: "/federal/manage-owners", icon: UserPlus },
   { title: "Owners List", url: "/federal/owners-list", icon: List },
+  { title: "Vehicle Type Config", url: "/federal/vehicle-types", icon: Car },
   { title: "Fuel Deliveries", url: "/federal/fuel-deliveries", icon: Truck },
 ];
 

@@ -4,7 +4,7 @@ import { hash } from "bcryptjs";
 
 export async function registerVehicle(req, res) {
   try {
-    const { ownerName, phone, vehicleType, carPlate, password, fullCapacity } = req.body;
+    const { ownerName, phone, vehicleType, carPlate } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ msg: "Document is required" });
@@ -15,7 +15,21 @@ export async function registerVehicle(req, res) {
     });
     if (existing) return res.status(400).json({ msg: "Vehicle phone already registered" });
 
-    const hashed = await hash(password, 10);
+    // Fetch fuel capacity from vehicle type config
+    const vehicleConfig = await prisma.vehicleTypeConfig.findUnique({
+      where: { vehicleType: vehicleType.toLowerCase() }
+    });
+
+    if (!vehicleConfig) {
+      return res.status(400).json({ 
+        msg: `Fuel capacity not configured for vehicle type: ${vehicleType}. Please contact federal admin.` 
+      });
+    }
+
+    // Auto-generate password from last 4 digits of phone + first 2 letters of plate
+    const defaultPassword = phone.slice(-4) + carPlate.slice(0, 2).toUpperCase();
+    const hashed = await hash(defaultPassword, 10);
+    
     const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
 
     const vehicle = await prisma.vehicle.create({
@@ -25,7 +39,7 @@ export async function registerVehicle(req, res) {
         vehicleType: vehicleType.toLowerCase(),
         carPlate,
         password: hashed,
-        fullCapacity: parseFloat(fullCapacity) || 0,
+        fullCapacity: vehicleConfig.fuelCapacity,
         isApproved: false,
         documentPath: req.file.path,
         region: admin.region,
@@ -35,10 +49,13 @@ export async function registerVehicle(req, res) {
     res.status(201).json({
       msg: "Vehicle registered. Awaiting admin approval.",
       vehicleId: vehicle.id,
+      generatedPassword: defaultPassword,
+      fuelCapacity: vehicleConfig.fuelCapacity
     });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Vehicle Registration Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
 

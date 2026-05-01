@@ -283,3 +283,79 @@ export async function getFederalDashboardStats(req, res) {
     res.status(500).json({ msg: "Failed to fetch dashboard stats", error: err.message });
   }
 }
+
+/**
+ * Federal - Get all Vehicle Type Configurations
+ */
+export async function getVehicleTypeConfigs(req, res) {
+  try {
+    const configs = await prisma.vehicleTypeConfig.findMany({
+      orderBy: { vehicleType: "asc" }
+    });
+    res.status(200).json(configs);
+  } catch (err) {
+    console.error("Get Vehicle Type Configs Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+/**
+ * Federal - Update or Create Vehicle Type Configuration
+ */
+export async function upsertVehicleTypeConfig(req, res) {
+  try {
+    const { vehicleType, fuelCapacity, description, isCustom } = req.body;
+
+    if (!vehicleType || fuelCapacity === undefined) {
+      return res.status(400).json({ msg: "Vehicle type and fuel capacity are required." });
+    }
+
+    // Validate vehicle type name (alphanumeric, spaces, hyphens, underscores)
+    const vehicleTypeRegex = /^[a-zA-Z0-9\s_-]+$/;
+    if (!vehicleTypeRegex.test(vehicleType)) {
+      return res.status(400).json({ 
+        msg: "Vehicle type can only contain letters, numbers, spaces, hyphens, and underscores." 
+      });
+    }
+
+    const config = await prisma.vehicleTypeConfig.upsert({
+      where: { vehicleType: vehicleType.toLowerCase().trim() },
+      update: { 
+        fuelCapacity: parseFloat(fuelCapacity),
+        description: description || null
+      },
+      create: { 
+        vehicleType: vehicleType.toLowerCase().trim(), 
+        fuelCapacity: parseFloat(fuelCapacity),
+        description: description || null,
+        isCustom: isCustom || false
+      }
+    });
+
+    res.status(200).json({ 
+      msg: "Vehicle type configuration updated successfully.", 
+      config 
+    });
+  } catch (err) {
+    console.error("Upsert Vehicle Type Config Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+/**
+ * Federal - Delete Vehicle Type Configuration
+ */
+export async function deleteVehicleTypeConfig(req, res) {
+  try {
+    const { vehicleType } = req.params;
+
+    await prisma.vehicleTypeConfig.delete({
+      where: { vehicleType }
+    });
+
+    res.status(200).json({ msg: "Vehicle type configuration deleted successfully." });
+  } catch (err) {
+    console.error("Delete Vehicle Type Config Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
