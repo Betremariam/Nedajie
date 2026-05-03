@@ -306,7 +306,9 @@ export async function createAdmin(req, res) {
     const tempPassword = generateTempPassword();
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    const { region, companyName } = req.body;
+    // Get the super admin's region
+    const superAdmin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    const { companyName } = req.body;
 
     await prisma.admin.create({
       data: { 
@@ -315,7 +317,7 @@ export async function createAdmin(req, res) {
         password: hashedPassword, 
         role, 
         mustChangePassword: true,
-        region,
+        region: superAdmin?.region, // Inherit super admin's region
         companyName
       },
     });
@@ -341,8 +343,16 @@ export async function getAllAdmins(req, res) {
       admin = await prisma.admin.findUnique({ where: { id: adminId } });
     }
     
-    // If federal but no DB record yet, treat as national
-    const where = (admin && admin.role === "super" && admin.region) ? { region: admin.region } : {};
+    // Filter by region for super admins, and exclude the requesting admin
+    const where = (admin && admin.role === "super" && admin.region) 
+      ? { 
+          region: admin.region,
+          id: { not: adminId }, // Exclude self
+          role: { in: ["register", "approver"] } // Only show register and approver admins
+        } 
+      : { 
+          id: { not: adminId } // Exclude self for federal admins
+        };
 
     const [admins, stations] = await Promise.all([
       prisma.admin.findMany({
