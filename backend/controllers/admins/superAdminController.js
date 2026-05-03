@@ -403,7 +403,6 @@ export async function getAllAdmins(req, res) {
       ...stations.map(s => ({ ...s, role: "stationOwner" })) // Ensure role is set for frontend
     ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-
     res.status(200).json(combined);
   } catch (err) {
     const fs = await import('fs');
