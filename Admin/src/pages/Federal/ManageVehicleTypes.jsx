@@ -63,12 +63,18 @@ const ManageVehicleTypes = () => {
     setLoading(true);
 
     try {
-      await API.post("/admins/vehicle-type-configs", {
+      const res = await API.post("/admins/vehicle-type-configs", {
         vehicleType,
         fuelCapacity: parseFloat(fuelCapacity),
         description,
       });
-      setSuccess(`Updated ${vehicleType} fuel capacity successfully.`);
+      
+      const vehiclesUpdated = res.data.vehiclesUpdated || 0;
+      const message = vehiclesUpdated > 0 
+        ? `Updated ${vehicleType} fuel capacity successfully. ${vehiclesUpdated} existing vehicle(s) updated.`
+        : `Updated ${vehicleType} fuel capacity successfully.`;
+      
+      setSuccess(message);
       fetchConfigs();
     } catch (err) {
       setError(err?.response?.data?.msg || "Failed to update configuration.");

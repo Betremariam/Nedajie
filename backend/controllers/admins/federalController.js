@@ -318,23 +318,37 @@ export async function upsertVehicleTypeConfig(req, res) {
       });
     }
 
+    const normalizedVehicleType = vehicleType.toLowerCase().trim();
+    const parsedCapacity = parseFloat(fuelCapacity);
+
     const config = await prisma.vehicleTypeConfig.upsert({
-      where: { vehicleType: vehicleType.toLowerCase().trim() },
+      where: { vehicleType: normalizedVehicleType },
       update: { 
-        fuelCapacity: parseFloat(fuelCapacity),
+        fuelCapacity: parsedCapacity,
         description: description || null
       },
       create: { 
-        vehicleType: vehicleType.toLowerCase().trim(), 
-        fuelCapacity: parseFloat(fuelCapacity),
+        vehicleType: normalizedVehicleType, 
+        fuelCapacity: parsedCapacity,
         description: description || null,
         isCustom: isCustom || false
       }
     });
 
+    // Update all existing vehicles of this type with the new fuel capacity
+    const updateResult = await prisma.vehicle.updateMany({
+      where: { 
+        vehicleType: normalizedVehicleType 
+      },
+      data: { 
+        fullCapacity: parsedCapacity 
+      }
+    });
+
     res.status(200).json({ 
       msg: "Vehicle type configuration updated successfully.", 
-      config 
+      config,
+      vehiclesUpdated: updateResult.count
     });
   } catch (err) {
     console.error("Upsert Vehicle Type Config Error:", err);
