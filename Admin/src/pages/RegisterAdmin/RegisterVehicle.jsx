@@ -279,7 +279,7 @@ const RegisterVehicle = () => {
 
             {/* Document Upload */}
             <div className="space-y-3">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Vehicle Registration Document</Label>
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Vehicle Libre Document</Label>
               <div className="relative group">
                 <input
                   className="hidden"
@@ -299,7 +299,7 @@ const RegisterVehicle = () => {
                      </div>
                      <div className="flex flex-col">
                        <span className="text-[13px] font-bold text-foreground mb-0.5 truncate max-w-[150px]">
-                         {form.document ? form.document.name : "Upload registration"}
+                         {form.document ? form.document.name : "Upload libre document"}
                        </span>
                        <span className="text-[11px] text-muted-foreground font-medium">PDF or image, max 5MB</span>
                      </div>

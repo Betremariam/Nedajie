@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
 import API from "../../services/api.js";
-import { Car, Fuel, Save, AlertCircle, CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { Car, Fuel, Save, AlertCircle, CheckCircle2, Plus, Trash2, AlertTriangle } from "lucide-react";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Card } from "../../components/ui/Card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/AlertDialog";
 
 const ManageVehicleTypes = () => {
   const [configs, setConfigs] = useState([]);
@@ -13,6 +23,8 @@ const ManageVehicleTypes = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [showAddNew, setShowAddNew] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [vehicleTypeToDelete, setVehicleTypeToDelete] = useState(null);
   const [newVehicleType, setNewVehicleType] = useState({
     vehicleType: "",
     fuelCapacity: "",
@@ -94,17 +106,22 @@ const ManageVehicleTypes = () => {
   };
 
   const handleDelete = async (vehicleType) => {
-    if (!confirm(`Are you sure you want to delete the vehicle type "${vehicleType}"?`)) {
-      return;
-    }
+    setVehicleTypeToDelete(vehicleType);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!vehicleTypeToDelete) return;
 
     setSuccess("");
     setError("");
     setLoading(true);
+    setDeleteDialogOpen(false);
 
     try {
-      await API.delete(`/admins/vehicle-type-configs/${vehicleType}`);
-      setSuccess(`Vehicle type "${vehicleType}" deleted successfully.`);
+      await API.delete(`/admins/vehicle-type-configs/${vehicleTypeToDelete}`);
+      setSuccess(`Vehicle type "${vehicleTypeToDelete}" deleted successfully.`);
+      setVehicleTypeToDelete(null);
       fetchConfigs();
     } catch (err) {
       setError(err?.response?.data?.msg || "Failed to delete vehicle type.");
@@ -278,6 +295,34 @@ const ManageVehicleTypes = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <AlertDialogTitle className="text-xl">Delete Vehicle Type</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-base pt-2">
+              Are you sure you want to delete the vehicle type <span className="font-bold text-foreground">"{vehicleTypeToDelete}"</span>?
+              <br />
+              <span className="text-red-600 font-medium mt-2 block">This action cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="rounded-xl bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

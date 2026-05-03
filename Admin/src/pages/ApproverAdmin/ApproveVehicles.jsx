@@ -12,10 +12,12 @@ import {
   FileText, 
   Download,
   Trash2,
-  Check
+  Check,
+  ArrowRight
 } from "lucide-react";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+import { Label } from "../../components/ui/Label";
 
 const ApproveVehicles = () => {
   const [vehicles, setVehicles] = useState([]);
