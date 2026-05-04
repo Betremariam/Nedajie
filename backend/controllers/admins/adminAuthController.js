@@ -88,6 +88,7 @@ export const loginAdmin = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
+    res.status(500).json({ msg: "Server error during login. Please try again." });
   }
 };
 

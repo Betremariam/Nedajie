@@ -35,6 +35,12 @@ const RegisterAdminDashboard = () => {
   const [error, setError] = useState("");
 
   const fetchStats = async () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       setLoading(true);
       setError("");

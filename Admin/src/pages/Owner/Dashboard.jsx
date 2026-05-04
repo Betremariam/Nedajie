@@ -36,6 +36,12 @@ const Dashboard = () => {
   const token = localStorage.getItem("adminToken");
 
   const fetchData = async () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       setLoading(true);
       setError("");

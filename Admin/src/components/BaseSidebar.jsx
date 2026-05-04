@@ -28,7 +28,7 @@ const BaseSidebar = ({ navItems, label, roleTitle }) => {
           {/* Brand text */}
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
             <span className="font-bold text-[15px] tracking-tight text-sidebar-foreground drop-shadow-sm">
-              Nigd Bureau
+              Nedajie
             </span>
             <span className="text-[10px] text-sidebar-foreground/60 font-semibold tracking-widest uppercase mt-0.5">
               {roleTitle}

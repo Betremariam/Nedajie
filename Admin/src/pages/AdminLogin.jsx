@@ -33,21 +33,24 @@ const AdminLogin = () => {
           localStorage.removeItem("stationIds");
           return;
         }
+        
+        // Token is valid, redirect to appropriate dashboard
+        const admin = JSON.parse(adminStr);
+        if (admin.mustChangePassword) {
+          navigate("/change-password");
+        } else {
+          if (admin.role === "super") navigate("/super-admin/dashboard");
+          else if (admin.role === "federal") navigate("/federal/dashboard");
+          else if (admin.role === "approver") navigate("/approver/dashboard");
+          else if (admin.role === "register") navigate("/register/register-dashboard");
+          else if (admin.role === "stationOwner") navigate("/owner/dashboard");
+        }
       } catch (e) {
+        // Invalid token format, clear storage and stay on login page
         localStorage.removeItem("adminToken");
         localStorage.removeItem("admin");
+        localStorage.removeItem("stationIds");
         return;
-      }
-
-      const admin = JSON.parse(adminStr);
-      if (admin.mustChangePassword) {
-        navigate("/change-password");
-      } else {
-        if (admin.role === "super") navigate("/super-admin/dashboard");
-        else if (admin.role === "federal") navigate("/federal/dashboard");
-        else if (admin.role === "approver") navigate("/approver/dashboard");
-        else if (admin.role === "register") navigate("/register/register-dashboard");
-        else if (admin.role === "stationOwner") navigate("/owner/dashboard");
       }
     }
   }, [navigate]);

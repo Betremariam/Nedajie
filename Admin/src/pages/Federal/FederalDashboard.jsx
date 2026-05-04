@@ -26,6 +26,9 @@ const FederalDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
+      const token = localStorage.getItem("adminToken");
+      if (!token) return;
+      
       try {
         const res = await getFederalDashboardStats();
         setStatsData(res.data);

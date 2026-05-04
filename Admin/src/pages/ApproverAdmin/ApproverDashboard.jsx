@@ -24,6 +24,12 @@ const ApproverDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
       try {
         const { data } = await getApproverAdminDashboardStats();
         setStats(data);

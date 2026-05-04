@@ -26,6 +26,12 @@ const SuperAdminDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
       try {
         const res = await API.get("/admins/dashboard-stats");
         setStatsData(res.data);

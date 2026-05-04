@@ -16,6 +16,7 @@ import ConfirmDeliveries from "./pages/SuperAdmin/ConfirmDeliveries";
 // Layouts
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ThemeProvider } from "./components/ThemeProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Sidebars
 import SuperAdminSidebar from "./components/SuperAdminSidebar";
@@ -63,10 +64,18 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<AdminLogin />} />
-          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/change-password" element={
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>
+          } />
 
           {/* Super Admin Routes */}
-          <Route path="/super-admin" element={<DashboardLayout Sidebar={SuperAdminSidebar} />}>
+          <Route path="/super-admin" element={
+            <ProtectedRoute allowedRoles={["super"]}>
+              <DashboardLayout Sidebar={SuperAdminSidebar} />
+            </ProtectedRoute>
+          }>
             <Route path="dashboard" element={<SuperAdminDashboard />}/>
             <Route path="manage-admins" element={<ManageAdmins />} />
             <Route path="manage-owners" element={<ManageStationOwners />} />
@@ -81,7 +90,11 @@ function App() {
           </Route>
 
           {/* Register Admin Routes */}
-          <Route path="/register" element={<DashboardLayout Sidebar={RegisterAdminSidebar} />}>
+          <Route path="/register" element={
+            <ProtectedRoute allowedRoles={["register"]}>
+              <DashboardLayout Sidebar={RegisterAdminSidebar} />
+            </ProtectedRoute>
+          }>
             <Route path="register-dashboard" element={<RegisterAdminDashboard />} />
             <Route path="vehicle-registration" element={<RegisterVehicle />} />
             <Route path="farmer-registration" element={<RegisterFarmer />} />
@@ -90,7 +103,11 @@ function App() {
           </Route>
             
           {/* Approver Admin Routes */}
-          <Route path="/approver" element={<DashboardLayout Sidebar={ApproverSidebar} />}>
+          <Route path="/approver" element={
+            <ProtectedRoute allowedRoles={["approver"]}>
+              <DashboardLayout Sidebar={ApproverSidebar} />
+            </ProtectedRoute>
+          }>
             <Route path="dashboard" element={<ApproveDashboard/>} />
             <Route path="vehicles" element={<ApproveVehicles/>} />
             <Route path="farmers" element={<ApproveFarmers/>} />
@@ -99,7 +116,11 @@ function App() {
             <Route path="others" element={<ApproveOthers/>} />
           </Route>
 
-          <Route path="/owner" element={<DashboardLayout Sidebar={OwnerSidebar} />}>
+          <Route path="/owner" element={
+            <ProtectedRoute allowedRoles={["stationOwner"]}>
+              <DashboardLayout Sidebar={OwnerSidebar} />
+            </ProtectedRoute>
+          }>
             <Route path="dashboard" element={<OwnerDashboard />} />
             <Route path="fuelstock" element={<OwnerFuelStock />} />
             <Route path="attendant" element={<RegisterAttendants />} />
@@ -110,7 +131,11 @@ function App() {
           </Route>
 
           {/* Federal Routes */}
-          <Route path="/federal" element={<DashboardLayout Sidebar={FederalSidebar} />}>
+          <Route path="/federal" element={
+            <ProtectedRoute allowedRoles={["federal"]}>
+              <DashboardLayout Sidebar={FederalSidebar} />
+            </ProtectedRoute>
+          }>
             <Route path="dashboard" element={<FederalDashboard />} />
             <Route path="manage-super-admins" element={<ManageSuperAdmins />} />
             <Route path="super-admins-list" element={<SuperAdminsList />} />
