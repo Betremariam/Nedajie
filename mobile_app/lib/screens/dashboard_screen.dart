@@ -81,7 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.slate.shade400 : Colors.slate.shade600,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
               ),
             ),
             Text(
@@ -121,7 +121,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       const Icon(Icons.local_gas_station_rounded, color: Color(0xFF10B981), size: 32),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, py: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
@@ -263,7 +263,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     subtitle,
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark ? Colors.slate.shade400 : Colors.slate.shade500,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
                     ),
                   ),
                 ],
@@ -271,7 +271,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: isDark ? Colors.slate.shade600 : Colors.slate.shade300,
+              color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
             ),
           ],
         ),

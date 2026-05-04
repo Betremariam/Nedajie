@@ -27,7 +27,7 @@ class FuelAttendantApp extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.slate.shade200),
+            side: BorderSide(color: Colors.grey.shade200),
           ),
         ),
         fontFamily: 'SF Pro Text', // Or Inter if available

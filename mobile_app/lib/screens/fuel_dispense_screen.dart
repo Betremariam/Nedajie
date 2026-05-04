@@ -216,7 +216,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
       children: [
         const Text(
           'Position QR code within the frame',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.slate),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey),
         ),
         const SizedBox(height: 32),
         Expanded(
@@ -251,7 +251,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
         ),
         const SizedBox(height: 32),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, py: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
             color: const Color(0xFF3B82F6).withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
@@ -340,7 +340,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
                 const SizedBox(height: 8),
                 Text(
                   phone ?? '',
-                  style: TextStyle(color: isDark ? Colors.slate.shade400 : Colors.slate.shade500),
+                  style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade500),
                 ),
               ],
             ),
@@ -362,7 +362,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
                   children: [
                     const Text('REMAINING QUOTA', style: TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, py: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(6)),
                       child: Text(
                         (quota?['gasType'] ?? 'diesel').toUpperCase(),
@@ -425,7 +425,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
             decoration: InputDecoration(
               hintText: '0.0',
               suffixText: 'LITERS',
-              suffixStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.slate),
+              suffixStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),
               filled: true,
               fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
@@ -466,7 +466,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
           
           TextButton(
             onPressed: _resetScan,
-            child: const Text('CANCEL & DISCARD SCAN', style: TextStyle(color: Colors.slate, fontWeight: FontWeight.w600)),
+            child: const Text('CANCEL & DISCARD SCAN', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(height: 40),
         ],

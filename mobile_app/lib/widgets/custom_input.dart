@@ -30,7 +30,7 @@ class CustomInputField extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.slate.shade400 : Colors.slate.shade700,
+              color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
             ),
           ),
         ),
@@ -45,7 +45,7 @@ class CustomInputField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: 'Enter $label',
             hintStyle: TextStyle(
-              color: isDark ? Colors.slate.shade600 : Colors.slate.shade400,
+              color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
               fontSize: 14,
             ),
             prefixIcon: prefixIcon != null 

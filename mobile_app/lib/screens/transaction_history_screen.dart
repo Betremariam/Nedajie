@@ -103,14 +103,14 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history_rounded, size: 64, color: isDark ? Colors.slate.shade800 : Colors.slate.shade200),
+          Icon(Icons.history_rounded, size: 64, color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
           const SizedBox(height: 16),
           Text(
             'No transactions yet',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.slate.shade500 : Colors.slate.shade400,
+              color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
             ),
           ),
         ],
@@ -181,7 +181,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   '$details • $formattedDate',
                   style: TextStyle(
                     fontSize: 11,
-                    color: isDark ? Colors.slate.shade400 : Colors.slate.shade500,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
                   ),
                 ),
               ],
@@ -204,7 +204,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.slate.shade500 : Colors.slate.shade400,
+                  color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
                 ),
               ),
             ],

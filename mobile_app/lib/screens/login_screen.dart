@@ -140,7 +140,7 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.slate.shade400 : Colors.slate.shade600,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                     ),
                   ),
                   const SizedBox(height: 48),
@@ -214,7 +214,7 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
                     children: [
                       Text(
                         'Don\'t have an account?',
-                        style: TextStyle(color: isDark ? Colors.slate.shade400 : Colors.slate.shade600),
+                        style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                       ),
                       TextButton(
                         onPressed: () {
