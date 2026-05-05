@@ -39,7 +39,7 @@ export async function getUnapprovedVehicles(req, res) {
       where: where,
     });
 
-    const baseUrl = 'http://192.168.43.237:5000';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
 
     const updatedVehicles = vehicles.map(vehicle => ({
       ...vehicle,
@@ -88,7 +88,7 @@ export async function getUnapprovedAttendants(req, res) {
       where: where,
     });
 
-    const baseUrl = 'http://192.168.43.237:5000';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
 
     const updatedAttendants = attendants.map(attendant => ({
       ...attendant,
@@ -157,7 +157,7 @@ export async function getUnapprovedFarmers(req, res) {
       where: where,
     });
 
-    const baseUrl = 'http://192.168.43.237:5000';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
 
     const updatedFarmers = farmers.map(farmer => ({
       ...farmer,
@@ -275,7 +275,7 @@ export async function getUnapprovedMillHouseOwners(req, res) {
       orderBy: { createdAt: "desc" },
     });
 
-    const baseUrl = 'http://192.168.43.237:5000';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
 
     const updatedOwners = owners.map(owner => ({
       ...owner,
