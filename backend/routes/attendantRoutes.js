@@ -1,11 +1,9 @@
 import { Router } from "express";
-import { registerAttendant, loginAttendant, getVehicleByQR, dispenseFuel, getAttendantTransactions } from "../controllers/admins/attendantController.js";
-import { upload } from '../middleWare/multerConfig.js';
+import { loginAttendant, getVehicleByQR, dispenseFuel, getAttendantTransactions } from "../controllers/admins/attendantController.js";
 
 const router = Router();
 
-// Removed public registration - only station owners can register attendants
-// router.post("/register", upload.single("document"), registerAttendant);
+// Attendants are registered by station owners only - no public registration endpoint
 router.post("/login", loginAttendant);
 router.get('/vehicle/:id', getVehicleByQR);
 router.post('/dispense', dispenseFuel);

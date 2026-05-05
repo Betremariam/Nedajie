@@ -12,6 +12,7 @@ import {
   registerAttendant,
   getMyAttendants,
   toggleAttendantStatus,
+  generateAttendantPassword,
 } from "../controllers/stationOwnerController.js";
 
 const router = express.Router();
@@ -89,6 +90,14 @@ router.patch(
   attachAdmin,
   authorizeRoles("stationOwner"),
   toggleAttendantStatus
+);
+
+router.post(
+  "/attendant/:id/generate-password",
+  authMiddleware,
+  attachAdmin,
+  authorizeRoles("stationOwner"),
+  generateAttendantPassword
 );
 
 export default router;

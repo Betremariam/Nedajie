@@ -59,47 +59,8 @@ export async function registerVehicle(req, res) {
   }
 }
 
-export async function registerAttendant(req, res) {
-  try {
-    const { name, phone, password, stationName, city } = req.body;
-
-    if (!name || !phone || !password || !stationName || !city) {
-      return res.status(400).json({ msg: "All fields are required." });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ msg: "Document is required." });
-    }
-
-    const existing = await prisma.fuelAttendant.findUnique({
-      where: { phone },
-    });
-    if (existing) {
-      return res.status(400).json({ msg: "Phone already registered." });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
-
-    const newAttendant = await prisma.fuelAttendant.create({
-      data: {
-        name,
-        phone,
-        password: hashedPassword,
-        stationName,
-        city,
-        region: admin.region,
-        documentPath: req.file.path,
-      },
-    });
-
-    res.status(201).json({ msg: "Registered successfully. Await admin approval." });
-
-  } catch (err) {
-    console.error("Register Error:", err);
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-}
+// Attendant registration has been moved to station owners only
+// Register admins no longer register attendants directly
 
 export async function registerFarmer(req, res) {
   try {

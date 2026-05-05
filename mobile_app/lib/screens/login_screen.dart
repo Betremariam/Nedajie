@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dashboard_screen.dart';
-import 'register_screen.dart';
 import '../widgets/custom_input.dart';
 
 class AttendantLoginScreen extends StatefulWidget {
@@ -208,30 +207,36 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
                   
                   const SizedBox(height: 24),
                   
-                  // Register Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Don\'t have an account?',
-                        style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                  // Contact Admin Message
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF334155) : Colors.blue.shade200,
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const AttendantRegisterScreen()),
-                          );
-                        },
-                        child: const Text(
-                          'Register now',
-                          style: TextStyle(
-                            color: Color(0xFF10B981),
-                            fontWeight: FontWeight.bold,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline, 
+                          color: isDark ? Colors.blue.shade300 : Colors.blue.shade700, 
+                          size: 20
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'New attendants must be registered by station owners',
+                            style: TextStyle(
+                              color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

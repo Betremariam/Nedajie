@@ -2,45 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../../lib/prisma.js";
 
-export async function registerAttendant(req, res) {
-  try {
-    const { name, phone, password, stationName, city, region } = req.body;
-
-    if (!name || !phone || !password || !stationName || !city || !region) {
-      return res.status(400).json({ msg: "All fields are required." });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ msg: "Document is required." });
-    }
-
-    const existing = await prisma.fuelAttendant.findUnique({
-      where: { phone },
-    });
-    if (existing) {
-      return res.status(400).json({ msg: "Phone already registered." });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await prisma.fuelAttendant.create({
-      data: {
-        name,
-        phone,
-        password: hashedPassword,
-        stationName,
-        city,
-        region,
-        documentPath: req.file.path,
-      },
-    });
-
-    res.status(201).json({ msg: "Registered successfully. Await admin approval." });
-  } catch (err) {
-    console.error("Register Error:", err);
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-}
+// Removed public registration - attendants are now registered by station owners only
 
 export async function loginAttendant(req, res) {
   try {
@@ -67,7 +29,11 @@ export async function loginAttendant(req, res) {
     }
 
     if (!attendant.isEnabled) {
-      return res.status(403).json({ msg: "Your account has been disabled by the station owner." });
+      return res.status(403).json({ msg: "Your account has been disabled. Please contact your station owner." });
+    }
+
+    if (!attendant.password || attendant.password === "") {
+      return res.status(403).json({ msg: "Password not set. Please contact your station owner to generate your password." });
     }
 
     const token = jwt.sign(

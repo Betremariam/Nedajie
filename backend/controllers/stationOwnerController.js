@@ -199,14 +199,14 @@ export const ownerReports = async (req, res) => {
 
 export async function registerAttendant(req, res) {
   try {
-    const { name, phone, stationName, city, region } = req.body;
+    const { name, phone } = req.body;
 
-    if (!name || !phone || !stationName || !city || !region) {
-      return res.status(400).json({ msg: "All fields are required." });
+    if (!name || !phone) {
+      return res.status(400).json({ msg: "Name and phone are required." });
     }
 
     if (!req.file) {
-      return res.status(400).json({ msg: "Document is required." });
+      return res.status(400).json({ msg: "Employment proof document is required." });
     }
 
     const existing = await prisma.fuelAttendant.findUnique({
@@ -216,27 +216,33 @@ export async function registerAttendant(req, res) {
       return res.status(400).json({ msg: "Phone already registered." });
     }
 
-    const generatedPassword = Math.random().toString(36).slice(-8);
-    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+    // Get owner's station details
+    const owner = await prisma.fuelStation.findUnique({
+      where: { id: req.admin.id },
+      select: { stationName: true, city: true, region: true }
+    });
 
+    if (!owner) {
+      return res.status(400).json({ msg: "Station owner not found." });
+    }
+
+    // Create attendant without password - will be generated after approval
     await prisma.fuelAttendant.create({
       data: {
         name,
         phone,
-        password: hashedPassword,
-        stationName,
-        city,
-        region,
+        password: "", // Empty password - will be set when owner generates it
+        stationName: owner.stationName,
+        city: owner.city,
+        region: owner.region,
         documentPath: req.file.path,
         ownerId: req.admin.id,
-        isEnabled: true,
+        isEnabled: false, // Disabled until approved and password is generated
       },
     });
 
-
     res.status(201).json({ 
-      msg: "Registered successfully. Await admin approval.", 
-      generatedPassword 
+      msg: "Attendant registered successfully. Awaiting approval." 
     });
   } catch (err) {
     console.error("Register Error:", err);
@@ -274,6 +280,44 @@ export async function toggleAttendantStatus(req, res) {
 
     res.json({ msg: `Attendant ${updated.isEnabled ? "enabled" : "disabled"}`, isEnabled: updated.isEnabled });
   } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function generateAttendantPassword(req, res) {
+  try {
+    const { id } = req.params;
+    
+    const attendant = await prisma.fuelAttendant.findFirst({
+      where: { id, ownerId: req.admin.id }
+    });
+
+    if (!attendant) {
+      return res.status(404).json({ msg: "Attendant not found or not owned by you." });
+    }
+
+    if (!attendant.isApproved) {
+      return res.status(400).json({ msg: "Attendant must be approved before generating password." });
+    }
+
+    // Generate a random password
+    const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+    await prisma.fuelAttendant.update({
+      where: { id },
+      data: { 
+        password: hashedPassword,
+        isEnabled: true // Enable when password is generated
+      }
+    });
+
+    res.json({ 
+      msg: "Password generated successfully", 
+      generatedPassword 
+    });
+  } catch (err) {
+    console.error("Generate Password Error:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }

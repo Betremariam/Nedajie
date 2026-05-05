@@ -58,9 +58,7 @@ import {
   getApproverDashboardStats
 } from "../controllers/admins/approverAdminController.js"; // 🔄 Make sure this is approverController now
 
-import { registerVehicle, registerFarmer,registerOtherUser, registerMillHouseOwner, getRegisterDashboardStats } from "../controllers/admins/registerAdminController.js";
-import { registerAttendant } from "../controllers/admins/attendantController.js";
-
+import { registerVehicle, registerFarmer, registerOtherUser, registerMillHouseOwner, getRegisterDashboardStats } from "../controllers/admins/registerAdminController.js";
 
 const router = express.Router();
 
@@ -143,13 +141,7 @@ router.post(
   registerVehicle
 );
 
-// Register a new attendant
-router.post(
-  "/register-attendant",
-  registerAdmin,
-  upload.single("document"),
-  registerAttendant
-);
+// Attendant registration moved to station owners - no longer available to register admins
 
 // Register a new farmer
 router.post(
