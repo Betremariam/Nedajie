@@ -17,7 +17,6 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
-import { Switch } from "../../components/ui/Switch";
 import { 
   Select, 
   SelectContent, 
@@ -36,9 +35,6 @@ const RegisterMillHouseOwner = () => {
     numberOfMills: "",
     document: null,
   });
-
-  const [isActive, setIsActive] = useState(true);
-  const [sendAlert, setSendAlert] = useState(true);
 
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -241,7 +237,7 @@ const RegisterMillHouseOwner = () => {
 
             {/* Document Upload */}
             <div className="space-y-3 md:col-span-2">
-              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Operational Credentials</Label>
+              <Label className="text-[13px] font-bold text-slate-800 ml-0.5">Proof from the Trade and Industry Bureau</Label>
               <div className="relative group">
                 <input
                   className="hidden"
@@ -259,7 +255,7 @@ const RegisterMillHouseOwner = () => {
                      <CloudUpload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                   <span className="text-[14px] font-bold text-foreground mb-1">
-                    {form.document ? form.document.name : "Upload mill house permit or ID"}
+                    {form.document ? form.document.name : "Upload proof document"}
                   </span>
                   <span className="text-[12px] text-muted-foreground font-medium mb-4">PDF or image, max 5MB</span>
                   
@@ -272,52 +268,24 @@ const RegisterMillHouseOwner = () => {
             
           </div>
 
-          {/* Bottom Status Section */}
-          <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-             <div className="flex flex-col gap-6 w-full max-w-lg">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-slate-600" />
-                  <h3 className="text-[14px] font-bold text-slate-800">Authorization Status</h3>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-8 pl-1">
-                  {/* Toggle 1 */}
-                  <div className="flex items-start gap-3">
-                    <Switch id="active-mill" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
-                    <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="active-mill" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Active profile</Label>
-                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Owner is eligible for allocation</span>
-                    </div>
-                  </div>
-                  {/* Toggle 2 */}
-                  <div className="flex items-start gap-3">
-                    <Switch id="creds-alert" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
-                    <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="creds-alert" className="text-[13px] font-semibold text-slate-800 cursor-pointer">Verification alert</Label>
-                       <span className="text-[11px] text-slate-500 font-medium leading-tight max-w-[160px]">Notify regional center of valid proof</span>
-                    </div>
-                  </div>
-                </div>
-             </div>
-             
-             {/* Right Action Buttons */}
-             <div className="flex flex-col gap-3 min-w-[200px]">
-               <Button 
-                disabled={loading}
-                className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
-                type="submit"
-               >
-                {loading ? "Registering..." : "Register Mill Owner"}
-                <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
-               </Button>
-               <Button 
-                type="button" 
-                variant="outline"
-                className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({fullName:"", phoneNumber:"", kebele:"", woreda:"", fuelType: "diesel", numberOfMills: "", document:null})}
-               >
-                Clear
-               </Button>
-             </div>
+          {/* Bottom Action Buttons */}
+          <div className="pt-8 pb-4 border-t border-slate-100 flex justify-end gap-3">
+            <Button 
+              type="button" 
+              variant="outline"
+              className="h-11 px-6 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
+              onClick={() => setForm({fullName:"", phoneNumber:"", kebele:"", woreda:"", fuelType: "diesel", numberOfMills: "", document:null})}
+            >
+              Clear Form
+            </Button>
+            <Button 
+              disabled={loading}
+              className="h-11 px-6 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
+              type="submit"
+            >
+              {loading ? "Registering..." : "Register Mill Owner"}
+              <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
+            </Button>
           </div>
           
         </form>

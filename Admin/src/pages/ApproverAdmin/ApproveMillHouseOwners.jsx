@@ -131,10 +131,6 @@ const ApproveMillHouseOwners = () => {
                   <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Site Location</p>
                   <p className="font-bold text-foreground">{approvedOwner.woreda}, {approvedOwner.kebele}</p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Security ID</p>
-                  <p className="font-bold text-primary tabular-nums">{approvedOwner.id.slice(-8)}</p>
-                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">

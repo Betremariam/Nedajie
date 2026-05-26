@@ -139,10 +139,6 @@ const ApproveFarmers = () => {
                   <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Contact Phone</p>
                   <p className="font-bold text-foreground">{approvedFarmer.phoneNumber}</p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-widest">Security ID</p>
-                  <p className="font-bold text-primary tabular-nums">{approvedFarmer.id.slice(-8)}</p>
-                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">

@@ -37,7 +37,6 @@ const RegisterVehicle = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [generatedPassword, setGeneratedPassword] = useState("");
   const [fuelCapacity, setFuelCapacity] = useState(null);
   const [vehicleTypes, setVehicleTypes] = useState([]);
 
@@ -94,7 +93,6 @@ const RegisterVehicle = () => {
       });
 
       setSuccess(res.data.msg || "Vehicle registered successfully.");
-      setGeneratedPassword(res.data.generatedPassword || "");
       setFuelCapacity(res.data.fuelCapacity || null);
       setForm({
         ownerName: "",
@@ -106,7 +104,6 @@ const RegisterVehicle = () => {
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
       setError(err?.response?.data?.msg || "Registration failed.");
-      setGeneratedPassword("");
     } finally {
       setLoading(false);
     }
@@ -119,15 +116,7 @@ const RegisterVehicle = () => {
         <Alert className="border-emerald-500/50 bg-emerald-50 text-emerald-800">
           <CheckCircle2 className="h-4 w-4" />
           <AlertTitle className="font-bold">Success</AlertTitle>
-          <AlertDescription>
-            {success}
-            {generatedPassword && (
-              <div className="mt-2 p-3 bg-white rounded-lg border border-emerald-200">
-                <p className="text-sm font-semibold text-emerald-900">Generated Password: <span className="font-mono text-base">{generatedPassword}</span></p>
-                <p className="text-xs text-emerald-700 mt-1">Please save this password and share it with the vehicle owner.</p>
-              </div>
-            )}
-          </AlertDescription>
+          <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
 
