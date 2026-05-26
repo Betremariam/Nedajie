@@ -3,20 +3,15 @@ import API from "../../services/api.js";
 import { 
   User, 
   PhoneCall, 
-  KeyRound, 
   Car, 
   Link as LinkIcon, 
   CloudUpload, 
-  ShieldCheck, 
   ArrowRight,
   BusFront,
   IdCard,
   CheckCircle2,
   AlertCircle,
-  Fuel,
-  Ship,
-  Truck,
-  Bike
+  Fuel
 } from "lucide-react";
 import { 
   Select, 
@@ -29,7 +24,6 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
-import { Switch } from "../../components/ui/Switch";
 
 const RegisterVehicle = () => {
   const [form, setForm] = useState({
@@ -39,9 +33,6 @@ const RegisterVehicle = () => {
     carPlate: "",
     document: null,
   });
-
-  const [isActive, setIsActive] = useState(true);
-  const [sendAlert, setSendAlert] = useState(true);
 
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -73,8 +64,8 @@ const RegisterVehicle = () => {
 
   const handleSelectChange = (value) => {
     setForm({ ...form, vehicleType: value });
-    // Find fuel capacity for this vehicle type
-    const config = vehicleTypes.find(c => c.vehicleType === value.toLowerCase());
+    // Find fuel capacity for this vehicle type (case-insensitive match)
+    const config = vehicleTypes.find(c => c.vehicleType.toLowerCase() === value.toLowerCase());
     if (config) {
       setFuelCapacity(config.fuelCapacity);
     } else {
@@ -217,21 +208,31 @@ const RegisterVehicle = () => {
                 <BusFront className="w-4 h-4 text-primary" /> 
                 Vehicle Type
               </Label>
-              <Select value={form.vehicleType} onValueChange={handleSelectChange} required>
+              <Select value={form.vehicleType} onValueChange={handleSelectChange}>
                 <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-medium text-[14px] transition-all text-foreground">
                   <SelectValue placeholder="Select vehicle type" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-border shadow-xl bg-card max-h-[300px] overflow-y-auto">
-                  {vehicleTypes.map((type) => (
-                    <SelectItem 
-                      key={type.vehicleType} 
-                      value={type.vehicleType} 
-                      className="font-medium py-2.5"
-                    >
-                      {type.description || type.vehicleType}
-                      {type.isCustom && <span className="ml-2 text-xs text-primary">(Custom)</span>}
-                    </SelectItem>
-                  ))}
+                  {vehicleTypes.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      No vehicle types configured. Contact federal admin.
+                    </div>
+                  ) : (
+                    vehicleTypes.map((type) => (
+                      <SelectItem 
+                        key={type.id || type.vehicleType} 
+                        value={type.vehicleType} 
+                        className="font-medium py-2.5 capitalize"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="capitalize">{type.vehicleType}</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            {type.fuelCapacity}L
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -313,52 +314,24 @@ const RegisterVehicle = () => {
             
           </div>
 
-          {/* Bottom Vehicle Status Section */}
-          <div className="pt-8 pb-4 border-t border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-             <div className="flex flex-col gap-6 w-full max-w-lg">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-muted-foreground" />
-                  <h3 className="text-[14px] font-bold text-foreground">Registration Options</h3>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-8 pl-1">
-                  {/* Toggle 1 */}
-                  <div className="flex items-start gap-3">
-                    <Switch id="active-vehicle" checked={isActive} onCheckedChange={setIsActive} className="mt-1 data-[state=checked]:bg-emerald-500" />
-                    <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="active-vehicle" className="text-[13px] font-semibold text-foreground cursor-pointer">Immediate Active</Label>
-                       <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[160px]">Ready for fuel after approval</span>
-                    </div>
-                  </div>
-                  {/* Toggle 2 */}
-                  <div className="flex items-start gap-3">
-                    <Switch id="send-noti" checked={sendAlert} onCheckedChange={setSendAlert} className="mt-1 data-[state=checked]:bg-primary" />
-                    <div className="flex flex-col gap-1 text-left">
-                       <Label htmlFor="send-noti" className="text-[13px] font-semibold text-foreground cursor-pointer">SMS Confirmation</Label>
-                       <span className="text-[11px] text-muted-foreground font-medium leading-tight max-w-[160px]">Send credentials to owner via SMS</span>
-                    </div>
-                  </div>
-                </div>
-             </div>
-             
-             {/* Right Action Buttons */}
-             <div className="flex flex-col gap-3 min-w-[200px]">
-               <Button 
-                disabled={loading}
-                className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
-                type="submit"
-               >
-                {loading ? "Registering..." : "Register Vehicle"}
-                <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
-               </Button>
-               <Button 
-                type="button" 
-                variant="outline"
-                className="w-full h-11 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
-                onClick={() => setForm({ownerName:"", phone:"", vehicleType:"", carPlate:"", document:null})}
-               >
-                Clear Form
-               </Button>
-             </div>
+          {/* Bottom Action Buttons */}
+          <div className="pt-8 pb-4 border-t border-slate-100 flex justify-end gap-3">
+            <Button 
+              type="button" 
+              variant="outline"
+              className="h-11 px-6 bg-white hover:bg-slate-50 text-slate-800 font-bold border-slate-200 rounded-xl"
+              onClick={() => setForm({ownerName:"", phone:"", vehicleType:"", carPlate:"", document:null})}
+            >
+              Clear Form
+            </Button>
+            <Button 
+              disabled={loading}
+              className="h-11 px-6 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] rounded-xl shadow-md border-0 gap-2 transition-all hover:pr-3"
+              type="submit"
+            >
+              {loading ? "Registering..." : "Register Vehicle"}
+              <ArrowRight className="w-4 h-4 ml-1 opacity-90" />
+            </Button>
           </div>
           
         </form>
