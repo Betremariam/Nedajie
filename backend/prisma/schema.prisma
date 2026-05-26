@@ -67,20 +67,21 @@ model Farmer {
 }
 
 model FuelAttendant {
-  id           String       @id @default(cuid())
-  name         String
-  phone        String       @unique
-  password     String
-  stationName  String
-  city         String
-  isApproved   Boolean      @default(false)
-  documentPath String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now()) @updatedAt
-  region       String?
-  isEnabled    Boolean      @default(true)
-  ownerId      String?
-  owner        FuelStation? @relation(fields: [ownerId], references: [id])
+  id                 String       @id @default(cuid())
+  name               String
+  phone              String       @unique
+  password           String
+  stationName        String
+  city               String
+  isApproved         Boolean      @default(false)
+  documentPath       String
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @default(now()) @updatedAt
+  region             String?
+  isEnabled          Boolean      @default(true)
+  ownerId            String?
+  mustChangePassword Boolean      @default(true)
+  owner              FuelStation? @relation(fields: [ownerId], references: [id])
 }
 
 model FuelStation {

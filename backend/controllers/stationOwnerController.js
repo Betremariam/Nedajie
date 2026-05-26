@@ -308,7 +308,8 @@ export async function generateAttendantPassword(req, res) {
       where: { id },
       data: { 
         password: hashedPassword,
-        isEnabled: true // Enable when password is generated
+        isEnabled: true, // Enable when password is generated
+        mustChangePassword: true, // Force password change on first login
       }
     });
 

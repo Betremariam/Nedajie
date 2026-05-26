@@ -4,6 +4,7 @@ import 'login_screen.dart';
 import 'fuel_dispense_screen.dart';
 import 'dart:convert';
 import 'transaction_history_screen.dart';
+import 'change_password_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String attendantName;
@@ -21,6 +22,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   String stationName = 'Loading...';
   String region = '...';
+  bool mustChangePassword = false;
 
   @override
   void initState() {
@@ -36,7 +38,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       setState(() {
         stationName = data['stationName'] ?? 'Generic Station';
         region = data['region'] ?? 'Unknown Region';
+        mustChangePassword = data['mustChangePassword'] ?? false;
       });
+    }
+  }
+  
+  Future<void> _navigateToChangePassword({bool mandatory = false}) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangePasswordScreen(mustChange: mandatory),
+      ),
+    );
+    
+    // If password was changed successfully, reload attendant data
+    if (result == true) {
+      await _loadAttendantData();
     }
   }
 
@@ -208,6 +225,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   MaterialPageRoute(builder: (_) => TransactionHistoryScreen(stationName: stationName)),
                 );
               },
+            ),
+            
+            const SizedBox(height: 16),
+            
+            _buildActionCard(
+              context,
+              title: 'Change Password',
+              subtitle: 'Update Your Security',
+              icon: Icons.lock_reset,
+              color: const Color(0xFF8B5CF6), // Purple
+              onTap: () => _navigateToChangePassword(mandatory: false),
             ),
           ],
         ),

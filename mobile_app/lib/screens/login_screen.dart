@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dashboard_screen.dart';
+import '../services/auth_service.dart';
 import '../widgets/custom_input.dart';
+import 'dashboard_screen.dart';
+import 'change_password_screen.dart';
 
 class AttendantLoginScreen extends StatefulWidget {
   const AttendantLoginScreen({super.key});
@@ -15,11 +14,10 @@ class AttendantLoginScreen extends StatefulWidget {
 class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  
   bool loading = false;
   String? error;
-
-  // Use a constant for base URL to make it easier to change
-  static const String baseUrl = 'http://192.168.43.237:5000/api';
 
   Future<void> login() async {
     if (phoneController.text.isEmpty || passwordController.text.isEmpty) {
@@ -33,45 +31,66 @@ class _AttendantLoginScreenState extends State<AttendantLoginScreen> {
     });
 
     try {
-      final res = await http.post(
-        Uri.parse('$baseUrl/attendants/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'phone': phoneController.text,
-          'password': passwordController.text,
-        }),
+      final result = await _authService.login(
+        phoneController.text,
+        passwordController.text,
       );
 
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        final attendant = data['attendant'];
-        final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
 
-        await prefs.setString('token', data['token']);
-        await prefs.setString('attendantId', attendant['id']);
-        await prefs.setString('stationName', attendant['stationName']);
-        await prefs.setString('attendantName', attendant['name']);
-        await prefs.setString('attendant', jsonEncode(attendant));
-
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DashboardScreen(
-              attendantId: attendant['id'],
-              attendantName: attendant['name'],
+      if (result['success']) {
+        final attendant = result['data']['attendant'];
+        final mustChangePassword = attendant['mustChangePassword'] ?? false;
+        
+        if (mustChangePassword) {
+          // Navigate to change password screen first
+          final passwordChanged = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ChangePasswordScreen(mustChange: true),
             ),
-          ),
-        );
+          );
+          
+          // If password was changed successfully, go to dashboard
+          if (passwordChanged == true) {
+            if (!mounted) return;
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DashboardScreen(
+                  attendantId: attendant['id'],
+                  attendantName: attendant['name'],
+                ),
+              ),
+            );
+          } else {
+            // If they didn't change password, stay on login screen
+            setState(() {
+              loading = false;
+              error = 'Password change is required to continue';
+            });
+          }
+        } else {
+          // Normal login flow - go directly to dashboard
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DashboardScreen(
+                attendantId: attendant['id'],
+                attendantName: attendant['name'],
+              ),
+            ),
+          );
+        }
       } else {
         setState(() {
-          error = data['msg'] ?? 'Login failed';
+          error = result['message'];
           loading = false;
         });
       }
     } catch (e) {
       setState(() {
-        error = 'Connection failed. Please check your network.';
+        error = 'An unexpected error occurred';
         loading = false;
       });
     }

@@ -51,10 +51,57 @@ export async function loginAttendant(req, res) {
         stationName: attendant.stationName,
         city: attendant.city,
         region: attendant.region,
+        mustChangePassword: attendant.mustChangePassword || false,
       },
     });
   } catch (err) {
     console.error("Login Error:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+}
+
+export async function changePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const attendantId = req.user.id;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ msg: "Current password and new password are required." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ msg: "New password must be at least 6 characters long." });
+    }
+
+    const attendant = await prisma.fuelAttendant.findUnique({
+      where: { id: attendantId },
+    });
+
+    if (!attendant) {
+      return res.status(404).json({ msg: "Attendant not found." });
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, attendant.password);
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Current password is incorrect." });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear mustChangePassword flag
+    await prisma.fuelAttendant.update({
+      where: { id: attendantId },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: false,
+      },
+    });
+
+    res.status(200).json({ msg: "Password changed successfully." });
+  } catch (err) {
+    console.error("Change Password Error:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
