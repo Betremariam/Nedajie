@@ -3,6 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../config/api_config.dart';
 
 class FuelDispenseScreen extends StatefulWidget {
   const FuelDispenseScreen({super.key});
@@ -36,8 +37,6 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
     });
   }
 
-  static const String baseUrl = 'http://192.168.43.237:5000/api';
-
   void onScan(String scannedText) {
     if (scanned) return;
     setState(() {
@@ -58,7 +57,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
 
     try {
       final res = await http.get(
-        Uri.parse('$baseUrl/attendants/entity/$id'),
+        Uri.parse('${ApiConfig.baseUrl}/api/attendants/entity/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -119,7 +118,7 @@ class _FuelDispenseScreenState extends State<FuelDispenseScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/attendants/dispense'),
+        Uri.parse('${ApiConfig.baseUrl}/api/attendants/dispense'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

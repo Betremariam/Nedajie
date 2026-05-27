@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginAttendant, getVehicleByQR, dispenseFuel, getAttendantTransactions, changePassword } from "../controllers/admins/attendantController.js";
+import { loginAttendant, getEntityByQR, dispenseFuel, getAttendantTransactions, changePassword } from "../controllers/admins/attendantController.js";
 import authMiddleware from "../middleWare/authMiddleware.js";
 
 const router = Router();
@@ -7,7 +7,8 @@ const router = Router();
 // Attendants are registered by station owners only - no public registration endpoint
 router.post("/login", loginAttendant);
 router.post("/change-password", authMiddleware, changePassword);
-router.get('/vehicle/:id', getVehicleByQR);
+router.get('/vehicle/:id', getEntityByQR); // Legacy route for backward compatibility
+router.get('/entity/:id', getEntityByQR); // New unified route
 router.post('/dispense', dispenseFuel);
 router.get('/transactions/:stationName', getAttendantTransactions);
 export default router;

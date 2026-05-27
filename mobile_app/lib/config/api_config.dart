@@ -4,7 +4,7 @@
 /// Change the baseUrl here to update it across the entire app.
 class ApiConfig {
   // Base URL - Change this for different environments
-  static const String baseUrl = 'http://localhost:5000';
+  static const String baseUrl = 'http://192.168.43.237:5000';
   
   // Alternative URLs for different environments
   // static const String baseUrl = 'http://192.168.43.237:5000'; // Network testing
