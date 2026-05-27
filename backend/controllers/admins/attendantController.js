@@ -136,15 +136,19 @@ async function calculateEntityQuota(entity, type) {
   const now = new Date();
   
   if (type === "vehicle") {
-    const today = now.toDateString();
-    const lastFuelDate = entity.lastFuelDate ? new Date(entity.lastFuelDate).toDateString() : null;
-    let usedToday = entity.dailyLimitUsed || 0;
-    if (lastFuelDate !== today) usedToday = 0;
+    const lastFuelDate = entity.lastFuelDate ? new Date(entity.lastFuelDate) : null;
+    let usedIn3Days = entity.dailyLimitUsed || 0;
+    
+    // Check if 3 days have passed since last fuel
+    if (!lastFuelDate || (now.getTime() - lastFuelDate.getTime()) / (1000 * 60 * 60 * 24) >= 3) {
+      usedIn3Days = 0;
+    }
     
     return {
       limit: entity.fullCapacity,
-      remaining: Math.max(entity.fullCapacity - usedToday, 0),
-      isDaily: true,
+      remaining: Math.max(entity.fullCapacity - usedIn3Days, 0),
+      is3Day: true,
+      resetDate: lastFuelDate ? new Date(lastFuelDate.getTime() + 3 * 24 * 60 * 60 * 1000) : now,
       gasType: getGasType("vehicle", entity.vehicleType)
     };
   }
