@@ -201,22 +201,24 @@ model OtherUser {
 }
 
 model MillHouseOwner {
-  id            String            @id @default(cuid())
-  fullName      String
-  kebele        String
-  woreda        String
-  phoneNumber   String            @unique
-  fuelType      FuelType          @default(diesel)
-  dailyLimit    Float             @default(0)
-  documentPath  String?
-  region        String?
-  isApproved    Boolean           @default(false)
-  approvedById  String?
-  createdAt     DateTime          @default(now())
-  numberOfMills Int               @default(1)
-  updatedAt     DateTime          @default(now()) @updatedAt
-  transactions  FuelTransaction[]
-  approvedBy    Admin?            @relation(fields: [approvedById], references: [id])
+  id               String            @id @default(cuid())
+  fullName         String
+  kebele           String
+  woreda           String
+  phoneNumber      String            @unique
+  fuelType         FuelType          @default(diesel)
+  dailyLimit       Float             @default(0)
+  litersUsed15Days Float             @default(0)
+  limitStartDate   DateTime?         @default(now())
+  documentPath     String?
+  region           String?
+  isApproved       Boolean           @default(false)
+  approvedById     String?
+  createdAt        DateTime          @default(now())
+  numberOfMills    Int               @default(1)
+  updatedAt        DateTime          @default(now()) @updatedAt
+  transactions     FuelTransaction[]
+  approvedBy       Admin?            @relation(fields: [approvedById], references: [id])
 }
 
 enum AdminRole {

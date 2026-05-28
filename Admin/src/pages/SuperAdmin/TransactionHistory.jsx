@@ -68,12 +68,14 @@ const Transactions = () => {
   useEffect(() => {
     let filtered = [...transactions];
 
-    // Search filter (consumer name, station, attendant)
+    // Search filter (consumer name, station, attendant, phone)
     if (searchTerm) {
       filtered = filtered.filter(tx => 
-        (tx.driver?.name || tx.farmer?.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (tx.consumerName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (tx.phoneNumber || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         tx.stationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (tx.attendantName || "").toLowerCase().includes(searchTerm.toLowerCase())
+        (tx.attendantName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t(`${tx.customerType}TypeLabel`).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -250,18 +252,20 @@ const Transactions = () => {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent bg-muted/40">
-                  <TableHead className="pl-6 h-12 uppercase text-[10px] font-bold tracking-wider">Consumer</TableHead>
-                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Product</TableHead>
-                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Volume</TableHead>
-                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Attendant</TableHead>
-                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">Station / Node</TableHead>
-                  <TableHead className="pr-6 h-12 text-right uppercase text-[10px] font-bold tracking-wider">Timestamp</TableHead>
+                  <TableHead className="pl-6 h-12 uppercase text-[10px] font-bold tracking-wider">{t("authorizedCustomer")}</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">{t("customerType")}</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">{t("phoneNumber")}</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">{t("product")}</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">{t("volume")}</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">{t("leadAttendant")}</TableHead>
+                  <TableHead className="h-12 uppercase text-[10px] font-bold tracking-wider">{t("activeStation")}</TableHead>
+                  <TableHead className="pr-6 h-12 text-right uppercase text-[10px] font-bold tracking-wider">{t("timestamp")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-64 text-center">
+                    <TableCell colSpan={8} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground gap-3">
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
                           <Receipt className="w-8 h-8 opacity-20" />
@@ -289,13 +293,21 @@ const Transactions = () => {
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-primary/10 dark:bg-primary/30 rounded-md flex items-center justify-center border border-primary/20 dark:border-primary/80">
                             <span className="text-primary dark:text-primary font-bold text-xs">
-                              {(tx.driver?.name || tx.farmer?.fullName)?.charAt(0) || 'C'}
+                              {(tx.consumerName || "C").charAt(0)}
                             </span>
                           </div>
                           <div className="font-semibold text-sm">
-                            {tx.driver?.name || tx.farmer?.fullName || "Private Consumer"}
+                            {tx.consumerName}
                           </div>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-[10px] h-5 font-bold uppercase tracking-wider">
+                          {t(`${tx.customerType}TypeLabel`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs font-medium text-muted-foreground">
+                        {tx.phoneNumber}
                       </TableCell>
                       <TableCell>
                         <Badge 

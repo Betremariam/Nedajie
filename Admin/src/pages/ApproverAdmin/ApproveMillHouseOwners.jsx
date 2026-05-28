@@ -101,7 +101,14 @@ const ApproveMillHouseOwners = () => {
         <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
           <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
-               <div className="w-[200px] h-[200px] bg-muted flex items-center justify-center">QR Disabled</div>
+               <QRCodeCanvas
+                 id="qr-gen"
+                 value={approvedOwner.id}
+                 size={200}
+                 level="H"
+                 includeMargin={true}
+                 ref={qrRef}
+               />
             </div>
             
             <div className="flex-1 space-y-6 text-center md:text-left">

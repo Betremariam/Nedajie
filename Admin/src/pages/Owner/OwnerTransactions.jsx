@@ -141,6 +141,8 @@ const OwnerTransactions = () => {
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50 border-none h-14">
                     <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("authorizedCustomer")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">{t("customerType")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("phoneNumber")}</TableHead>
                     <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Type</TableHead>
                     <TableHead className="text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("volume")}</TableHead>
                     <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("leadAttendant")}</TableHead>
@@ -157,12 +159,17 @@ const OwnerTransactions = () => {
                               <User className="w-5 h-5" />
                            </div>
                            <div>
-                              <p className="text-[14px] font-bold group-hover:text-primary transition-colors">{tx.driver?.name || tx.farmer?.fullName || "UNKNOWN_NODE"}</p>
-                              <Badge variant="outline" className="text-[9px] h-4 font-bold uppercase tracking-widest border-border/40 py-0">
-                                 {tx.driver ? "Logistics Vendor" : tx.farmer ? "Agri Entity" : "External Node"}
-                              </Badge>
+                              <p className="text-[14px] font-bold group-hover:text-primary transition-colors">{tx.consumerName}</p>
                            </div>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="secondary" className="text-[9px] h-4 font-bold uppercase tracking-widest border-border/40 py-0">
+                          {t(`${tx.customerType}TypeLabel`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-[12px] font-medium text-muted-foreground">
+                        {tx.phoneNumber}
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="h-7 px-3 rounded-full font-bold text-[10px] uppercase tracking-widest bg-muted/20 border-border/50 group-hover:border-primary/30 transition-colors">

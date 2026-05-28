@@ -119,10 +119,12 @@ export const ownerTransactions = async (req, res) => {
 
     const transactionsRaw = await prisma.fuelTransaction.findMany({
       where: { stationName },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       include: {
-        vehicle: { select: { ownerName: true } },
-        farmer: { select: { fullName: true } },
+        vehicle: { select: { ownerName: true, phone: true } },
+        farmer: { select: { fullName: true, phoneNumber: true } },
+        millHouseOwner: { select: { fullName: true, phoneNumber: true } },
+        otherUser: { select: { fullName: true, phoneNumber: true } },
       },
     });
 
@@ -130,11 +132,25 @@ export const ownerTransactions = async (req, res) => {
       return res.json([]);
     }
 
-    const transactions = transactionsRaw.map((tx) => ({
-      ...tx,
-      driver: tx.vehicle ? { name: tx.vehicle.ownerName } : undefined,
-      vehicle: undefined,
-    }));
+    const transactions = transactionsRaw.map((tx) => {
+      const vehicle = tx.vehicle || {};
+      const farmer = tx.farmer || {};
+      const millHouse = tx.millHouseOwner || {};
+      const other = tx.otherUser || {};
+
+      let type = "unknown";
+      if (tx.vehicle) type = "vehicle";
+      else if (tx.farmer) type = "farmer";
+      else if (tx.millHouseOwner) type = "millHouse";
+      else if (tx.otherUser) type = "other";
+
+      return {
+        ...tx,
+        customerType: type,
+        phoneNumber: vehicle.phone || farmer.phoneNumber || millHouse.phoneNumber || other.phoneNumber || "N/A",
+        consumerName: vehicle.ownerName || farmer.fullName || millHouse.fullName || other.fullName || "Private Consumer",
+      };
+    });
 
     res.json(transactions);
   } catch (err) {

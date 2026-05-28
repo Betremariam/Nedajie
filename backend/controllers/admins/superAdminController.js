@@ -13,7 +13,7 @@ export async function getAllFuelTransactions(req, res) {
       ? { region: admin.region } 
       : {};
     
-    const transactions = await prisma.fuelTransaction.findMany({
+    const transactionsRaw = await prisma.fuelTransaction.findMany({
       where,
       include: {
         vehicle: {
@@ -27,11 +27,19 @@ export async function getAllFuelTransactions(req, res) {
         farmer: {
           select: {
             fullName: true,
+            phoneNumber: true,
           },
         },
         millHouseOwner: {
           select: {
             fullName: true,
+            phoneNumber: true,
+          },
+        },
+        otherUser: {
+          select: {
+            fullName: true,
+            phoneNumber: true,
           },
         },
       },
@@ -39,6 +47,27 @@ export async function getAllFuelTransactions(req, res) {
         createdAt: "desc",
       },
     });
+
+    const transactions = transactionsRaw.map((tx) => {
+      const vehicle = tx.vehicle || {};
+      const farmer = tx.farmer || {};
+      const millHouse = tx.millHouseOwner || {};
+      const other = tx.otherUser || {};
+
+      let type = "unknown";
+      if (tx.vehicle) type = "vehicle";
+      else if (tx.farmer) type = "farmer";
+      else if (tx.millHouseOwner) type = "millHouse";
+      else if (tx.otherUser) type = "other";
+
+      return {
+        ...tx,
+        customerType: type,
+        phoneNumber: vehicle.phone || farmer.phoneNumber || millHouse.phoneNumber || other.phoneNumber || "N/A",
+        consumerName: vehicle.ownerName || farmer.fullName || millHouse.fullName || other.fullName || "Private Consumer",
+      };
+    });
+
     res.status(200).json(transactions);
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });

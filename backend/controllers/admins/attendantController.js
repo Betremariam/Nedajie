@@ -193,6 +193,7 @@ async function calculateEntityQuota(entity, type) {
       limit: totalLimit,
       remaining: Math.max(totalLimit - used15Days, 0),
       is15Day: true,
+      resetDate: limitStartDate ? new Date(limitStartDate.getTime() + 15 * 24 * 60 * 60 * 1000) : now,
       gasType: "diesel"
     };
   }
@@ -350,12 +351,10 @@ export const dispenseFuel = async (req, res) => {
         prisma.millHouseOwner.update({
           where: { id: userId },
           data: {
-             // Mill house uses litersUsed15Days (needs to be added to model if not there, or reuse dailyLimitUsed)
-             // Wait, I didn't add litersUsed15Days to MillHouseOwner in my schema update earlier. I should fix that.
-             dailyLimit: { decrement: 0 } // placeholder for now, I'll update schema for MillHouseOwner reset logic
+             litersUsed15Days: { increment: liters },
+             limitStartDate: quota.resetDate === now ? now : owner.limitStartDate
           }
         }),
-        // ... I'll actually standardise MillHouseOwner to have litersUsed15Days and limitStartDate in schema ...
         prisma.fuelStock.update({ where: { id: stock.id }, data: { litersDispensed: { increment: liters } } }),
         prisma.fuelTransaction.create({
           data: { millHouseOwnerId: userId, gasType, liters, stationName: fuelAttendant.stationName, attendantName: fuelAttendant.name, city: fuelAttendant.city, region: fuelAttendant.region }
