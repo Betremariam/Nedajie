@@ -19,8 +19,10 @@ import {
   Package
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const SuperAdminDashboard = () => {
+  const { t } = useTranslation();
   const [statsData, setStatsData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,10 +47,10 @@ const SuperAdminDashboard = () => {
   }, []);
 
   const stats = [
-    { label: "Active Nodes", value: statsData?.activeNodes || 0, icon: MonitorDot, trend: "Live", color: "emerald", desc: "Regional admin instances" },
-    { label: "Supply Points", value: statsData?.supplyPoints || 0, icon: Fuel, trend: "Active", color: "blue", desc: "Operational fuel stations" },
-    { label: "Disbursement Vol", value: (statsData?.disbursementVolume || 0).toLocaleString(), icon: Zap, trend: "Today", color: "amber", desc: "Total liters today" },
-    { label: "System Health", value: "99.9%", icon: ShieldCheck, trend: "Optimal", color: "purple", desc: "Encrypted traffic uptime" },
+    { label: t("activeNodes"), value: statsData?.activeNodes || 0, icon: MonitorDot, trend: "Live", color: "emerald", desc: "Regional admin instances" },
+    { label: t("supplyPoints"), value: statsData?.supplyPoints || 0, icon: Fuel, trend: "Active", color: "blue", desc: "Operational fuel stations" },
+    { label: t("disbursementVol"), value: (statsData?.disbursementVolume || 0).toLocaleString(), icon: Zap, trend: "Today", color: "amber", desc: t("totalLitersToday") },
+    { label: t("systemHealth"), value: "99.9%", icon: ShieldCheck, trend: "Optimal", color: "purple", desc: t("encryptedTrafficUptime") || "Encrypted traffic uptime" },
   ];
 
   const recentActivity = statsData?.recentActivity || [];
@@ -83,18 +85,18 @@ const SuperAdminDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <Terminal className="w-6 h-6 text-foreground" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Control Layer Active</span>
+
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("controlLayerActive")}</span>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
-             Global Control Center
+             {t("globalControl")}
           </h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Centralized intelligence nexus and multi-regional system orchestration.</p>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("centralNexusDesc")}</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="h-10 px-4 flex items-center gap-2 rounded-xl bg-card border border-border text-muted-foreground text-[13px] font-bold hover:bg-muted/50 transition-colors shadow-sm relative">
             <Bell className="w-4 h-4 text-muted-foreground/50" />
-            Notifications
+            {t("notifications")}
             <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full flex items-center justify-center bg-destructive text-destructive-foreground text-[10px] font-bold border-2 border-card">3</span>
           </button>
           <button className="h-10 px-5 flex items-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-md shadow-primary/20">
@@ -131,8 +133,8 @@ const SuperAdminDashboard = () => {
         <div className="col-span-4 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden relative">
           <div className="p-6 md:p-8 border-b border-border flex flex-row items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">Network Volume Monitor</h2>
-              <p className="text-muted-foreground text-[13px] font-medium">Real-time throughput analysis across all regional clusters.</p>
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">{t("networkVolume")}</h2>
+              <p className="text-muted-foreground text-[13px] font-medium">{t("realTimeThroughputAnalysis")}</p>
             </div>
             <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-xl border border-border">
               <button className="h-8 text-[11px] uppercase font-bold px-4 rounded-lg text-muted-foreground hover:text-foreground transition-colors">24H</button>

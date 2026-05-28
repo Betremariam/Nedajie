@@ -38,8 +38,10 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const FuelDeliveries = () => {
+  const { t } = useTranslation();
   const [deliveries, setDeliveries] = useState([]);
   const [form, setForm] = useState({
     date: "",
@@ -80,7 +82,7 @@ const FuelDeliveries = () => {
       setAllStations(stockRes.data);
     } catch (err) {
       console.error(err);
-      setError("Failed to load initial data.");
+      setError(t("failedToLoadData"));
     }
   };
 
@@ -119,11 +121,11 @@ const FuelDeliveries = () => {
     
     // Check all fields except letter (letter is required but handled separately in FormData check)
     if (Object.keys(form).some((key) => key !== 'letter' && !form[key])) {
-      setError("All text fields are required.");
+      setError(t("allFieldsRequired"));
       return;
     }
     if (!form.letter) {
-      setError("Assignment letter is required.");
+      setError(t("assignmentLetterRequired"));
       return;
     }
 
@@ -135,11 +137,11 @@ const FuelDeliveries = () => {
       });
 
       await addFuelDelivery(formData);
-      setSuccess("Fuel delivery recorded successfully.");
+      setSuccess(t("fuelDeliveryRecordedSuccess"));
       setForm({ date: "", customer: "", destination: "", citter: "", fdcNo: "", volume: "", region: "", fuelType: "diesel", letter: null, ownerId: "" });
       fetchData();
     } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to record delivery.");
+      setError(err?.response?.data?.msg || t("failedToRecordDelivery"));
     } finally {
       setLoading(false);
     }
@@ -188,8 +190,8 @@ const FuelDeliveries = () => {
               <Truck className="w-7 h-7" />
             </div>
             <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">Fuel Deliveries</h1>
-              <p className="text-muted-foreground text-[13px] font-medium">Record and track national fuel dispatches</p>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("fuelDeliveries")}</h1>
+              <p className="text-muted-foreground text-[13px] font-medium">{t("fuelDeliveriesDesc")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -421,7 +423,7 @@ const FuelDeliveries = () => {
               <History className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-[17px] font-bold text-foreground tracking-tight">Delivery History</h2>
+              <h2 className="text-[17px] font-bold text-foreground tracking-tight">{t("deliveryHistory")}</h2>
               <p className="text-muted-foreground text-[13px] font-medium">{deliveries.length} record{deliveries.length !== 1 ? "s" : ""} found</p>
             </div>
           </div>

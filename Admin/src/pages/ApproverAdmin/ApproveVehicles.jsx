@@ -18,8 +18,10 @@ import {
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
+import { useTranslation } from "react-i18next";
 
 const ApproveVehicles = () => {
+  const { t } = useTranslation();
   const [vehicles, setVehicles] = useState([]);
   const [typeFilter, setTypeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ const ApproveVehicles = () => {
   };
 
   const handleDownload = () => {
-    const canvas = qrRef.current?.querySelector("canvas");
+    const canvas = qrRef.current;
     if (!canvas) return alert("QR code not found!");
 
     const pngUrl = canvas
@@ -80,7 +82,7 @@ const ApproveVehicles = () => {
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      <p className="text-muted-foreground animate-pulse font-medium">Fetching pending applications...</p>
+      <p className="text-muted-foreground animate-pulse font-medium">{t("loading")}</p>
     </div>
   );
 
@@ -88,19 +90,20 @@ const ApproveVehicles = () => {
     <div className="p-8 max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Vehicle Approvals</h1>
-          <p className="text-muted-foreground font-medium">Review and authorize pending fleet registrations</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("vehicleApprovals")}</h1>
+          <p className="text-muted-foreground font-medium">{t("vehicleApprovalsDesc")}</p>
         </div>
         <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold h-fit">
-          {vehicles.length} Pending
+          {vehicles.length} {t("pending")}
         </Badge>
       </div>
 
 {approvedVehicle && (
         <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
-          <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
+          <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
+                ref={qrRef}
                 value={approvedVehicle.id}
                 size={220}
                 bgColor="#ffffff"
@@ -114,9 +117,9 @@ const ApproveVehicles = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 justify-center md:justify-start text-primary">
                   <CheckCircle2 className="w-6 h-6" />
-                  <h3 className="text-2xl font-bold">Vehicle Authorized</h3>
+                  <h3 className="text-2xl font-bold">{t("vehicleAuthorized")}</h3>
                 </div>
-                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">Download the digital QR profile for station authentication</p>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">{t("downloadDigitalQrProfile")}</p>
               </div>
 
               <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-2 gap-4">
@@ -140,10 +143,10 @@ const ApproveVehicles = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={handleDownload} className="h-12 px-8 rounded-xl gap-2 font-bold shadow-lg shadow-primary/20">
-                  <Download className="w-5 h-5" /> Download QR Profile
+                  <Download className="w-5 h-5" /> {t("downloadQrProfile")}
                 </Button>
                 <Button variant="outline" onClick={() => setApprovedVehicle(null)} className="h-12 px-8 rounded-xl font-bold">
-                  Dismiss
+                  {t("dismiss")}
                 </Button>
               </div>
             </div>
@@ -153,14 +156,14 @@ const ApproveVehicles = () => {
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-xl border border-border/50">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Show Type:</span>
+          <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">{t("showType")}</span>
           <select 
             title="Filter by Vehicle Type"
             value={typeFilter} 
             onChange={(e) => setTypeFilter(e.target.value)}
             className="h-10 px-4 rounded-lg border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
           >
-            <option value="all">All Pending</option>
+            <option value="all">{t("allPending")}</option>
             <option value="bajaj">Bajaj</option>
             <option value="taxi">Taxi</option>
             <option value="car">Private Car</option>
@@ -181,8 +184,8 @@ const ApproveVehicles = () => {
               <Car className="w-10 h-10 text-muted-foreground opacity-30" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-xl font-bold text-foreground">Clean Slate</h3>
-              <p className="text-muted-foreground max-w-[280px]">All vehicle applications have been processed. Great job!</p>
+              <h3 className="text-xl font-bold text-foreground">{t("cleanSlate")}</h3>
+              <p className="text-muted-foreground max-w-[280px]">{t("allVehicleAppsProcessedDesc")}</p>
             </div>
           </div>
         </div>
@@ -243,13 +246,13 @@ const ApproveVehicles = () => {
                     onClick={() => handleReject(vehicle.id)}
                     className="flex-1 sm:flex-none text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl gap-2 font-bold h-11 px-6 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" /> Reject Vehicle
+                    <Trash2 className="w-4 h-4" /> {t("rejectVehicle")}
                   </Button>
                   <Button 
                     onClick={() => handleApprove(vehicle.id)}
                     className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 font-bold h-11 px-8 shadow-md shadow-primary/10 transition-all active:scale-95"
                   >
-                    <Check className="w-4 h-4" /> Approve Registration
+                    <Check className="w-4 h-4" /> {t("approveRegistration")}
                   </Button>
                 </div>
               </div>
@@ -262,3 +265,5 @@ const ApproveVehicles = () => {
 };
 
 export default ApproveVehicles;
+
+

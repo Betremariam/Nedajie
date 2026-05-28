@@ -16,8 +16,10 @@ import {
 } from "lucide-react";
 import { getApproverAdminDashboardStats } from "../../services/api.js";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const ApproverDashboard = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,7 +37,7 @@ const ApproverDashboard = () => {
         setStats(data);
       } catch (err) {
         console.error("Failed to fetch approver stats:", err);
-        setError("Could not load validation queue status.");
+        setError(t("failedToLoadValidationQueue"));
       } finally {
         setLoading(false);
       }
@@ -46,7 +48,7 @@ const ApproverDashboard = () => {
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      <p className="text-muted-foreground font-medium animate-pulse">Initializing Security Hub...</p>
+      <p className="text-muted-foreground font-medium animate-pulse">{t("initializingSecurityHub")}</p>
     </div>
   );
 
@@ -55,11 +57,11 @@ const ApproverDashboard = () => {
   );
 
   const pendingApprovals = [
-    { label: "Vehicles", count: stats.counts.vehicles, icon: Car, url: "/approvals/vehicles" },
-    { label: "Farmers", count: stats.counts.farmers, icon: Wheat, url: "/approvals/farmers" },
-    { label: "Mill Houses", count: stats.counts.millOwners, icon: Home, url: "/approvals/mill-house" },
-    { label: "Attendants", count: stats.counts.attendants, icon: Fuel, url: "/approvals/attendants" },
-    { label: "Others", count: stats.counts.others, icon: Users2, url: "/approvals/others" },
+    { label: t("vehicles"), count: stats.counts.vehicles, icon: Car, url: "/approvals/vehicles" },
+    { label: t("farmers"), count: stats.counts.farmers, icon: Wheat, url: "/approvals/farmers" },
+    { label: t("millHouses"), count: stats.counts.millOwners, icon: Home, url: "/approvals/mill-house" },
+    { label: t("attendants"), count: stats.counts.attendants, icon: Fuel, url: "/approvals/attendants" },
+    { label: t("others"), count: stats.counts.others, icon: Users2, url: "/approvals/others" },
   ];
 
   return (
@@ -70,12 +72,12 @@ const ApproverDashboard = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <ClipboardCheck className="w-6 h-6 text-foreground" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Identity Validation Queue</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("identityValidationQueue")}</span>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
-             Verification Center
+             {t("verificationCenter")}
           </h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Identity Validation & Access Authorization Queue</p>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("validationQueueDesc")}</p>
         </div>
         <div className="flex items-center gap-4">
            <div className="text-right hidden md:block">
@@ -114,15 +116,15 @@ const ApproverDashboard = () => {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
 
-        {/* Action Required Banner */}
+        {/* {t("actionRequired")} Banner */}
         <div className="col-span-4 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden group/batch">
           <div className="p-6 md:p-8 border-b border-border pb-4">
              <h2 className="flex items-center gap-3 text-xl font-semibold tracking-tight text-foreground">
                 <ShieldAlert className="h-5 w-5 text-destructive" />
-                Action Required
+                {t("actionRequired")}
              </h2>
              <p className="text-muted-foreground text-[13px] font-medium mt-1">
-                Urgent applications awaiting your validation.
+                {t("urgentApplicationsDesc")}
              </p>
           </div>
 
@@ -131,7 +133,7 @@ const ApproverDashboard = () => {
              <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 to-transparent opacity-50 group-hover/batch:opacity-100 transition-opacity" />
 
              <div className="space-y-3 relative z-10">
-                <h2 className="text-7xl font-black tracking-tighter text-foreground tabular-nums">{stats.counts.total} <span className="text-xl font-bold text-muted-foreground uppercase tracking-widest">Pending</span></h2>
+                <h2 className="text-7xl font-black tracking-tighter text-foreground tabular-nums">{stats.counts.total} <span className="text-xl font-bold text-muted-foreground uppercase tracking-widest">{t("pending")}</span></h2>
                 <p className="text-muted-foreground font-medium max-w-[320px] mx-auto text-[14px] leading-relaxed">
                    A batch of entity applications is ready for final review across all categories.
                 </p>
@@ -139,7 +141,7 @@ const ApproverDashboard = () => {
 
              <div className="space-y-4 w-full flex flex-col items-center relative z-10">
                   <a href="/approvals/vehicles" className="w-full max-w-[300px] h-14 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-all shadow-sm">
-                     Begin Verification Batch <ArrowRight className="h-4 w-4" />
+                     {t("beginVerificationBatch")} <ArrowRight className="h-4 w-4" />
                   </a>
                   <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest flex items-center justify-center gap-2">
                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Regional Priority Active • SLA: 24h
@@ -153,7 +155,7 @@ const ApproverDashboard = () => {
           <div className="p-6 md:p-8 border-b border-border pb-4">
             <h2 className="flex items-center gap-3 text-xl font-semibold tracking-tight text-foreground">
                <Clock className="h-5 w-5 text-primary" />
-               Recent Decisions
+               {t("recentDecisions")}
             </h2>
             <p className="text-muted-foreground text-[13px] font-medium mt-1">
                Latest approvals and audit trails.
@@ -234,3 +236,6 @@ const ApproverDashboard = () => {
 };
 
 export default ApproverDashboard;
+
+
+

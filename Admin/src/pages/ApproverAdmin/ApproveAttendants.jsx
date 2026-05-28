@@ -15,8 +15,10 @@ import {
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const ApproveAttendants = () => {
+  const { t } = useTranslation();
   const [attendants, setAttendants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -66,7 +68,7 @@ const ApproveAttendants = () => {
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      <p className="text-muted-foreground font-medium">Loading attendant requests...</p>
+      <p className="text-muted-foreground font-medium">{t("loading")}</p>
     </div>
   );
 
@@ -75,11 +77,11 @@ const ApproveAttendants = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Attendant Approvals</h1>
-          <p className="text-muted-foreground text-[14px] font-medium">Review and authorize fuel station attendant registrations</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">{t("attendantApprovals")}</h1>
+          <p className="text-muted-foreground text-[14px] font-medium">{t("attendantApprovalsDesc")}</p>
         </div>
         <Badge variant="outline" className="w-fit bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold">
-          {attendants.length} Pending
+          {attendants.length} {t("pending")}
         </Badge>
       </div>
 
@@ -92,9 +94,9 @@ const ApproveAttendants = () => {
                 <CheckCircle2 className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <AlertTitle className="font-bold text-lg text-emerald-600">Attendant Approved Successfully</AlertTitle>
+                <AlertTitle className="font-bold text-lg text-emerald-600">{t("attendantApprovedSuccess")}</AlertTitle>
                 <AlertDescription className="text-[13px] text-emerald-600/80 mt-1">
-                  <strong>{approvedAttendantName}</strong> has been approved. The station owner can now generate a password for them.
+                  <strong>{approvedAttendantName}</strong> {t("attendantApprovedDesc")}
                 </AlertDescription>
               </div>
             </div>
@@ -189,13 +191,13 @@ const ApproveAttendants = () => {
                     onClick={() => handleReject(attendant.id)}
                     className="flex-1 sm:flex-none text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl gap-2 font-bold h-11 px-6 transition-colors"
                   >
-                    <X className="w-4 h-4" /> Reject Request
+                    <X className="w-4 h-4" /> {t("rejectRequest")}
                   </Button>
                   <Button 
                     onClick={() => handleApprove(attendant.id)}
                     className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 font-bold h-11 px-8 shadow-md shadow-primary/10 transition-all active:scale-95"
                   >
-                    <CheckCircle2 className="w-4 h-4" /> Approve Attendant
+                    <CheckCircle2 className="w-4 h-4" /> {t("approveAttendant")}
                   </Button>
                 </div>
               </div>
@@ -208,3 +210,5 @@ const ApproveAttendants = () => {
 };
 
 export default ApproveAttendants;
+
+

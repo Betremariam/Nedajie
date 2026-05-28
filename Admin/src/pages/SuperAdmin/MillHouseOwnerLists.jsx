@@ -23,8 +23,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../..
 import { Input } from "../../components/ui/Input";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+import { useTranslation } from "react-i18next";
 
 const MillHouseOwnerLists = () => {
+  const { t } = useTranslation();
   const [owners, setOwners] = useState([]);
   const [search, setSearch] = useState("");
   const [regionFilter, setRegionFilter] = useState("all");
@@ -75,8 +77,8 @@ const MillHouseOwnerLists = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Mill House Owners</h1>
-          <p className="text-muted-foreground text-lg">Central directory of verified milling operations</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("millHouseOwners")}</h1>
+          <p className="text-muted-foreground text-lg">{t("millHouseOwnersDesc")}</p>
         </div>
         <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2 bg-primary/5 border-primary/20 text-primary">
           <Home className="w-4 h-4" />

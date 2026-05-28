@@ -8,8 +8,10 @@ import { Input } from "../components/ui/Input";
 import { Label } from "../components/ui/Label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "../components/ui/Card";
 import { Alert, AlertDescription } from "../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const ChangePassword = () => {
+  const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -100,8 +102,8 @@ const ChangePassword = () => {
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 border border-primary/20 shadow-sm">
               <Lock className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold tracking-tight">Setup Your Password</CardTitle>
-            <CardDescription className="text-muted-foreground text-sm mt-2">Please change your temporary password to continue to your dashboard.</CardDescription>
+            <CardTitle className="text-2xl font-bold tracking-tight">{t("setupYourPassword")}</CardTitle>
+            <CardDescription className="text-muted-foreground text-sm mt-2">{t("setupYourPasswordDesc")}</CardDescription>
           </CardHeader>
 
           <CardContent className="p-8">
@@ -139,7 +141,7 @@ const ChangePassword = () => {
               {/* Current Password */}
               <div className="space-y-2">
                 <Label htmlFor="current-password" title="Temporary Password" className="text-foreground pl-1">
-                  Temporary Password
+                  {t("temporaryPassword")}
                 </Label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
@@ -149,7 +151,7 @@ const ChangePassword = () => {
                     id="current-password"
                     type={showCurrent ? "text" : "password"}
                     className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
-                    placeholder="Enter temp password"
+                    placeholder={t("enterTempPassword")}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     required
@@ -167,7 +169,7 @@ const ChangePassword = () => {
               {/* New Password */}
               <div className="space-y-2">
                 <Label htmlFor="new-password" title="New Password" className="text-foreground pl-1">
-                  New Password
+                  {t("newPassword")}
                 </Label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
@@ -177,7 +179,7 @@ const ChangePassword = () => {
                     id="new-password"
                     type={showNew ? "text" : "password"}
                     className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
-                    placeholder="Min. 6 characters"
+                    placeholder={t("min6Chars")}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -195,7 +197,7 @@ const ChangePassword = () => {
               {/* Confirm New Password */}
               <div className="space-y-2">
                 <Label htmlFor="confirm-password" title="Confirm New Password" className="text-foreground pl-1">
-                  Confirm New Password
+                  {t("confirmNewPassword")}
                 </Label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
@@ -205,7 +207,7 @@ const ChangePassword = () => {
                     id="confirm-password"
                     type={showNew ? "text" : "password"}
                     className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
-                    placeholder="Re-enter new password"
+                    placeholder={t("reEnterNewPassword")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -229,11 +231,11 @@ const ChangePassword = () => {
                   {loading ? (
                     <>
                       <Loader2 className="animate-spin h-5 w-5" />
-                      <span className="tracking-wide">Updating...</span>
+                      <span className="tracking-wide">{t("updating")}</span>
                     </>
                   ) : (
                     <>
-                      <span className="tracking-wide text-sm font-semibold uppercase">Save & Continue</span>
+                      <span className="tracking-wide text-sm font-semibold uppercase">{t("saveAndContinue")}</span>
                       <motion.div
                         initial={{ x: 0 }}
                         whileHover={{ x: 5 }}

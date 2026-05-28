@@ -48,8 +48,10 @@ import {
 } from "../../components/ui/Select";
 import { Badge } from "../../components/ui/Badge";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 function FuelDelivery() {
+  const { t } = useTranslation();
   const [file, setFile] = useState(null);
   const [fuelType, setFuelType] = useState("");
   const [deliveries, setDeliveries] = useState([]);
@@ -123,8 +125,8 @@ function FuelDelivery() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Logistics Hub</h1>
-          <p className="text-gray-700 dark:text-gray-200 text-sm font-medium">Strategic resource allocation, ledger synchronization, and supply chain verification.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t("logisticsHub")}</h1>
+          <p className="text-gray-700 dark:text-gray-200 text-sm font-medium">{t("logisticsHubDesc")}</p>
         </div>
         <div className="flex items-center gap-3">
            <Badge variant="outline" className="h-8 px-4 text-[10px] font-bold gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 uppercase tracking-widest rounded-full">

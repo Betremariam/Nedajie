@@ -46,8 +46,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/Dialog";
+import { useTranslation } from "react-i18next";
 
 const ManageAdmins = () => {
+  const { t } = useTranslation();
   const [admins, setAdmins] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -151,8 +153,8 @@ const ManageAdmins = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Manage Administrators</h1>
-        <p className="text-muted-foreground text-lg">System-wide command and access control</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t("manageAdministrators")}</h1>
+        <p className="text-muted-foreground text-lg">{t("manageAdministratorsDesc")}</p>
       </div>
 
       <AnimatePresence>

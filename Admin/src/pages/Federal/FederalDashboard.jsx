@@ -13,8 +13,10 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { getFederalDashboardStats } from "../../services/api";
+import { useTranslation } from "react-i18next";
 
 const FederalDashboard = () => {
+  const { t } = useTranslation();
   const [statsData, setStatsData] = useState({
     superAdmins: 0,
     verifiedOwners: 0,
@@ -38,10 +40,10 @@ const FederalDashboard = () => {
   }, []);
 
   const stats = [
-    { label: "Regional Super Admins", value: statsData.superAdmins.toString(),      icon: Users,         color: "blue",    desc: "Provincial oversight" },
-    { label: "Verified Station Owners", value: statsData.verifiedOwners.toString(),    icon: Building2,     color: "emerald", desc: "Entity level auth" },
-    { label: "National Fuel Dispatch",  value: statsData.totalDeliveries.toString(),   icon: Truck,         color: "amber",   desc: "Weekly logistics flow" },
-    { label: "Regulatory Compliance",   value: "Optimal", icon: ShieldCheck, color: "purple",  desc: "Standard alignment" },
+    { label: t("regionalAdmins"), value: statsData.superAdmins.toString(),      icon: Users,         color: "blue",    desc: t("provincialOversight") || "Provincial oversight" },
+    { label: t("verifiedOwners"), value: statsData.verifiedOwners.toString(),    icon: Building2,     color: "emerald", desc: t("entityLevelAuth") || "Entity level auth" },
+    { label: t("nationalDispatch"),  value: statsData.totalDeliveries.toString(),   icon: Truck,         color: "amber",   desc: t("weeklyLogisticsFlow") || "Weekly logistics flow" },
+    { label: t("regulatoryCompliance"),   value: "Optimal", icon: ShieldCheck, color: "purple",  desc: t("standardAlignment") },
   ];
 
   const iconBg = {
@@ -70,10 +72,10 @@ const FederalDashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1.5">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            National Command Center
+            {t("nationalCommand")}
           </h1>
           <p className="text-muted-foreground text-[14px] font-medium max-w-xl">
-            Unified oversight for strategic fuel reserves and regional distribution networks.
+            {t("unifiedOversight")}
           </p>
         </div>
 
@@ -108,16 +110,16 @@ const FederalDashboard = () => {
       <div className="bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden">
           <div className="p-6 md:p-8 border-b border-border">
             <h2 className="text-xl font-semibold tracking-tight text-foreground">
-              Disbursement Stream
+              {t("disbursementStream")}
             </h2>
             <p className="text-muted-foreground text-[13px] font-medium mt-1">
-              Live telemetry from national supply chain nodes.
+              {t("liveNationalTelemetry")}
             </p>
           </div>
 
           <div className="p-4 md:p-6 space-y-3 flex-1 overflow-y-auto">
             {statsData.recentDeliveries.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8">No recent deliveries found</div>
+              <div className="text-center text-muted-foreground py-8">{t("noRecentDeliveries")}</div>
             ) : statsData.recentDeliveries.map((item) => {
               const style = statusStyle[item.status] || statusStyle.PENDING;
               const IconComp = getDeliveryIcon(item.destination);
@@ -157,7 +159,7 @@ const FederalDashboard = () => {
 
           <div className="p-4 border-t border-border bg-muted/30">
             <button className="w-full h-11 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-colors">
-              View National Logistics Ledger
+              {t("viewNationalLogisticsLedger")}
             </button>
           </div>
         </div>

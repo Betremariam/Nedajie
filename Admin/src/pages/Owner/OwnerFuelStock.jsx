@@ -17,8 +17,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Badge } from "../../components/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const OwnerFuelStock = () => {
+  const { t } = useTranslation();
   const [fuelStock, setFuelStock] = useState({ benzene: 0, diesel: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -77,10 +79,10 @@ const OwnerFuelStock = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 mb-1 text-primary">
             <Database className="w-5 h-5" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Asset Reservoir Monitor</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("assetReservoir")}</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Fuel Stocks</h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Real-time telemetry of liquid assets across operational nodes.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">{t("fuelStocks")}</h1>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("realTimeTelemetry")}</p>
         </div>
         <div className="hidden md:flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/40">
            <Activity className="w-4 h-4 text-emerald-500" />
@@ -105,9 +107,9 @@ const OwnerFuelStock = () => {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 relative z-10">
             <div>
               <CardTitle className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">
-                Benzene Level
+                {t("benzeneLevel")}
               </CardTitle>
-              <CardDescription className="text-xs font-medium">Unleaded Premium Reservoir</CardDescription>
+              <CardDescription className="text-xs font-medium">{t("unleadedPremiumReservoir")}</CardDescription>
             </div>
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary transition-all duration-300">
                <Zap className="h-6 w-6" />
@@ -118,12 +120,12 @@ const OwnerFuelStock = () => {
               <div className="text-5xl font-bold tracking-tight tabular-nums text-foreground group-hover:text-primary transition-colors">
                 {benzene.toLocaleString()} <span className="text-lg font-medium text-muted-foreground uppercase tracking-widest ml-1">L</span>
               </div>
-              <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Operational Aggregate</p>
+              <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">{t("operationalAggregate")}</p>
             </div>
             
             <div className="space-y-3.5">
                <div className="flex justify-between items-end px-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Capacity Utilization</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("capacityUtilization")}</span>
                   <span className="text-xs font-bold font-mono text-primary bg-primary/10 px-2 py-0.5 rounded-md">{Math.round(benzenePercent)}%</span>
                </div>
                <div className="h-4 w-full bg-muted rounded-full overflow-hidden border border-border p-1">
@@ -139,10 +141,10 @@ const OwnerFuelStock = () => {
                   "font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full",
                   benzene > 10000 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : benzene > 5000 ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"
                )}>
-                  {benzene > 10000 ? "Level Nominal" : benzene > 5000 ? "Threshold Alert" : "CRITICAL DEPLETION"}
+                  {benzene > 10000 ? t("levelNominal") : benzene > 5000 ? t("thresholdAlert") : t("criticalDepletion")}
                </Badge>
                <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/40">
-                  Node Link Secure
+                  {t("nodeLinkSecure")}
                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
                </div>
             </div>
@@ -157,9 +159,9 @@ const OwnerFuelStock = () => {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 relative z-10">
             <div>
               <CardTitle className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-emerald-500 transition-colors">
-                Diesel Level
+                {t("dieselLevel")}
               </CardTitle>
-              <CardDescription className="text-xs font-medium">Diesel Max Reservoir</CardDescription>
+              <CardDescription className="text-xs font-medium">{t("dieselMaxReservoir")}</CardDescription>
             </div>
             <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 transition-all duration-300">
                <Droplets className="h-6 w-6" />
@@ -170,12 +172,12 @@ const OwnerFuelStock = () => {
               <div className="text-5xl font-bold tracking-tight tabular-nums text-foreground group-hover:text-emerald-500 transition-colors">
                 {diesel.toLocaleString()} <span className="text-lg font-medium text-muted-foreground uppercase tracking-widest ml-1">L</span>
               </div>
-              <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Operational Aggregate</p>
+              <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">{t("operationalAggregate")}</p>
             </div>
             
             <div className="space-y-3.5">
                <div className="flex justify-between items-end px-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Capacity Utilization</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("capacityUtilization")}</span>
                   <span className="text-xs font-bold font-mono text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">{Math.round(dieselPercent)}%</span>
                </div>
                <div className="h-4 w-full bg-muted rounded-full overflow-hidden border border-border p-1">
@@ -191,10 +193,10 @@ const OwnerFuelStock = () => {
                   "font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full",
                   diesel > 10000 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : diesel > 5000 ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "bg-red-500/10 text-red-600 border-red-500/20"
                )}>
-                  {diesel > 10000 ? "OPTIMAL" : diesel > 5000 ? "MODERATE" : "REPLENISH"}
+                  {diesel > 10000 ? t("optimal") : diesel > 5000 ? t("moderate") : t("replenish")}
                </Badge>
                <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/40">
-                  Node Link Secure
+                  {t("nodeLinkSecure")}
                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
                </div>
             </div>
@@ -209,7 +211,7 @@ const OwnerFuelStock = () => {
                <ShieldCheck className="h-7 w-7 text-primary" />
             </div>
             <div className="space-y-2">
-               <h3 className="text-2xl font-semibold tracking-tight">Strategic Reservoir Oversight</h3>
+               <h3 className="text-2xl font-semibold tracking-tight">{t("strategicOversight")}</h3>
                <p className="text-muted-foreground max-w-xl mx-auto font-medium text-[15px] leading-relaxed">
                   Logistics and supply-chain synchronization active. Stock levels are verified against Federal and Regional distribution metrics for audit-ready compliance.
                </p>

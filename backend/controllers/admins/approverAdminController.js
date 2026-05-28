@@ -31,12 +31,20 @@ export async function approveVehicle(req, res) {
 
 export async function getUnapprovedVehicles(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const admin = req.admin;
+    if (!admin) {
+      console.error("No admin object found in request for getUnapprovedVehicles");
+      return res.status(401).json({ msg: "Admin authentication required" });
+    }
+
     const where = { isApproved: false };
-    if (admin.region) where.region = admin.region;
+    if (admin.region && admin.region !== "National") {
+      where.region = admin.region;
+    }
 
     const vehicles = await prisma.vehicle.findMany({
       where: where,
+      orderBy: { createdAt: "desc" }
     });
 
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
@@ -48,6 +56,7 @@ export async function getUnapprovedVehicles(req, res) {
 
     res.status(200).json(updatedVehicles);
   } catch (err) {
+    console.error("Error in getUnapprovedVehicles:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
@@ -149,12 +158,19 @@ export async function approveFarmer(req, res) {
 
 export async function getUnapprovedFarmers(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const admin = req.admin;
+    if (!admin) {
+      return res.status(401).json({ msg: "Admin authentication required" });
+    }
+
     const where = { isApproved: false };
-    if (admin.region) where.region = admin.region;
+    if (admin.region && admin.region !== "National") {
+      where.region = admin.region;
+    }
 
     const farmers = await prisma.farmer.findMany({
       where: where,
+      orderBy: { createdAt: "desc" }
     });
 
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
@@ -168,6 +184,7 @@ export async function getUnapprovedFarmers(req, res) {
 
     res.status(200).json(updatedFarmers);
   } catch (err) {
+    console.error("Error in getUnapprovedFarmers:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
@@ -266,9 +283,15 @@ export async function approveMillHouseOwner(req, res) {
 
 export async function getUnapprovedMillHouseOwners(req, res) {
   try {
-    const admin = await prisma.admin.findUnique({ where: { id: req.admin.id } });
+    const admin = req.admin;
+    if (!admin) {
+      return res.status(401).json({ msg: "Admin authentication required" });
+    }
+
     const where = { isApproved: false };
-    if (admin.region) where.region = admin.region;
+    if (admin.region && admin.region !== "National") {
+      where.region = admin.region;
+    }
 
     const owners = await prisma.millHouseOwner.findMany({
       where: where,
@@ -284,6 +307,7 @@ export async function getUnapprovedMillHouseOwners(req, res) {
 
     res.status(200).json(updatedOwners);
   } catch (err) {
+    console.error("Error in getUnapprovedMillHouseOwners:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }
@@ -302,13 +326,15 @@ export async function rejectMillHouseOwner(req, res) {
 
 export async function getApproverDashboardStats(req, res) {
   try {
-    const adminId = req.admin.id;
-    const admin = await prisma.admin.findUnique({ where: { id: adminId } });
-
-    if (!admin) return res.status(404).json({ msg: "Admin not found" });
+    const admin = req.admin;
+    if (!admin) {
+      return res.status(401).json({ msg: "Admin not found" });
+    }
 
     const where = { isApproved: false };
-    if (admin.region) where.region = admin.region;
+    if (admin.region && admin.region !== "National") {
+      where.region = admin.region;
+    }
 
     const [
       pendingVehicles,
@@ -325,9 +351,10 @@ export async function getApproverDashboardStats(req, res) {
     ]);
 
     // Fetch recent decisions (approvals)
-    // We'll collect the last few from each category and sort them centrally
     const recentWhere = { isApproved: true };
-    if (admin.region) recentWhere.region = admin.region;
+    if (admin.region && admin.region !== "National") {
+      recentWhere.region = admin.region;
+    }
 
     const [
       recentVehicles,
@@ -363,6 +390,7 @@ export async function getApproverDashboardStats(req, res) {
       recentDecisions: allRecent
     });
   } catch (err) {
+    console.error("Error in getApproverDashboardStats:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 }

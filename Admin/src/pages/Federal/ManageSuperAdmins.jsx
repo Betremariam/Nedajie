@@ -21,6 +21,7 @@ import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Switch } from "../../components/ui/Switch";
+import { useTranslation } from "react-i18next";
 
 const REGIONS = [
   "Addis Ababa",
@@ -40,6 +41,7 @@ const REGIONS = [
 ];
 
 const ManageSuperAdmins = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: "", email: "", region: "", document: null });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -67,14 +69,14 @@ const ManageSuperAdmins = () => {
 
     try {
       const res = await createRegionalSuperAdmin(formData);
-      setSuccess("Regional Super Admin created successfully.");
+      setSuccess(t("registrationSuccess"));
       setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
       setForm({ name: "", email: "", region: "", document: null });
       // Reset file input visually
       const fileInput = document.getElementById("documentUpload");
       if (fileInput) fileInput.value = "";
     } catch (err) {
-      setError(err?.response?.data?.msg || "Registration failed.");
+      setError(err?.response?.data?.msg || t("registrationFailed"));
     } finally {
       setLoading(false);
     }
@@ -95,14 +97,14 @@ const ManageSuperAdmins = () => {
       {success && !newCreds && (
         <Alert className="border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
           <CheckCircle2 className="h-4 w-4" />
-          <AlertTitle className="font-bold">Success</AlertTitle>
+          <AlertTitle className="font-bold">{t("successLabel")}</AlertTitle>
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
       {error && (
         <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-bold">Error</AlertTitle>
+          <AlertTitle className="font-bold">{t("errorLabel")}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -140,8 +142,8 @@ const ManageSuperAdmins = () => {
               <ShieldAlert className="w-7 h-7" />
             </div>
             <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">Super Admin Registry</h1>
-              <p className="text-muted-foreground text-[13px] font-medium">Provision regional super administrators</p>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("superAdminRegistry")}</h1>
+              <p className="text-muted-foreground text-[13px] font-medium">{t("superAdminRegistryDesc")}</p>
             </div>
           </div>
         </div>

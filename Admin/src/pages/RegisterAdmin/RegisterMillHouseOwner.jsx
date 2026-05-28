@@ -24,8 +24,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "../../components/ui/Select";
+import { useTranslation } from "react-i18next";
 
 const RegisterMillHouseOwner = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     fullName: "",
     phoneNumber: "",
@@ -72,7 +74,7 @@ const RegisterMillHouseOwner = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setSuccess("Mill House Owner registered successfully.");
+      setSuccess(t("millHouseRegisteredSuccess"));
       setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", fuelType: "diesel", numberOfMills: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
@@ -110,8 +112,8 @@ const RegisterMillHouseOwner = () => {
                 <Home className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Mill House Registry</h1>
-                <p className="text-muted-foreground text-[13px] font-medium">Capture operational data for mill house fuel allocation</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("millHouseRegistry")}</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">{t("millHouseRegistryDesc")}</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -295,3 +297,5 @@ const RegisterMillHouseOwner = () => {
 };
 
 export default RegisterMillHouseOwner;
+
+

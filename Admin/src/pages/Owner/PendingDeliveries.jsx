@@ -38,8 +38,10 @@ import {
   acceptDeliveryByOwner 
 } from "../../services/api";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const PendingDeliveries = () => {
+  const { t } = useTranslation();
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -121,10 +123,10 @@ const PendingDeliveries = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 mb-1 text-primary">
             <TrendingUp className="w-5 h-5" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Logistics Inbound Interface</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("logisticsInbound")}</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Pending Deliveries</h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Monitor and authorize incoming bulk fuel shipments.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">{t("pendingDeliveries")}</h1>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("monitorIncoming")}</p>
         </div>
       </div>
 

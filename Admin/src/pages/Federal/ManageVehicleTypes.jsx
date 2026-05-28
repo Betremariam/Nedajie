@@ -16,8 +16,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/AlertDialog";
+import { useTranslation } from "react-i18next";
 
 const ManageVehicleTypes = () => {
+  const { t } = useTranslation();
   const [configs, setConfigs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
@@ -77,7 +79,7 @@ const ManageVehicleTypes = () => {
       setSuccess(message);
       fetchConfigs();
     } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to update configuration.");
+      setError(err?.response?.data?.msg || t("failedToUpdateConfig"));
     } finally {
       setLoading(false);
     }
@@ -85,7 +87,7 @@ const ManageVehicleTypes = () => {
 
   const handleAddNew = async () => {
     if (!newVehicleType.vehicleType || !newVehicleType.fuelCapacity) {
-      setError("Vehicle type name and fuel capacity are required.");
+      setError(t("typeNameAndCapacityRequired"));
       return;
     }
 
@@ -105,7 +107,7 @@ const ManageVehicleTypes = () => {
       setShowAddNew(false);
       fetchConfigs();
     } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to create vehicle type.");
+      setError(err?.response?.data?.msg || t("failedToCreateVehicleType"));
     } finally {
       setLoading(false);
     }
@@ -130,7 +132,7 @@ const ManageVehicleTypes = () => {
       setVehicleTypeToDelete(null);
       fetchConfigs();
     } catch (err) {
-      setError(err?.response?.data?.msg || "Failed to delete vehicle type.");
+      setError(err?.response?.data?.msg || t("failedToDeleteVehicleType"));
     } finally {
       setLoading(false);
     }
@@ -180,10 +182,10 @@ const ManageVehicleTypes = () => {
             </div>
             <div className="space-y-1">
               <h1 className="text-2xl font-bold text-foreground tracking-tight">
-                Vehicle Type Fuel Capacity Management
+                {t("vehicleTypeFuelCapacityMgmt")}
               </h1>
               <p className="text-muted-foreground text-[13px] font-medium">
-                Configure fuel capacity limits for each vehicle type
+                {t("vehicleTypeFuelCapacityMgmtDesc")}
               </p>
             </div>
           </div>
@@ -192,7 +194,7 @@ const ManageVehicleTypes = () => {
             className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md gap-2"
           >
             <Plus className="w-4 h-4" />
-            Add Custom Type
+            {t("addCustomType")}
           </Button>
         </div>
 

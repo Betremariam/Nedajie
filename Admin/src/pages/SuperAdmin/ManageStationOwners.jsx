@@ -30,8 +30,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/AlertDialog";
+import { useTranslation } from "react-i18next";
 
 const ManageStationOwners = () => {
+  const { t } = useTranslation();
   const [owners, setOwners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -78,8 +80,8 @@ const ManageStationOwners = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Manage Station Owners</h1>
-        <p className="text-muted-foreground text-lg">View and manage fuel station owners in your region</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t("manageStationOwners")}</h1>
+        <p className="text-muted-foreground text-lg">{t("manageStationOwnersDesc")}</p>
       </div>
 
       <AnimatePresence>

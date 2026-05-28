@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { EllipsisVertical, LogOut, CircleUser } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -21,6 +22,7 @@ import {
 export function NavUser() {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const adminData = JSON.parse(localStorage.getItem("admin") || "{}");
 
@@ -89,7 +91,7 @@ export function NavUser() {
               <DropdownMenuItem asChild className="cursor-pointer">
                 <Link to="/settings/account">
                   <CircleUser />
-                  Account
+                  {t("navAccount")}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -98,7 +100,7 @@ export function NavUser() {
 
             <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
               <LogOut />
-              Log out
+              {t("navLogOut")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

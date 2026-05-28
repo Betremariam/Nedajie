@@ -19,8 +19,10 @@ import {
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
+import { useTranslation } from "react-i18next";
 
 const ApproveOthers = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [approvedUser, setApprovedUser] = useState(null);
@@ -60,7 +62,7 @@ const ApproveOthers = () => {
   };
 
   const handleDownload = () => {
-    const canvas = qrRef.current?.querySelector("canvas");
+    const canvas = qrRef.current;
     if (!canvas) return alert("QR code not found!");
 
     const pngUrl = canvas
@@ -92,7 +94,7 @@ const ApproveOthers = () => {
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      <p className="text-muted-foreground font-medium">Scanning identity manifest...</p>
+      <p className="text-muted-foreground font-medium">{t("loading")}</p>
     </div>
   );
 
@@ -100,11 +102,11 @@ const ApproveOthers = () => {
     <div className="p-8 max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Entity Approvals</h1>
-          <p className="text-muted-foreground font-medium">Review and authorize auxiliary resource consumers</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("entityApprovals")}</h1>
+          <p className="text-muted-foreground font-medium">{t("entityApprovalsDesc")}</p>
         </div>
         <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 text-[11px] font-black uppercase tracking-widest h-fit">
-          {users.length} Pending Authorization
+          {users.length} {t("pendingAuthorization")}
         </Badge>
       </div>
 
@@ -114,21 +116,21 @@ const ApproveOthers = () => {
             <PhoneCall className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search by name or phone..."
+              placeholder={t("searchByNameOrPhone")}
               className="w-full pl-10 h-11 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Fuel Type:</span>
+            <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">{t("fuelType")}</span>
             <select 
               title="Filter by Fuel Type"
               value={fuelTypeFilter} 
               onChange={(e) => setFuelTypeFilter(e.target.value)}
               className="h-11 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all flex-1 sm:flex-none"
             >
-              <option value="all">All Types</option>
+              <option value="all">{t("allTypes")}</option>
               {uniqueFuelTypes.map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
@@ -144,7 +146,7 @@ const ApproveOthers = () => {
               }}
               className="h-11 w-full sm:w-auto"
             >
-              Clear
+              {t("clear")}
             </Button>
           )}
         </div>
@@ -152,9 +154,10 @@ const ApproveOthers = () => {
 
 {approvedUser && (
         <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
-          <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
+          <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
+                ref={qrRef}
                 value={approvedUser.id}
                 size={200}
                 bgColor="#ffffff"
@@ -233,8 +236,8 @@ const ApproveOthers = () => {
               <Users className="w-10 h-10 text-muted-foreground opacity-30" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-xl font-bold text-foreground">Clean Slate</h3>
-              <p className="text-muted-foreground max-w-[280px]">No auxiliary entity applications found in your region.</p>
+              <h3 className="text-xl font-bold text-foreground">{t("cleanSlate")}</h3>
+              <p className="text-muted-foreground max-w-[280px]">{t("noAuxiliaryEntitiesDesc")}</p>
             </div>
           </div>
         </div>
@@ -289,13 +292,13 @@ const ApproveOthers = () => {
                     onClick={() => handleReject(user.id)}
                     className="flex-1 sm:flex-none text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl gap-2 font-bold h-11 px-6 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" /> Reject Request
+                    <Trash2 className="w-4 h-4" /> {t("rejectRequest")}
                   </Button>
                   <Button 
                     onClick={() => handleApprove(user.id)}
                     className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 font-bold h-11 px-8 shadow-md shadow-primary/10 transition-all active:scale-95"
                   >
-                    <Check className="w-4 h-4" /> Authorize Entity
+                    <Check className="w-4 h-4" /> {t("authorizeEntity")}
                   </Button>
                 </div>
               </div>
@@ -308,3 +311,5 @@ const ApproveOthers = () => {
 };
 
 export default ApproveOthers;
+
+

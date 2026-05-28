@@ -2,6 +2,7 @@ import * as React from "react";
 import { Separator } from "./ui/Separator";
 import { SidebarTrigger } from "./ui/Sidebar";
 import { ModeToggle } from "./ModeToggle";
+import { LanguageToggle } from "./LanguageToggle";
 
 const ROLE_LABELS = {
   federal:      "Federal Admin Portal",
@@ -46,6 +47,7 @@ export function SiteHeader() {
             </div>
 
             <div className="flex items-center gap-3">
+              <LanguageToggle />
               <ModeToggle />
               {/* Avatar */}
               <div className="group relative cursor-pointer">

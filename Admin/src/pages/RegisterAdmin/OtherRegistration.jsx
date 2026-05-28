@@ -22,8 +22,10 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const OtherRegistration = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     fullName: "",
     phoneNumber: "",
@@ -68,7 +70,7 @@ const OtherRegistration = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setSuccess("Entity registered successfully.");
+      setSuccess(t("otherRegisteredSuccess"));
       setForm({ fullName: "", phoneNumber: "", fuelType: "", maxUses: "-1", totalAllowedLiters: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
@@ -106,8 +108,8 @@ const OtherRegistration = () => {
                 <Users className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Entity Registry</h1>
-                <p className="text-muted-foreground text-[13px] font-medium">Capture identity data for auxiliary consumers</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("entityRegistry")}</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">{t("entityRegistryDesc")}</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -275,3 +277,4 @@ const OtherRegistration = () => {
 };
 
 export default OtherRegistration;
+

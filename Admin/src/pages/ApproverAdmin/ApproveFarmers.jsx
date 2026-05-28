@@ -17,8 +17,10 @@ import {
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
+import { useTranslation } from "react-i18next";
 
 const ApproveFarmers = () => {
+  const { t } = useTranslation();
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [approvedFarmer, setApprovedFarmer] = useState(null);
@@ -65,7 +67,7 @@ const ApproveFarmers = () => {
   };
 
   const handleDownload = () => {
-    const canvas = qrRef.current?.querySelector("canvas");
+    const canvas = qrRef.current;
     if (!canvas) return alert("QR code not found!");
 
     const pngUrl = canvas
@@ -87,7 +89,7 @@ const ApproveFarmers = () => {
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      <p className="text-muted-foreground font-medium">Loading farmer registry...</p>
+      <p className="text-muted-foreground font-medium">{t("loading")}</p>
     </div>
   );
 
@@ -95,21 +97,22 @@ const ApproveFarmers = () => {
     <div className="p-8 max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Farmer Approvals</h1>
-          <p className="text-muted-foreground font-medium">Review and authorize agricultural fuel allocations</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("farmerApprovals")}</h1>
+          <p className="text-muted-foreground font-medium">{t("farmerApprovalsDesc")}</p>
         </div>
-        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 text-[11px] font-black uppercase tracking-widest h-fit">
-          {farmers.length} Pending Approval
+        <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-4 py-2 text-sm font-bold h-fit">
+          {farmers.length} {t("pending")}
         </Badge>
       </div>
 
       {approvedFarmer && (
         <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
-          <div ref={qrRef} className="flex flex-col md:flex-row items-center gap-10">
+          <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-border">
               <QRCodeCanvas
+                ref={qrRef}
                 value={approvedFarmer.id}
-                size={200}
+                size={220}
                 bgColor="#ffffff"
                 fgColor="#1f2937"
                 level="H"
@@ -121,9 +124,9 @@ const ApproveFarmers = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 justify-center md:justify-start text-primary">
                   <CheckCircle2 className="w-6 h-6" />
-                  <h3 className="text-2xl font-bold text-foreground">Verification Complete</h3>
+                  <h3 className="text-2xl font-bold text-foreground">{t("verificationComplete")}</h3>
                 </div>
-                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">Agricultural quota profile has been activated</p>
+                <p className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">{t("agriculturalProfileActivated")}</p>
               </div>
 
               <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -143,10 +146,10 @@ const ApproveFarmers = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={handleDownload} className="h-12 px-8 rounded-xl gap-2 font-bold shadow-lg shadow-primary/20">
-                  <Download className="w-5 h-5" /> Download Farmer QR
+                  <Download className="w-5 h-5" /> {t("downloadFarmerQr")}
                 </Button>
                 <Button variant="outline" onClick={() => setApprovedFarmer(null)} className="h-12 px-8 rounded-xl font-bold">
-                  Dismiss
+                  {t("dismiss")}
                 </Button>
               </div>
             </div>
@@ -229,13 +232,13 @@ const ApproveFarmers = () => {
                     onClick={() => handleReject(farmer.id)}
                     className="flex-1 sm:flex-none text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl gap-2 font-bold h-11 px-6 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" /> Reject Application
+                    <Trash2 className="w-4 h-4" /> {t("rejectApplication")}
                   </Button>
                   <Button 
                     onClick={() => handleApprove(farmer.id)}
                     className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gap-2 font-bold h-11 px-8 shadow-md shadow-primary/10 transition-all active:scale-95"
                   >
-                    <Check className="w-4 h-4" /> Approve & Activate
+                    <Check className="w-4 h-4" /> {t("approveAndActivate")}
                   </Button>
                 </div>
               </div>
@@ -248,3 +251,5 @@ const ApproveFarmers = () => {
 };
 
 export default ApproveFarmers;
+
+

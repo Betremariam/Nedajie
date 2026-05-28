@@ -38,8 +38,10 @@ import { Input } from "../../components/ui/Input";
 import { Badge } from "../../components/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Button } from "../../components/ui/Button";
+import { useTranslation } from "react-i18next";
 
 const FuelReceived = () => {
+  const { t } = useTranslation();
   const [records, setRecords] = useState([]);
   const [stations, setStations] = useState([]);
   const [selectedStation, setSelectedStation] = useState("all");
@@ -114,17 +116,17 @@ const FuelReceived = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 mb-1 text-primary">
             <ArrowDownToLine className="w-5 h-5" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Asset Inflow Monitor</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("assetInflowMonitor")}</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Inbound Logistics</h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Audit-ready verification of bulk fuel replenishments.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">{t("inboundLogistics")}</h1>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("auditReadyVerification")}</p>
         </div>
         
         {stations.length > 0 && (
           <div className="flex items-center gap-4 bg-card p-3 rounded-2xl border border-border shadow-sm">
             <div className="flex flex-col items-end mr-2">
-              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Active Station</span>
-              <span className="text-xs font-semibold text-foreground">Operational Node</span>
+              <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">{t("activeStation")}</span>
+              <span className="text-xs font-semibold text-foreground">{t("operationalNodeLabel")}</span>
             </div>
             <Select value={selectedStation} onValueChange={setSelectedStation}>
               <SelectTrigger className="w-[180px] h-10 rounded-xl bg-background border border-border shadow-sm font-bold text-xs uppercase tracking-wider">
@@ -156,11 +158,11 @@ const FuelReceived = () => {
           <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-6">
             <Warehouse className="w-10 h-10 text-muted-foreground/30" />
           </div>
-          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">Logistics Void</h2>
-          <p className="text-muted-foreground mt-2 max-w-sm font-medium">No verified inbound fuel records were detected in this administrative cycle.</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">{t("logisticsVoid")}</h2>
+          <p className="text-muted-foreground mt-2 max-w-sm font-medium">{t("noVerifiedInboundDesc")}</p>
           <Button variant="outline" onClick={() => fetchFuelRecords(selectedStation)} className="mt-8 gap-2 rounded-xl h-12 px-8 font-bold uppercase text-[11px] tracking-widest transition-all">
             <History className="w-4 h-4" />
-            Retry Telemetry
+            {t("retryTelemetry")}
           </Button>
         </Card>
       ) : (
@@ -171,12 +173,12 @@ const FuelReceived = () => {
                 <History className="w-5 h-5 text-primary" />
                 Transfer Ledger
               </CardTitle>
-              <CardDescription className="text-[13px] font-medium">Immutable record of verified station replenishments.</CardDescription>
+              <CardDescription className="text-[13px] font-medium">{t("immutableRecordOfReplenishments")}</CardDescription>
             </div>
             <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 font-bold">
                   <TrendingUp className="w-3 h-3" />
-                  Supply Active
+                  {t("supplyActive")}
                </div>
             </div>
           </CardHeader>
@@ -185,12 +187,12 @@ const FuelReceived = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50 border-none h-14">
-                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Operational Node</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Fuel Specification</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-right">Transfer Volume</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-right">Timestamp</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Document</TableHead>
-                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Integrity</TableHead>
+                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("operationalNode")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">{t("fuelSpecification")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-right">{t("transferVolume")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-right">{t("timestamp")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">{t("document")}</TableHead>
+                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("integrity")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -221,7 +223,7 @@ const FuelReceived = () => {
                               {rec.liters.toLocaleString()} <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest ml-0.5">Liters</span>
                            </span>
                            <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase tracking-tight">
-                              <TrendingUp className="w-2.5 h-2.5" /> Verified Payload
+                              <TrendingUp className="w-2.5 h-2.5" /> {t("verifiedPayload")}
                            </div>
                         </div>
                       </TableCell>
@@ -244,7 +246,7 @@ const FuelReceived = () => {
                             className="h-8 text-[10px] font-bold uppercase bg-transparent text-primary border-primary/20 hover:bg-primary/10 rounded-lg px-3 flex items-center justify-center m-auto"
                             onClick={() => downloadFile(rec.documentPath)}
                           >
-                            <FileText className="w-3.5 h-3.5 mr-1" /> View
+                            <FileText className="w-3.5 h-3.5 mr-1" /> {t("view")}
                           </Button>
                         ) : (
                           <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase">N/A</span>
@@ -270,7 +272,7 @@ const FuelReceived = () => {
           <CardFooter className="bg-muted/5 border-t border-border/10 p-4 px-8 flex items-center justify-between">
              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5 text-primary/60" />
-                Real-time ingestion active. Last update: {new Date().toLocaleTimeString()}
+                {t("realTimeIngestionActive")} Last update: {new Date().toLocaleTimeString()}
              </p>
              <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/40">
                 <span>Ref: ISO-9001:2024</span>

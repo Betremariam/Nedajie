@@ -27,8 +27,10 @@ import {
 } from "../../components/ui/AlertDialog";
 import { Alert, AlertTitle, AlertDescription } from "../../components/ui/Alert";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const ConfirmDeliveries = () => {
+  const { t } = useTranslation();
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -100,8 +102,8 @@ const ConfirmDeliveries = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Federal Delivery Confirmation</h1>
-          <p className="text-muted-foreground text-lg italic">Verify and authorize incoming fuel shipments from Federal nodes</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("federalDeliveryConfirmation")}</h1>
+          <p className="text-muted-foreground text-lg italic">{t("verifyFederalShipments")}</p>
         </div>
         <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2">
           <Truck className="w-4 h-4" />

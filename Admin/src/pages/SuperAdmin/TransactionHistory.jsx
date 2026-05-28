@@ -29,8 +29,10 @@ import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select";
+import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +117,7 @@ const Transactions = () => {
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      <p className="text-muted-foreground animate-pulse font-medium">Reconstructing transaction ledger...</p>
+      <p className="text-muted-foreground animate-pulse font-medium">{t("reconstructingLedger")}</p>
     </div>
   );
 
@@ -123,8 +125,8 @@ const Transactions = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Transaction Ledger</h1>
-          <p className="text-muted-foreground text-lg">Full historical record of fuel allocations and disbursements</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("transactionLedger")}</h1>
+          <p className="text-muted-foreground text-lg">{t("transactionLedgerDesc")}</p>
         </div>
         <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2 bg-amber-500/5 border-amber-200 text-amber-700">
           <History className="w-4 h-4" />
@@ -137,7 +139,7 @@ const Transactions = () => {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="w-4 h-4 text-primary" />
-            <h3 className="font-bold text-sm">FILTERS</h3>
+            <h3 className="font-bold text-sm">{t("filters")}</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

@@ -19,13 +19,15 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState([
-    { label: "Total Volume", value: "0 L", icon: Droplets, color: "emerald", desc: "Benzene & Diesel" },
-    { label: "Daily Sales", value: "ETB 0", icon: TrendingUp, color: "blue", desc: "Total revenue today" },
-    { label: "Attendants", value: "0", icon: Users, color: "purple", desc: "Active on shifts" },
-    { label: "Stock Level", value: "0%", icon: Package, color: "amber", desc: "Storage capacity" },
+    { label: t("totalVolume"), value: "0 L", icon: Droplets, color: "emerald", desc: t("benzeneDiesel") },
+    { label: t("dailySales"), value: "ETB 0", icon: TrendingUp, color: "blue", desc: "Total revenue today" },
+    { label: t("attendants"), value: "0", icon: Users, color: "purple", desc: "Active on shifts" },
+    { label: t("stockLevel"), value: "0%", icon: Package, color: "amber", desc: "Storage capacity" },
   ]);
 
   const [recentDeliveries, setRecentDeliveries] = useState([]);
@@ -79,10 +81,10 @@ const Dashboard = () => {
       const stockPercent = Math.min(Math.round((totalVol / MAX_TOTAL) * 100), 100) || 0;
 
       setStats([
-        { label: "Total Volume", value: `${totalVol.toLocaleString()} L`, icon: Droplets, color: "emerald", desc: "Benzene & Diesel" },
-        { label: "Daily Sales", value: `${todayLiters.toLocaleString()} L`, icon: TrendingUp, color: "blue", desc: "Liters dispensed today" },
-        { label: "Attendants", value: attendantsCount.toString(), icon: Users, color: "purple", desc: "Registered personnel" },
-        { label: "Stock Level", value: `${stockPercent}%`, icon: Package, color: "amber", desc: "Aggregate capacity" },
+        { label: t("totalVolume"), value: `${totalVol.toLocaleString()} L`, icon: Droplets, color: "emerald", desc: t("benzeneDiesel") },
+        { label: t("dailySales"), value: `${todayLiters.toLocaleString()} L`, icon: TrendingUp, color: "blue", desc: "Liters dispensed today" },
+        { label: t("attendants"), value: attendantsCount.toString(), icon: Users, color: "purple", desc: "Registered personnel" },
+        { label: t("stockLevel"), value: `${stockPercent}%`, icon: Package, color: "amber", desc: "Aggregate capacity" },
       ]);
 
     } catch (err) {
@@ -118,10 +120,10 @@ const Dashboard = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <Building2 className="w-6 h-6 text-foreground" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Station Proprietor Node</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("stationProprietor")}</span>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
-             Station Overview
+             {t("stationOverview")}
           </h1>
           <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Real-time asset telemetry and inventory management.</p>
         </div>
@@ -175,7 +177,7 @@ const Dashboard = () => {
             <div className="space-y-1">
               <h2 className="text-xl font-semibold tracking-tight text-foreground flex items-center gap-2">
                 <Fuel className="h-5 w-5 text-primary" />
-                Live Storage Monitor
+                {t("liveStorage")}
               </h2>
               <p className="text-muted-foreground text-[13px] font-medium mt-1">Underground tank levels and capacity tracking.</p>
             </div>
@@ -239,7 +241,7 @@ const Dashboard = () => {
           <div className="p-6 md:p-8 border-b border-border pb-4">
             <h2 className="flex items-center gap-3 text-xl font-semibold tracking-tight text-foreground">
                <History className="h-5 w-5 text-primary" />
-               Supply Ledger
+               {t("supplyLedger")}
             </h2>
             <p className="text-muted-foreground text-[13px] font-medium mt-1">Latest inbound fuel deliveries.</p>
           </div>

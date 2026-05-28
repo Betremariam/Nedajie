@@ -39,8 +39,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Badge } from "../../components/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
 
 const Reports = () => {
+  const { t } = useTranslation();
   const [reportType, setReportType] = useState("daily");
   const [transactions, setTransactions] = useState([]);
   const [totalLiters, setTotalLiters] = useState(0);
@@ -107,10 +109,10 @@ const Reports = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 mb-1 text-primary">
             <TrendingUp className="w-5 h-5" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Operational Intelligence</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("operationalIntelligence")}</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Fuel Analytics</h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Strategic oversight of fuel distribution cycles and node performance.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">{t("fuelAnalytics")}</h1>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("realTimeThroughput")}</p>
         </div>
         <div className="flex items-center gap-4">
            <Button 
@@ -120,7 +122,7 @@ const Reports = () => {
             className="h-11 px-6 rounded-xl bg-emerald-500/5 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500 hover:text-white font-bold uppercase tracking-widest text-[10px] shadow-sm transition-all disabled:opacity-30 flex items-center gap-2 group"
           >
             <FileSpreadsheet className="w-4 h-4 transition-transform group-hover:scale-110" />
-            Export Intelligence [.XLSX]
+            {t("exportIntelligence")}
           </Button>
         </div>
       </div>
@@ -132,29 +134,29 @@ const Reports = () => {
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                      <Calendar className="w-5 h-5" />
                   </div>
-                  <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-primary/80">Configuration</CardTitle>
+                  <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-primary/80">{t("configuration")}</CardTitle>
                </div>
-               <CardDescription className="text-[13px] font-medium">Define parameters for data synthesis.</CardDescription>
+               <CardDescription className="text-[13px] font-medium">{t("defineParameters")}</CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
                <div className="space-y-3">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">Analysis Period</label>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">{t("analysisPeriod")}</label>
                   <Select value={reportType} onValueChange={setReportType}>
                     <SelectTrigger className="h-12 rounded-xl border-border bg-background font-semibold transition-all">
                       <SelectValue placeholder="Select Period" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-border font-sans">
-                      <SelectItem value="daily" className="font-medium py-2.5">Daily Synthesis</SelectItem>
-                      <SelectItem value="weekly" className="font-medium py-2.5">Weekly Aggregate</SelectItem>
-                      <SelectItem value="monthly" className="font-medium py-2.5">Monthly Summary</SelectItem>
-                      <SelectItem value="yearly" className="font-medium py-2.5">Yearly Audit</SelectItem>
+                      <SelectItem value="daily" className="font-medium py-2.5">{t("dailySynthesis")}</SelectItem>
+                      <SelectItem value="weekly" className="font-medium py-2.5">{t("weeklyAggregate")}</SelectItem>
+                      <SelectItem value="monthly" className="font-medium py-2.5">{t("monthlySummary")}</SelectItem>
+                      <SelectItem value="yearly" className="font-medium py-2.5">{t("yearlyAudit")}</SelectItem>
                     </SelectContent>
                   </Select>
                </div>
                <div className="pt-6 border-t border-border/10 space-y-4">
                   <div className="flex items-center justify-between px-1">
-                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/40">Data Integrity</span>
-                     <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-widest border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Verified</Badge>
+                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/40">{t("dataIntegrity")}</span>
+                     <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-widest border-emerald-500/20 text-emerald-600 bg-emerald-500/5">{t("verified")}</Badge>
                   </div>
                   <div className="flex items-center justify-between px-1">
                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/40">Timestamp</span>
@@ -170,8 +172,8 @@ const Reports = () => {
                <TrendingUp className="w-64 h-64" />
             </div>
             <CardHeader className="relative z-10 pb-2 p-8">
-               <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-primary-foreground/90">Throughput Aggregate</CardTitle>
-               <CardDescription className="text-primary-foreground/60 font-medium">Aggregate volume metrics across authorized nodes.</CardDescription>
+               <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-primary-foreground/90">{t("throughputAggregate")}</CardTitle>
+               <CardDescription className="text-primary-foreground/60 font-medium">{t("aggregateVolumeMetrics")}</CardDescription>
             </CardHeader>
             <CardContent className="relative z-10 py-10 flex flex-col items-center justify-center text-center px-8">
                <div className="space-y-1">
@@ -179,22 +181,22 @@ const Reports = () => {
                      {totalLiters.toLocaleString()}
                      <span className="text-xl font-semibold text-primary-foreground/40 uppercase tracking-widest ml-3 mb-4">Liters</span>
                   </div>
-                  <p className="text-[11px] font-bold text-primary-foreground/30 uppercase tracking-[0.3em]">Net Throughput Authorized</p>
+                  <p className="text-[11px] font-bold text-primary-foreground/30 uppercase tracking-[0.3em]">{t("netThroughputAuthorized")}</p>
                </div>
                
                <div className="mt-12 w-full max-w-md bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-xl flex items-center justify-around gap-8">
                   <div className="text-center">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">TX Volume</p>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">{t("txVolume")}</p>
                      <p className="text-2xl font-bold tabular-nums text-white">{transactions.length}</p>
                   </div>
                   <div className="w-px h-10 bg-white/10" />
                   <div className="text-center">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">Activity</p>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">{t("activity")}</p>
                      <p className="text-2xl font-bold tabular-nums text-white">{transactions.length > 0 ? "100%" : "0%"}</p>
                   </div>
                   <div className="w-px h-10 bg-white/10" />
                   <div className="text-center">
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">Cycle</p>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/40 mb-1">{t("cycle")}</p>
                      <p className="text-xl font-bold text-white">{reportType.toUpperCase()}</p>
                   </div>
                </div>
@@ -215,8 +217,8 @@ const Reports = () => {
           <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-6">
             <BarChart3 className="w-10 h-10 text-muted-foreground/30" />
           </div>
-          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">Analytical Void</h2>
-          <p className="text-muted-foreground mt-2 max-w-sm font-medium">Zero operational data detected for this period node-set combination.</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">{t("analyticalVoid")}</h2>
+          <p className="text-muted-foreground mt-2 max-w-sm font-medium">{t("zeroOperationalData")}</p>
         </Card>
       ) : (
         <Card className="border-border shadow-sm overflow-hidden rounded-[24px]">
@@ -226,8 +228,8 @@ const Reports = () => {
                   <History className="w-6 h-6" />
                </div>
                <div>
-                  <CardTitle className="text-xl font-bold">Transaction Ledger</CardTitle>
-                  <CardDescription className="font-medium">Granular inspection of historical discharge sequences.</CardDescription>
+                  <CardTitle className="text-xl font-bold">{t("transactionLedgerTitle")}</CardTitle>
+                  <CardDescription className="font-medium">{t("granularInspection")}</CardDescription>
                </div>
             </div>
           </CardHeader>
@@ -236,13 +238,13 @@ const Reports = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50 border-none h-14">
-                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-wider">Cycle Timestamp</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">Authorized Entity</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">Fuel Type</TableHead>
-                    <TableHead className="text-right text-[11px] font-bold uppercase tracking-wider">Volume (L)</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">Lead Attendant</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">Operational Node</TableHead>
-                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-wider">City</TableHead>
+                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-wider">{t("cycleTimestampCol")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">{t("authorizedEntity")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">{t("fuelTypeCol")}</TableHead>
+                    <TableHead className="text-right text-[11px] font-bold uppercase tracking-wider">{t("volumeL")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">{t("leadAttendant")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-wider">{t("operationalNode")}</TableHead>
+                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-wider">{t("cityCol")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

@@ -39,6 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/AlertDialog";
+import { useTranslation } from "react-i18next";
 
 const REGIONS = [
   "Addis Ababa",
@@ -58,6 +59,7 @@ const REGIONS = [
 ];
 
 const ManageOwners = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ 
     name: "", 
     email: "", 
@@ -113,7 +115,7 @@ const ManageOwners = () => {
     try {
       console.log("Submitting Owner Registration (FormData key-values):", Object.fromEntries(formData.entries()));
       const res = await createOwner(formData);
-      setSuccess("Station owner created successfully.");
+      setSuccess(t("registrationSuccess"));
       setNewCreds({ email: form.email, tempPassword: res.data.tempPassword });
       setForm({ 
         name: "", 
@@ -140,7 +142,7 @@ const ManageOwners = () => {
         data: err.response?.data,
         msg: err.response?.data?.msg
       });
-      setError(err?.response?.data?.msg || "Registration failed.");
+      setError(err?.response?.data?.msg || t("registrationFailed"));
     } finally {
       setLoading(false);
     }
@@ -206,8 +208,8 @@ const ManageOwners = () => {
               <Building2 className="w-7 h-7" />
             </div>
             <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">Owner Registry</h1>
-              <p className="text-muted-foreground text-[13px] font-medium">Register fuel station proprietors and entities</p>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("ownerRegistry")}</h1>
+              <p className="text-muted-foreground text-[13px] font-medium">{t("ownerRegistryDesc")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

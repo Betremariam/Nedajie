@@ -25,8 +25,10 @@ import {
 import { Button } from "../../components/ui/Button";
 import { Alert, AlertTitle, AlertDescription } from "../../components/ui/Alert";
 import { Badge } from "../../components/ui/Badge";
+import { useTranslation } from "react-i18next";
 
 const FuelStockManager = () => {
+  const { t } = useTranslation();
   const [stations, setStations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -52,8 +54,8 @@ const FuelStockManager = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Regional Fuel Inventory</h1>
-          <p className="text-muted-foreground text-lg italic">Real-time status of registered fuel stocks within your jurisdiction</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("regionalFuelInventory")}</h1>
+          <p className="text-muted-foreground text-lg italic">{t("regionalFuelDesc")}</p>
         </div>
         <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2">
             <Fuel className="w-4 h-4" />

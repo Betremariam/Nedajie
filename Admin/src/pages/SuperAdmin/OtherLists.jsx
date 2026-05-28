@@ -23,8 +23,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../..
 import { Input } from "../../components/ui/Input";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+import { useTranslation } from "react-i18next";
 
 const OthersLists = () => {
+  const { t } = useTranslation();
   const [others, setOthers] = useState([]);
   const [search, setSearch] = useState("");
   const [fuelTypeFilter, setFuelTypeFilter] = useState("all");
@@ -82,8 +84,8 @@ const OthersLists = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Auxiliary User Accounts</h1>
-          <p className="text-muted-foreground text-lg">Registry of non-primary stakeholders and service consumers</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("auxiliaryUserAccounts")}</h1>
+          <p className="text-muted-foreground text-lg">{t("auxiliaryUserAccountsDesc")}</p>
         </div>
         <Badge variant="outline" className="h-fit px-4 py-1.5 text-sm gap-2 bg-purple-500/5 border-purple-200 text-purple-700">
           <Users2 className="w-4 h-4" />

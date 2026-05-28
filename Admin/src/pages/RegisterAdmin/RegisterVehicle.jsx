@@ -24,8 +24,10 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const RegisterVehicle = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     ownerName: "",
     phone: "",
@@ -92,7 +94,7 @@ const RegisterVehicle = () => {
         },
       });
 
-      setSuccess(res.data.msg || "Vehicle registered successfully.");
+      setSuccess(res.data.msg || t("vehicleRegisteredSuccess"));
       setFuelCapacity(res.data.fuelCapacity || null);
       setForm({
         ownerName: "",
@@ -137,8 +139,8 @@ const RegisterVehicle = () => {
                 <Car className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Vehicle Registry</h1>
-                <p className="text-muted-foreground text-[13px] font-medium">Map vehicle identities to capacity-based quotas</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("vehicleRegistry")}</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">{t("vehicleRegistryDesc")}</p>
              </div>
           </div>
           <div className="flex items-center gap-3">

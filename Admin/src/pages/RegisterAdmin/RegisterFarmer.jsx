@@ -16,8 +16,10 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const RegisterFarmer = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     fullName: "",
     phoneNumber: "",
@@ -58,7 +60,7 @@ const RegisterFarmer = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setSuccess("Farmer registered successfully.");
+      setSuccess(t("farmerRegisteredSuccess"));
       setForm({ fullName: "", phoneNumber: "", kebele: "", woreda: "", landSize: "", document: null });
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
@@ -96,8 +98,8 @@ const RegisterFarmer = () => {
                 <TreePine className="w-7 h-7" />
              </div>
              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Farmer Registry</h1>
-                <p className="text-muted-foreground text-[13px] font-medium">Verify agricultural identities for regional fuel access</p>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("farmerRegistry")}</h1>
+                <p className="text-muted-foreground text-[13px] font-medium">{t("farmerRegistryDesc")}</p>
              </div>
           </div>
           <div className="flex items-center gap-3">
@@ -266,3 +268,5 @@ const RegisterFarmer = () => {
 };
 
 export default RegisterFarmer;
+
+

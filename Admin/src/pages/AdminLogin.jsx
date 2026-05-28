@@ -8,8 +8,10 @@ import { Input } from "../components/ui/Input";
 import { Label } from "../components/ui/Label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "../components/ui/Card";
 import { Alert, AlertDescription } from "../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const AdminLogin = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -62,7 +64,7 @@ const AdminLogin = () => {
 
     if (!email || !password) {
       setLoading(false);
-      return setError("All fields are required.");
+      return setError(t("allFieldsRequired"));
     }
 
     try {
@@ -89,7 +91,7 @@ const AdminLogin = () => {
       }
 
     } catch (err) {
-      const msg = err.response?.data?.msg || "Login failed.";
+      const msg = err.response?.data?.msg || t("loginFailed");
       setError(msg);
     } finally {
       setLoading(false);
@@ -129,10 +131,10 @@ const AdminLogin = () => {
               </div>
             </motion.div>
             <CardTitle className="text-3xl font-bold tracking-tight">
-              Admin Portal
+              {t("adminPortal")}
             </CardTitle>
             <CardDescription className="font-medium mt-2">
-              Secure access to the ecosystem
+              {t("secureAccess")}
             </CardDescription>
           </CardHeader>
 
@@ -156,7 +158,7 @@ const AdminLogin = () => {
             <form onSubmit={handleLogin} className="space-y-5 relative z-20">
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
                 <Label htmlFor="email" className="mb-2 pl-1 block">
-                  Email Address
+                  {t("emailAddress")}
                 </Label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors z-10">
@@ -165,7 +167,7 @@ const AdminLogin = () => {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder={t("emailPlaceholder")}
                     className="pl-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -176,7 +178,7 @@ const AdminLogin = () => {
 
               <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>
                 <Label htmlFor="password" title="Password" className="mb-2 pl-1 block">
-                  Password
+                  {t("password")}
                 </Label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors z-10">
@@ -185,7 +187,7 @@ const AdminLogin = () => {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder={t("passwordPlaceholder")}
                     className="pl-12 pr-12 h-12 bg-background border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-all"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -215,11 +217,11 @@ const AdminLogin = () => {
                   {loading ? (
                     <>
                       <Loader2 className="animate-spin h-5 w-5" />
-                      <span className="tracking-wide">Authenticating...</span>
+                      <span className="tracking-wide">{t("authenticating")}</span>
                     </>
                   ) : (
                     <>
-                      <span className="tracking-wider uppercase text-sm font-semibold">Sign In</span>
+                      <span className="tracking-wider uppercase text-sm font-semibold">{t("signIn")}</span>
                       <motion.div
                         initial={{ x: 0 }}
                         whileHover={{ x: 4 }}
@@ -235,7 +237,7 @@ const AdminLogin = () => {
           </CardContent>
           
           <CardFooter className="bg-muted/50 py-4 px-8 border-t justify-center">
-             <p className="text-xs text-muted-foreground font-medium">NigdBureau Bureau System v2.0</p>
+             <p className="text-xs text-muted-foreground font-medium">{t("systemVersion")}</p>
           </CardFooter>
         </Card>
       </motion.div>

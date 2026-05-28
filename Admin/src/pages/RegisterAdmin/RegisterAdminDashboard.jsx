@@ -22,13 +22,15 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import API, { getRegisterAdminDashboardStats } from "../../services/api";
+import { useTranslation } from "react-i18next";
 
 const RegisterAdminDashboard = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState([
-    { label: "Attendants", desc: "Energy distribution staff", icon: Fuel, count: "0", color: "blue" },
-    { label: "Vehicles", desc: "Logistics & transport operators", icon: Car, count: "0", color: "emerald" },
-    { label: "Farmers", desc: "Agricultural asset owners", icon: Wheat, count: "0", color: "amber" },
-    { label: "Others", desc: "General system entities", icon: Users2, count: "0", color: "purple" },
+    { label: t("attendants"), desc: "Energy distribution staff", icon: Fuel, count: "0", color: "blue" },
+    { label: t("vehicles"), desc: "Logistics & transport operators", icon: Car, count: "0", color: "emerald" },
+    { label: t("farmers"), desc: "Agricultural asset owners", icon: Wheat, count: "0", color: "amber" },
+    { label: t("others"), desc: "General system entities", icon: Users2, count: "0", color: "purple" },
   ]);
 
   const [loading, setLoading] = useState(true);
@@ -48,14 +50,14 @@ const RegisterAdminDashboard = () => {
       const data = res.data;
 
       setStats([
-        { label: "Attendants", desc: "Energy distribution staff", icon: Fuel, count: data.attendants.toLocaleString(), color: "blue" },
-        { label: "Vehicles", desc: "Logistics & transport operators", icon: Car, count: data.vehicles.toLocaleString(), color: "emerald" },
-        { label: "Farmers", desc: "Agricultural asset owners", icon: Wheat, count: data.farmers.toLocaleString(), color: "amber" },
-        { label: "Others", desc: "General system entities", icon: Users2, count: data.others.toLocaleString(), color: "purple" },
+        { label: t("attendants"), desc: "Energy distribution staff", icon: Fuel, count: data.attendants.toLocaleString(), color: "blue" },
+        { label: t("vehicles"), desc: "Logistics & transport operators", icon: Car, count: data.vehicles.toLocaleString(), color: "emerald" },
+        { label: t("farmers"), desc: "Agricultural asset owners", icon: Wheat, count: data.farmers.toLocaleString(), color: "amber" },
+        { label: t("others"), desc: "General system entities", icon: Users2, count: data.others.toLocaleString(), color: "purple" },
       ]);
     } catch (err) {
       console.error("Failed to fetch registry stats:", err);
-      setError("Synchronization failure with biometric database.");
+      setError(t("syncFailureBiometric"));
     } finally {
       setLoading(false);
     }
@@ -73,8 +75,8 @@ const RegisterAdminDashboard = () => {
           <Fingerprint className="h-8 w-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
         <div className="text-center space-y-2">
-          <p className="text-xl font-semibold tracking-tight">Accessing Biometric Registry</p>
-          <p className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold italic">Establishing secure handshake...</p>
+          <p className="text-xl font-semibold tracking-tight">{t("accessingBiometricRegistry")}</p>
+          <p className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold italic">{t("establishingSecureHandshake")}</p>
         </div>
       </div>
     );
@@ -88,12 +90,12 @@ const RegisterAdminDashboard = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <Fingerprint className="w-6 h-6 text-foreground" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Biometric Identity Hub</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("biometricIdentityHub")}</span>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
-            Registry Overview
+            {t("registryOverview")}
           </h1>
-          <p className="text-muted-foreground text-[14px] font-medium">Manage and monitor total ecosystem enrollments</p>
+          <p className="text-muted-foreground text-[14px] font-medium">{t("manageMonitorEnrollments")}</p>
         </div>
 
         <div className="flex items-center gap-4 bg-card p-2 pl-4 rounded-[16px] border border-border shadow-sm transition-all focus-within:ring-1 focus-within:ring-primary/20">
@@ -105,8 +107,8 @@ const RegisterAdminDashboard = () => {
               ))}
            </div>
            <div className="pr-4 border-r border-border h-10 flex flex-col justify-center">
-             <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none mb-1 whitespace-nowrap">Active Personnel</span>
-             <span className="text-[13px] font-bold text-foreground leading-none">REAL-TIME SYNC</span>
+             <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground leading-none mb-1 whitespace-nowrap">{t("activePersonnel")}</span>
+             <span className="text-[13px] font-bold text-foreground leading-none">{t("realTimeSync")}</span>
            </div>
            <div className="text-foreground p-2.5">
               <Activity className="w-6 h-6" />

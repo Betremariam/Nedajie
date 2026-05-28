@@ -11,8 +11,10 @@ import {
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const SuperAdminsList = () => {
+  const { t } = useTranslation();
   const [admins, setAdmins] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ const SuperAdminsList = () => {
       const res = await getAllAdmins();
       setAdmins(res.data.filter((a) => a.role === "super"));
     } catch {
-      setError("Failed to load admin list.");
+      setError(t("failedToLoadAdmins"));
     } finally {
       setLoading(false);
     }
@@ -46,8 +48,8 @@ const SuperAdminsList = () => {
     <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto font-sans">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Regional Super Admins</h1>
-          <p className="text-muted-foreground text-lg">View and manage all regional super administrators</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("regionalSuperAdmins")}</h1>
+          <p className="text-muted-foreground text-lg">{t("regionalSuperAdminsDesc")}</p>
         </div>
       </div>
 
@@ -55,7 +57,7 @@ const SuperAdminsList = () => {
       {error && (
         <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-bold">Error</AlertTitle>
+          <AlertTitle className="font-bold">{t("errorLabel")}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -68,14 +70,14 @@ const SuperAdminsList = () => {
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-[17px] font-bold text-foreground tracking-tight">Regional Super Admins</h2>
-              <p className="text-muted-foreground text-[13px] font-medium">{admins.length} admin{admins.length !== 1 ? "s" : ""} registered</p>
+              <h2 className="text-[17px] font-bold text-foreground tracking-tight">{t("regionalSuperAdmins")}</h2>
+              <p className="text-muted-foreground text-[13px] font-medium">{admins.length} {t("registered")}</p>
             </div>
           </div>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search admins..."
+              placeholder={t("search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-10 pl-11 rounded-xl border-border bg-muted/30 font-medium text-[13px] w-full sm:w-[220px] text-foreground"
@@ -86,12 +88,12 @@ const SuperAdminsList = () => {
         {loading ? (
           <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-3">
             <Loader2 className="w-10 h-10 animate-spin" />
-            <p className="text-[13px] font-medium">Loading admins...</p>
+            <p className="text-[13px] font-medium">{t("loading")}</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-3">
             <Users className="w-10 h-10 opacity-30" />
-            <p className="text-[13px] font-medium">{search ? "No admins match your search." : "No super admins registered yet."}</p>
+            <p className="text-[13px] font-medium">{search ? t("noResults") : t("noAdminsRegistered")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -126,7 +128,7 @@ const SuperAdminsList = () => {
                     <td className="pr-6 md:pr-8 py-4 text-right">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:text-emerald-400">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        Active
+                        {t("active")}
                       </span>
                     </td>
                     <td className="pr-6 md:pr-8 py-4 text-right">

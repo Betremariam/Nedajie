@@ -32,8 +32,10 @@ import { Input } from "../../components/ui/Input";
 import { Badge } from "../../components/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
 import { Button } from "../../components/ui/Button";
+import { useTranslation } from "react-i18next";
 
 const OwnerTransactions = () => {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -85,15 +87,15 @@ const OwnerTransactions = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 mb-1 text-primary">
             <Receipt className="w-5 h-5" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">Financial Audit Interface</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-primary/80">{t("financialAudit")}</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Station Transactions</h1>
-          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">Immutable ledger of real-time fuel sales and station throughput.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">{t("stationTransactions")}</h1>
+          <p className="text-muted-foreground text-[14px] font-medium max-w-xl">{t("realTimeThroughput")}</p>
         </div>
         <div className="flex items-center gap-4">
            <div className="bg-muted/40 p-1.5 rounded-xl border border-border/50 flex items-center gap-1">
-              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg bg-background shadow-sm font-bold uppercase text-[10px] tracking-widest">All Cycles</Button>
-              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg font-bold uppercase text-[10px] tracking-widest text-muted-foreground/60 transition-colors">Export CSV</Button>
+              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg bg-background shadow-sm font-bold uppercase text-[10px] tracking-widest">{t("allCycles")}</Button>
+              <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg font-bold uppercase text-[10px] tracking-widest text-muted-foreground/60 transition-colors">{t("exportCsv")}</Button>
            </div>
         </div>
       </div>
@@ -111,8 +113,8 @@ const OwnerTransactions = () => {
           <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-6">
             <CreditCard className="w-10 h-10 text-muted-foreground/30" />
           </div>
-          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">Transaction Void</h2>
-          <p className="text-muted-foreground mt-2 max-w-sm font-medium">No sales transactions have been authorized in this administrative cycle.</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground">{t("transactionVoid")}</h2>
+          <p className="text-muted-foreground mt-2 max-w-sm font-medium">{t("noSalesTransactionsDesc")}</p>
         </Card>
       ) : (
         <Card className="border border-border shadow-sm overflow-hidden rounded-[24px]">
@@ -122,8 +124,8 @@ const OwnerTransactions = () => {
                   <History className="w-6 h-6" />
                </div>
                <div>
-                  <CardTitle className="text-xl font-semibold">Asset Liquidation Log</CardTitle>
-                  <CardDescription className="text-[13px] font-medium">Real-time throughput metrics across nodes.</CardDescription>
+                  <CardTitle className="text-xl font-semibold">{t("assetLiquidationLog")}</CardTitle>
+                  <CardDescription className="text-[13px] font-medium">{t("realTimeThroughput")}</CardDescription>
                </div>
             </div>
             <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -138,12 +140,12 @@ const OwnerTransactions = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50 border-none h-14">
-                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Authorized Customer</TableHead>
+                    <TableHead className="pl-8 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("authorizedCustomer")}</TableHead>
                     <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground text-center">Type</TableHead>
-                    <TableHead className="text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Volume</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Lead Attendant</TableHead>
-                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Operational Node</TableHead>
-                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Cycle Timestamp</TableHead>
+                    <TableHead className="text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("volume")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("leadAttendant")}</TableHead>
+                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("operationalNode")}</TableHead>
+                    <TableHead className="pr-8 text-right text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t("cycleTimestamp")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -210,9 +212,9 @@ const OwnerTransactions = () => {
             </div>
           </CardContent>
           <CardFooter className="bg-muted/5 border-t border-border/10 p-4 px-8 flex items-center justify-between">
-             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5 text-primary/60" />
-                Ledger synchronized with station nodes.
+                {t("ledgerSyncedWithNodes")}
              </p>
              <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
                 <span>ISO-27001</span>

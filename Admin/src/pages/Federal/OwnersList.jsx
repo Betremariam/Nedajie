@@ -17,8 +17,10 @@ import {
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/Alert";
+import { useTranslation } from "react-i18next";
 
 const OwnersList = () => {
+  const { t } = useTranslation();
   const [owners, setOwners] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState(null);
   const [showDocuments, setShowDocuments] = useState(false);
@@ -35,7 +37,7 @@ const OwnersList = () => {
       const filteredOwners = res.data.filter((a) => a.role === "stationOwner");
       setOwners(filteredOwners);
     } catch {
-      setError("Failed to load owners.");
+      setError(t("failedToLoadOwners"));
     } finally {
       setLoading(false);
     }
@@ -50,11 +52,11 @@ const OwnersList = () => {
     setSuccess("");
     try {
       await API.patch(`/admins/admins/${ownerId}/block`);
-      setSuccess(`Station owner successfully ${isBlocked ? "unblocked" : "blocked"}`);
+      setSuccess(isBlocked ? t("successUnblocked") : t("successBlocked"));
       fetchOwners();
       setBlockingOwner(null);
     } catch (err) {
-      setError(err.response?.data?.msg || `Failed to ${isBlocked ? "unblock" : "block"} station owner`);
+      setError(err.response?.data?.msg || (isBlocked ? t("failedToUnblock") : t("failedToBlock")));
       setBlockingOwner(null);
     }
   };
@@ -71,8 +73,8 @@ const OwnersList = () => {
     <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto font-sans">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Station Owners</h1>
-          <p className="text-muted-foreground text-lg">View and manage all registered fuel station owners</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t("stationOwners")}</h1>
+          <p className="text-muted-foreground text-lg">{t("stationOwnersDesc")}</p>
         </div>
       </div>
 
@@ -80,14 +82,14 @@ const OwnersList = () => {
       {success && (
         <Alert className="border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
           <ShieldCheck className="h-4 w-4" />
-          <AlertTitle className="font-bold">Success</AlertTitle>
+          <AlertTitle className="font-bold">{t("successLabel")}</AlertTitle>
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
       {error && (
         <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-bold">Error</AlertTitle>
+          <AlertTitle className="font-bold">{t("errorLabel")}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -100,14 +102,14 @@ const OwnersList = () => {
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-[17px] font-bold text-foreground tracking-tight">Registered Owners</h2>
-              <p className="text-muted-foreground text-[13px] font-medium">{owners.length} owner{owners.length !== 1 ? "s" : ""} in the system</p>
+              <h2 className="text-[17px] font-bold text-foreground tracking-tight">{t("registeredOwners")}</h2>
+              <p className="text-muted-foreground text-[13px] font-medium">{owners.length} {owners.length !== 1 ? t("owners") : t("owner")} {t("registeredInSystem")}</p>
             </div>
           </div>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search owners..."
+              placeholder={t("searchOwners")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-10 pl-11 rounded-xl border-border bg-muted/30 font-medium text-[13px] w-full sm:w-[220px] text-foreground"
@@ -118,12 +120,12 @@ const OwnersList = () => {
         {loading ? (
           <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-3">
             <Loader2 className="w-10 h-10 animate-spin" />
-            <p className="text-[13px] font-medium">Loading owners...</p>
+            <p className="text-[13px] font-medium">{t("loadingOwners")}</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-3">
             <Building2 className="w-10 h-10 opacity-30" />
-            <p className="text-[13px] font-medium">{search ? "No owners match your search." : "No owners registered yet."}</p>
+            <p className="text-[13px] font-medium">{search ? t("noOwnersFound") : t("noOwnersRegistered")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
