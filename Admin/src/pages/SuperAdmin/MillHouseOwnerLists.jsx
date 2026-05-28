@@ -27,6 +27,10 @@ import { Button } from "../../components/ui/Button";
 const MillHouseOwnerLists = () => {
   const [owners, setOwners] = useState([]);
   const [search, setSearch] = useState("");
+  const [regionFilter, setRegionFilter] = useState("all");
+  const [woredaFilter, setWoredaFilter] = useState("all");
+  const [fuelTypeFilter, setFuelTypeFilter] = useState("all");
+  const [approvalFilter, setApprovalFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,9 +48,21 @@ const MillHouseOwnerLists = () => {
     fetchOwners();
   }, []);
 
-  const filteredOwners = owners.filter((owner) =>
-    owner.fullName.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredOwners = owners.filter((owner) => {
+    const matchesSearch = owner.fullName.toLowerCase().includes(search.toLowerCase()) ||
+      owner.phoneNumber?.includes(search);
+    const matchesRegion = regionFilter === "all" || owner.region === regionFilter;
+    const matchesWoreda = woredaFilter === "all" || owner.woreda === woredaFilter;
+    const matchesFuelType = fuelTypeFilter === "all" || owner.fuelType === fuelTypeFilter;
+    const matchesApproval = approvalFilter === "all" || 
+      (approvalFilter === "approved" && owner.approvedBy) ||
+      (approvalFilter === "pending" && !owner.approvedBy);
+    
+    return matchesSearch && matchesRegion && matchesWoreda && matchesFuelType && matchesApproval;
+  });
+
+  const uniqueRegions = [...new Set(owners.map(o => o.region).filter(Boolean))].sort();
+  const uniqueWoredas = [...new Set(owners.map(o => o.woreda).filter(Boolean))].sort();
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
@@ -70,14 +86,91 @@ const MillHouseOwnerLists = () => {
 
       <Card className="border-border/50 shadow-sm">
         <CardHeader className="pb-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Filter by owner name..."
-              className="pl-10 h-11"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex flex-col gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by owner name or phone..."
+                className="pl-10 h-11"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Region:</span>
+                <select 
+                  title="Filter by Region"
+                  value={regionFilter} 
+                  onChange={(e) => setRegionFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Regions</option>
+                  {uniqueRegions.map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Woreda:</span>
+                <select 
+                  title="Filter by Woreda"
+                  value={woredaFilter} 
+                  onChange={(e) => setWoredaFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Woredas</option>
+                  {uniqueWoredas.map(woreda => (
+                    <option key={woreda} value={woreda}>{woreda}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Fuel Type:</span>
+                <select 
+                  title="Filter by Fuel Type"
+                  value={fuelTypeFilter} 
+                  onChange={(e) => setFuelTypeFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Types</option>
+                  <option value="diesel">Diesel</option>
+                  <option value="benzene">Benzene</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Status:</span>
+                <select 
+                  title="Filter by Approval Status"
+                  value={approvalFilter} 
+                  onChange={(e) => setApprovalFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              {(search || regionFilter !== "all" || woredaFilter !== "all" || fuelTypeFilter !== "all" || approvalFilter !== "all") && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setSearch("");
+                    setRegionFilter("all");
+                    setWoredaFilter("all");
+                    setFuelTypeFilter("all");
+                    setApprovalFilter("all");
+                  }}
+                  className="h-10 text-sm"
+                >
+                  Clear Filters
+                </Button>
+              )}
+              <div className="ml-auto text-sm text-muted-foreground font-medium">
+                {filteredOwners.length} of {owners.length} Records
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">

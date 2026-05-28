@@ -27,6 +27,9 @@ import { Button } from "../../components/ui/Button";
 const OthersLists = () => {
   const [others, setOthers] = useState([]);
   const [search, setSearch] = useState("");
+  const [fuelTypeFilter, setFuelTypeFilter] = useState("all");
+  const [approvalFilter, setApprovalFilter] = useState("all");
+  const [usageFilter, setUsageFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,9 +47,29 @@ const OthersLists = () => {
     fetchOthers();
   }, []);
 
-  const filteredOthers = others.filter((other) =>
-    other.fullName.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredOthers = others.filter((other) => {
+    const matchesSearch = 
+      other.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+      other.phoneNumber?.includes(search);
+    
+    const matchesFuelType = fuelTypeFilter === "all" || other.fuelType === fuelTypeFilter;
+    const matchesApproval = approvalFilter === "all" || 
+      (approvalFilter === "approved" && other.approvedBy) ||
+      (approvalFilter === "pending" && !other.approvedBy);
+    
+    let matchesUsage = true;
+    if (usageFilter === "active" && other.maxUses !== -1) {
+      matchesUsage = other.useCount < other.maxUses;
+    } else if (usageFilter === "exhausted" && other.maxUses !== -1) {
+      matchesUsage = other.useCount >= other.maxUses;
+    } else if (usageFilter === "unlimited") {
+      matchesUsage = other.maxUses === -1;
+    }
+    
+    return matchesSearch && matchesFuelType && matchesApproval && matchesUsage;
+  });
+
+  const uniqueFuelTypes = [...new Set(others.map(o => o.fuelType).filter(Boolean))].sort();
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
@@ -70,14 +93,77 @@ const OthersLists = () => {
 
       <Card className="border-border/50 shadow-sm">
         <CardHeader className="pb-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by full name..."
-              className="pl-10 h-11"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex flex-col gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or phone number..."
+                className="pl-10 h-11"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Fuel Type:</span>
+                <select 
+                  title="Filter by Fuel Type"
+                  value={fuelTypeFilter} 
+                  onChange={(e) => setFuelTypeFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Types</option>
+                  {uniqueFuelTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Usage:</span>
+                <select 
+                  title="Filter by Usage Status"
+                  value={usageFilter} 
+                  onChange={(e) => setUsageFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Usage</option>
+                  <option value="active">Active</option>
+                  <option value="exhausted">Exhausted</option>
+                  <option value="unlimited">Unlimited</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Status:</span>
+                <select 
+                  title="Filter by Approval Status"
+                  value={approvalFilter} 
+                  onChange={(e) => setApprovalFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              {(search || fuelTypeFilter !== "all" || usageFilter !== "all" || approvalFilter !== "all") && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setSearch("");
+                    setFuelTypeFilter("all");
+                    setUsageFilter("all");
+                    setApprovalFilter("all");
+                  }}
+                  className="h-10 text-sm"
+                >
+                  Clear Filters
+                </Button>
+              )}
+              <div className="ml-auto text-sm text-muted-foreground font-medium">
+                {filteredOthers.length} of {others.length} Records
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -95,13 +181,24 @@ const OthersLists = () => {
               <TableBody>
                 {filteredOthers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-64 text-center">
+                    <TableCell colSpan={5} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground gap-3">
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
                           <UserCircle2 className="w-8 h-8 opacity-20" />
                         </div>
-                        <p className="text-lg font-medium">{search ? "No results match" : "Registry is healthy but empty"}</p>
-                        <Button variant="link" onClick={() => setSearch("")} className="text-primary">Clear all filters</Button>
+                        <p className="text-lg font-medium">{search || fuelTypeFilter !== "all" || usageFilter !== "all" || approvalFilter !== "all" ? "No matches found" : "Registry is healthy but empty"}</p>
+                        <Button 
+                          variant="link" 
+                          onClick={() => {
+                            setSearch("");
+                            setFuelTypeFilter("all");
+                            setUsageFilter("all");
+                            setApprovalFilter("all");
+                          }} 
+                          className="text-primary"
+                        >
+                          Clear all filters
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

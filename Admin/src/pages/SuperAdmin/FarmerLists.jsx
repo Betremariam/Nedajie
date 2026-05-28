@@ -27,6 +27,9 @@ import { Button } from "../../components/ui/Button";
 const FarmerLists = () => {
   const [farmers, setFarmers] = useState([]);
   const [search, setSearch] = useState("");
+  const [regionFilter, setRegionFilter] = useState("all");
+  const [woredaFilter, setWoredaFilter] = useState("all");
+  const [approvalFilter, setApprovalFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,9 +47,20 @@ const FarmerLists = () => {
     fetchFarmers();
   }, []);
 
-  const filteredFarmers = farmers.filter((farmer) =>
-    farmer.fullName.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredFarmers = farmers.filter((farmer) => {
+    const matchesSearch = farmer.fullName.toLowerCase().includes(search.toLowerCase()) ||
+      farmer.phoneNumber?.includes(search);
+    const matchesRegion = regionFilter === "all" || farmer.region === regionFilter;
+    const matchesWoreda = woredaFilter === "all" || farmer.woreda === woredaFilter;
+    const matchesApproval = approvalFilter === "all" || 
+      (approvalFilter === "approved" && farmer.approvedBy) ||
+      (approvalFilter === "pending" && !farmer.approvedBy);
+    
+    return matchesSearch && matchesRegion && matchesWoreda && matchesApproval;
+  });
+
+  const uniqueRegions = [...new Set(farmers.map(f => f.region).filter(Boolean))].sort();
+  const uniqueWoredas = [...new Set(farmers.map(f => f.woreda).filter(Boolean))].sort();
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
@@ -70,14 +84,77 @@ const FarmerLists = () => {
 
       <Card className="border-border/50 shadow-sm">
         <CardHeader className="pb-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Filter by farmer name..."
-              className="pl-10 h-11"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex flex-col gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by farmer name or phone..."
+                className="pl-10 h-11"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Region:</span>
+                <select 
+                  title="Filter by Region"
+                  value={regionFilter} 
+                  onChange={(e) => setRegionFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Regions</option>
+                  {uniqueRegions.map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Woreda:</span>
+                <select 
+                  title="Filter by Woreda"
+                  value={woredaFilter} 
+                  onChange={(e) => setWoredaFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Woredas</option>
+                  {uniqueWoredas.map(woreda => (
+                    <option key={woreda} value={woreda}>{woreda}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Status:</span>
+                <select 
+                  title="Filter by Approval Status"
+                  value={approvalFilter} 
+                  onChange={(e) => setApprovalFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              {(search || regionFilter !== "all" || woredaFilter !== "all" || approvalFilter !== "all") && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setSearch("");
+                    setRegionFilter("all");
+                    setWoredaFilter("all");
+                    setApprovalFilter("all");
+                  }}
+                  className="h-10 text-sm"
+                >
+                  Clear Filters
+                </Button>
+              )}
+              <div className="ml-auto text-sm text-muted-foreground font-medium">
+                {filteredFarmers.length} of {farmers.length} Records
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">

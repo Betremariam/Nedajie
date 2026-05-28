@@ -5,8 +5,6 @@ import {
   ShieldCheck,
   Activity,
   ArrowUpRight,
-  Globe,
-  Map,
   FileCheck,
   Building2,
   Navigation,
@@ -40,7 +38,7 @@ const FederalDashboard = () => {
   }, []);
 
   const stats = [
-    { label: "Regional Super Admins", value: statsData.superAdmins.toString(),      icon: Globe,         color: "blue",    desc: "Provincial oversight" },
+    { label: "Regional Super Admins", value: statsData.superAdmins.toString(),      icon: Users,         color: "blue",    desc: "Provincial oversight" },
     { label: "Verified Station Owners", value: statsData.verifiedOwners.toString(),    icon: Building2,     color: "emerald", desc: "Entity level auth" },
     { label: "National Fuel Dispatch",  value: statsData.totalDeliveries.toString(),   icon: Truck,         color: "amber",   desc: "Weekly logistics flow" },
     { label: "Regulatory Compliance",   value: "Optimal", icon: ShieldCheck, color: "purple",  desc: "Standard alignment" },
@@ -79,11 +77,7 @@ const FederalDashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="h-10 px-5 flex items-center gap-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 transition-colors shadow-sm">
-            Export National Report
-          </button>
-        </div>
+       
       </div>
 
       {/* Stat Cards */}
@@ -110,53 +104,8 @@ const FederalDashboard = () => {
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-
-        {/* Map placeholder */}
-        <div className="col-span-4 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden relative">
-          <div className="p-6 md:p-8 border-b border-border flex flex-row items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">
-                Regional Distribution Matrix
-              </h2>
-              <p className="text-muted-foreground text-[13px] font-medium">
-                Strategic fuel quota allocation across domestic administrative zones.
-              </p>
-            </div>
-            <div className="flex items-center justify-center">
-              <Map className="w-10 h-10 text-foreground" />
-            </div>
-          </div>
-
-          <div className="h-[340px] flex items-center justify-center relative bg-muted/30 m-6 mb-8 rounded-[24px] border border-dashed border-border overflow-hidden">
-            <div className="text-center space-y-4 relative z-10 transition-transform duration-300">
-              <div className="flex items-center justify-center mx-auto">
-                <Globe className="h-12 w-12 text-foreground/50" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-lg font-bold text-foreground">Interactive Mapping Layer</p>
-                <p className="text-[12px] text-muted-foreground font-medium px-12 max-w-sm">
-                  Synchronizing geospatial telemetry from regional depots. Database reconciliation in progress.
-                </p>
-              </div>
-              <button className="h-9 px-6 bg-card border border-border text-foreground rounded-xl text-[11px] uppercase font-bold tracking-widest hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors shadow-sm">
-                Initialize Layer
-              </button>
-            </div>
-            {/* Decorative SVG */}
-            <div className="absolute inset-0 opacity-10 select-none pointer-events-none text-primary">
-              <svg className="w-full h-full" viewBox="0 0 100 100" fill="currentColor">
-                <circle cx="20" cy="30" r="1" />
-                <circle cx="50" cy="80" r="1.5" />
-                <circle cx="80" cy="40" r="0.8" />
-                <path d="M20 30 L50 80 L80 40" stroke="currentColor" strokeWidth="0.2" fill="none" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        {/* Deliveries list */}
-        <div className="col-span-3 bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden">
+      {/* Deliveries list */}
+      <div className="bg-card rounded-[24px] shadow-sm border border-border flex flex-col overflow-hidden">
           <div className="p-6 md:p-8 border-b border-border">
             <h2 className="text-xl font-semibold tracking-tight text-foreground">
               Disbursement Stream
@@ -212,7 +161,6 @@ const FederalDashboard = () => {
             </button>
           </div>
         </div>
-      </div>
     </div>
   );
 };

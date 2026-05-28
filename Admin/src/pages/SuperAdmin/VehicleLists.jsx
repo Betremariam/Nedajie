@@ -29,6 +29,8 @@ const VehicleLists = () => {
   const [vehicles, setVehicles] = useState([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [regionFilter, setRegionFilter] = useState("all");
+  const [approvalFilter, setApprovalFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,9 +54,15 @@ const VehicleLists = () => {
       vehicle.carPlate?.toLowerCase().includes(search.toLowerCase());
     
     const matchesType = typeFilter === "all" || vehicle.vehicleType === typeFilter;
+    const matchesRegion = regionFilter === "all" || vehicle.region === regionFilter;
+    const matchesApproval = approvalFilter === "all" || 
+      (approvalFilter === "approved" && vehicle.approvedBy) ||
+      (approvalFilter === "pending" && !vehicle.approvedBy);
     
-    return matchesSearch && matchesType;
+    return matchesSearch && matchesType && matchesRegion && matchesApproval;
   });
+
+  const uniqueRegions = [...new Set(vehicles.map(v => v.region).filter(Boolean))].sort();
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
@@ -78,35 +86,82 @@ const VehicleLists = () => {
 
       <Card className="border-border/50 shadow-sm">
         <CardHeader className="pb-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative flex-1 max-w-md">
+          <div className="flex flex-col gap-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Filter by owner or plate..."
+                placeholder="Search by owner name or plate number..."
                 className="pl-10 h-11"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Show:</span>
-              <select 
-                title="Filter by Vehicle Type"
-                value={typeFilter} 
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="h-11 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
-              >
-                <option value="all">All Vehicles</option>
-                <option value="bajaj">Bajaj</option>
-                <option value="taxi">Taxi</option>
-                <option value="car">Private Car</option>
-                <option value="bus">Bus</option>
-                <option value="truck">Truck</option>
-                <option value="heavy">Heavy Machinery</option>
-                <option value="boat">Boat / Marine</option>
-                <option value="ambulance">Ambulance</option>
-                <option value="other">Other</option>
-              </select>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Type:</span>
+                <select 
+                  title="Filter by Vehicle Type"
+                  value={typeFilter} 
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Types</option>
+                  <option value="bajaj">Bajaj</option>
+                  <option value="taxi">Taxi</option>
+                  <option value="car">Private Car</option>
+                  <option value="bus">Bus</option>
+                  <option value="truck">Truck</option>
+                  <option value="heavy">Heavy Machinery</option>
+                  <option value="boat">Boat / Marine</option>
+                  <option value="ambulance">Ambulance</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Region:</span>
+                <select 
+                  title="Filter by Region"
+                  value={regionFilter} 
+                  onChange={(e) => setRegionFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Regions</option>
+                  {uniqueRegions.map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Status:</span>
+                <select 
+                  title="Filter by Approval Status"
+                  value={approvalFilter} 
+                  onChange={(e) => setApprovalFilter(e.target.value)}
+                  className="h-10 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              {(search || typeFilter !== "all" || regionFilter !== "all" || approvalFilter !== "all") && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setSearch("");
+                    setTypeFilter("all");
+                    setRegionFilter("all");
+                    setApprovalFilter("all");
+                  }}
+                  className="h-10 text-sm"
+                >
+                  Clear Filters
+                </Button>
+              )}
+              <div className="ml-auto text-sm text-muted-foreground font-medium">
+                {filteredVehicles.length} of {vehicles.length} Records
+              </div>
             </div>
           </div>
         </CardHeader>

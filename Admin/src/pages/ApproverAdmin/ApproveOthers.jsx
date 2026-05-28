@@ -24,6 +24,8 @@ const ApproveOthers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [approvedUser, setApprovedUser] = useState(null);
+  const [search, setSearch] = useState("");
+  const [fuelTypeFilter, setFuelTypeFilter] = useState("all");
   const qrRef = useRef();
 
   const fetchUsers = async () => {
@@ -77,6 +79,16 @@ const ApproveOthers = () => {
     fetchUsers();
   }, []);
 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch = 
+      user.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+      user.phoneNumber?.includes(search);
+    const matchesFuelType = fuelTypeFilter === "all" || user.fuelType === fuelTypeFilter;
+    return matchesSearch && matchesFuelType;
+  });
+
+  const uniqueFuelTypes = [...new Set(users.map(u => u.fuelType).filter(Boolean))].sort();
+
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
       <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -95,6 +107,48 @@ const ApproveOthers = () => {
           {users.length} Pending Authorization
         </Badge>
       </div>
+
+      {users.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <div className="relative flex-1 w-full">
+            <PhoneCall className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search by name or phone..."
+              className="w-full pl-10 h-11 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-sm font-bold text-muted-foreground whitespace-nowrap">Fuel Type:</span>
+            <select 
+              title="Filter by Fuel Type"
+              value={fuelTypeFilter} 
+              onChange={(e) => setFuelTypeFilter(e.target.value)}
+              className="h-11 px-4 rounded-xl border border-border bg-card font-medium text-sm focus:ring-2 focus:ring-primary outline-none transition-all flex-1 sm:flex-none"
+            >
+              <option value="all">All Types</option>
+              {uniqueFuelTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+          {(search || fuelTypeFilter !== "all") && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                setSearch("");
+                setFuelTypeFilter("all");
+              }}
+              className="h-11 w-full sm:w-auto"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+      )}
 
 {approvedUser && (
         <div className="bg-card border-2 border-primary/10 rounded-[24px] shadow-xl p-8 animate-in fade-in zoom-in duration-300">
@@ -151,7 +205,28 @@ const ApproveOthers = () => {
         </div>
       )}
 
-      {users.length === 0 ? (
+      {filteredUsers.length === 0 && users.length > 0 ? (
+        <div className="border border-dashed border-border py-20 bg-muted/5 rounded-[24px]">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+              <Users className="w-10 h-10 text-muted-foreground opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-foreground">No Matches</h3>
+              <p className="text-muted-foreground max-w-[280px]">No entities match your current filters.</p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setSearch("");
+                setFuelTypeFilter("all");
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
+      ) : users.length === 0 ? (
         <div className="border border-dashed border-border py-20 bg-muted/5 rounded-[24px]">
           <div className="flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
@@ -165,7 +240,7 @@ const ApproveOthers = () => {
         </div>
       ) : (
         <div className="grid gap-6">
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div
               key={user.id}
               className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/20 transition-all group"
