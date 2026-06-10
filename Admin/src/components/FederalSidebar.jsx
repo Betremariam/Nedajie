@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, UserPlus, Truck, List, ShieldPlus, Car } from "lucide-react";
+import { LayoutGrid, Users, UserPlus, Truck, List, ShieldPlus, Car, Receipt } from "lucide-react";
 import BaseSidebar from "./BaseSidebar";
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +12,7 @@ const FederalSidebar = () => {
     { title: t("navRegisterOwner"), url: "/federal/manage-owners", icon: UserPlus },
     { title: t("navOwnersList"), url: "/federal/owners-list", icon: List },
     { title: t("navVehicleTypeConfig"), url: "/federal/vehicle-types", icon: Car },
+    { title: t("navTransactions"), url: "/federal/transactions", icon: Receipt },
     { title: t("navFuelDeliveries"), url: "/federal/fuel-deliveries", icon: Truck },
   ];
 
